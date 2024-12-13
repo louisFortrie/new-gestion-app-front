@@ -20,10 +20,7 @@ export const NextTamaguiProvider = ({ children }: { children: ReactNode }) => {
     const rnwStyle = StyleSheet.getSheet()
     return (
       <>
-        <style
-          dangerouslySetInnerHTML={{ __html: rnwStyle.textContent }}
-          id={rnwStyle.id}
-        />
+        <style dangerouslySetInnerHTML={{ __html: rnwStyle.textContent }} id={rnwStyle.id} />
 
         <style
           dangerouslySetInnerHTML={{
@@ -50,10 +47,7 @@ export const NextTamaguiProvider = ({ children }: { children: ReactNode }) => {
           }}
         />
 
-        <style
-          jsx
-          global
-        >{`
+        <style jsx global>{`
           html {
             font-family: 'Inter';
           }
@@ -67,14 +61,11 @@ export const NextTamaguiProvider = ({ children }: { children: ReactNode }) => {
       skipNextHead
       // change default theme (system) here:
       // defaultTheme="dark"
-      onChangeTheme={(next) => {
-        setTheme(next as any)
-      }}
+      // onChangeTheme={(next) => {
+      //   setTheme(next as any)
+      // }}
     >
-      <Provider
-        disableRootThemeClass
-        defaultTheme={theme}
-      >
+      <Provider disableRootThemeClass defaultTheme={'light'}>
         {children}
       </Provider>
     </NextThemeProvider>

@@ -1,54 +1,106 @@
 import { createTamagui } from 'tamagui'
-import { createInterFont } from '@tamagui/font-inter'
+import { createFont } from 'tamagui'
 import { shorthands } from '@tamagui/shorthands'
 import { tokens, themes } from '@tamagui/config/v3'
 import { createMedia } from '@tamagui/react-native-media-driver'
+import { createThemeBuilder } from '@tamagui/theme-builder'
 
 import { animations } from '@my/ui/src/animations'
 
-const headingFont = createInterFont({
+const outfitFont = createFont({
+  family: 'Outfit',
   size: {
-    6: 15,
-  },
-  transform: {
-    6: 'uppercase',
-    7: 'none',
+    1: 12,
+    2: 14,
+    3: 16,
+    4: 18,
+    5: 20,
+    6: 24,
+    7: 32,
+    8: 40,
+    9: 48,
+    10: 64,
   },
   weight: {
-    6: '400',
-    7: '700',
+    1: '300',
+    2: '400',
+    3: '500',
+    4: '600',
+    5: '700',
   },
-  color: {
-    6: '$colorFocus',
-    7: '$color',
+  lineHeight: {
+    1: 16,
+    2: 20,
+    3: 24,
+    4: 28,
+    5: 32,
+    6: 40,
+    7: 48,
+    8: 56,
+    9: 64,
+    10: 80,
   },
   letterSpacing: {
-    5: 2,
-    6: 1,
-    7: 0,
-    8: -1,
-    9: -2,
-    10: -3,
-    12: -4,
-    14: -5,
-    15: -6,
+    1: 0,
+    2: 0,
+    3: -0.5,
+    4: -0.5,
+    5: -1,
   },
   face: {
-    700: { normal: 'InterBold' },
+    400: { normal: 'Outfit-Regular' },
+    700: { normal: 'Outfit-Bold' },
   },
 })
 
-const bodyFont = createInterFont(
-  {
-    face: {
-      700: { normal: 'InterBold' },
+// Définir les polices heading et body pour Tamagui
+const headingFont = outfitFont
+const bodyFont = outfitFont
+
+const primary = [
+  '#F1F5F9', // bg
+  '#CDF463', // primary
+  '#9ebd4a', // pressed
+  '#dcfa89', // hover
+  '#000000', // text
+]
+
+const template = {
+  background: 1,
+  backgroundFocus: 1,
+  backgroundHover: 3,
+  backgroundPress: 2,
+  borderColor: 1,
+  borderColorFocus: 1,
+  borderColorHover: 3,
+  borderColorPress: 2,
+  color: 4,
+  colorFocus: 1,
+  colorHover: 3,
+  colorPress: 2,
+  colorTransparent: 'transparent',
+  placeholderColor: 1,
+  shadowColor: 1,
+  shadowColorFocus: 1,
+  shadowColorHover: 3,
+  shadowColorPress: 2,
+}
+
+const themesBuilder = createThemeBuilder()
+  .addPalettes({
+    primary: primary,
+  })
+  .addTemplates({
+    primary: template,
+  })
+  .addThemes({
+    primary: {
+      template: 'primary',
+      palette: 'primary',
     },
-  },
-  {
-    sizeSize: (size) => Math.round(size * 1.1),
-    sizeLineHeight: (size) => Math.round(size * 1.1 + (size > 20 ? 10 : 10)),
-  }
-)
+  })
+
+const avistarTheme = themesBuilder.build()
 
 export const config = createTamagui({
   defaultFont: 'body',
@@ -69,7 +121,10 @@ export const config = createTamagui({
   settings: {
     allowedStyleValues: 'somewhat-strict',
   },
-  themes,
+  themes: {
+    ...themes,
+    ...avistarTheme,
+  },
   tokens,
   media: createMedia({
     xs: { maxWidth: 660 },
