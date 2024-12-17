@@ -12,7 +12,7 @@ const StyledInput = styled(Input, {
   width: '100%',
   backgroundColor: 'white',
   color: 'black',
-  placeholderTextColor: '#475569',
+  placeholderTextColor: '#64748B',
   margin: '$0',
   borderRadius: 100,
   borderColor: 'transparent',

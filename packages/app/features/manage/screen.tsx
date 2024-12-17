@@ -1,5 +1,6 @@
-import { styled, YStack, Text, XStack, Label, Stack } from 'tamagui'
-import { CustomInput, BusinessHoursEditor } from '@my/ui'
+import { styled, YStack, Text, XStack, Label, Stack, Button } from 'tamagui'
+import { CustomInput, BusinessHoursEditor, CustomButton } from '@my/ui'
+import { Check, SquarePen } from '@tamagui/lucide-icons'
 
 const StyledYstack = styled(YStack, {
   gap: '$2',
@@ -70,7 +71,23 @@ export const Manage = () => {
       <Title>Télécharger ou Remplacer les Photos de l'établissement</Title>
       <StyledXStack></StyledXStack>
       <Title>Horaire d'ouvertures</Title>
-      <BusinessHoursEditor></BusinessHoursEditor>
+      <BusinessHoursEditor
+        businessHours={{
+          periods: [
+            {
+              openDay: 'MONDAY',
+              openTime: { hours: 8, minutes: 0 },
+              closeDay: 'MONDAY',
+              closeTime: { hours: 18, minutes: 0 },
+            },
+          ],
+        }}
+        onBusinessHoursChange={() => {}}
+      ></BusinessHoursEditor>
+      <XStack justifyContent="flex-end" gap={16}>
+        <Button icon={<SquarePen />}>Modifier</Button>
+        <CustomButton icon={<Check />}>Approuver</CustomButton>
+      </XStack>
     </YStack>
   )
 }
