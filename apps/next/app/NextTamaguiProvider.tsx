@@ -61,6 +61,7 @@ export const NextTamaguiProvider = ({ children }: { children: ReactNode }) => {
       skipNextHead
       // change default theme (system) here:
       // defaultTheme="dark"
+      defaultTheme="light"
       // onChangeTheme={(next) => {
       //   setTheme(next as any)
       // }}

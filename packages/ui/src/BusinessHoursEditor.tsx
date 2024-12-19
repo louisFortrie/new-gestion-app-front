@@ -36,6 +36,10 @@ const halfHourOptions = Array.from({ length: 48 }, (_, i) => {
   return `${hour.toString().padStart(2, '0')}:${minute}`
 }).concat(['24h/24'])
 
+const selectOptions = halfHourOptions.map((time) => ({ name: time }))
+
+
+
 const openTimeOptions = Array.from({ length: 48 }, (_, i) => {
   const hour = Math.floor(i / 2)
   const minute = i % 2 === 0 ? '00' : '30'
@@ -66,10 +70,15 @@ export const BusinessHoursEditor: React.FC<BusinessHoursEditorProps> = ({
   businessHours,
   onBusinessHoursChange,
 }) => {
+  const days = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche']
+
   return (
     <YStack gap={16}>
+      {days.map((day) => {
+        return (
+
       <DayContainer>
-        <Text>Lundi</Text>
+        <Text width={100}>{day}</Text>
         <XStack alignItems="center" height={'fit-content'} gap={16}>
           <Switch backgroundColor={'#CDF463'} size={'$3'}>
             <Switch.Thumb animation={'quick'} />
@@ -80,30 +89,34 @@ export const BusinessHoursEditor: React.FC<BusinessHoursEditorProps> = ({
           <XStack gap={16} f={1}>
             <CustomSelect
               width={'49%'}
-              options={halfHourOptions.map((time) => ({ name: time }))}
+              options={selectOptions}
               iconAfter={<Clock />}
             ></CustomSelect>
             <CustomSelect
               width={'49%'}
-              options={halfHourOptions.map((time) => ({ name: time }))}
+              options={selectOptions}
               iconAfter={<Clock />}
             ></CustomSelect>
           </XStack>
           <XStack gap={16} f={1}>
             <CustomSelect
               width={'49%'}
-              options={halfHourOptions.map((time) => ({ name: time }))}
+              options={selectOptions}
               iconAfter={<Clock />}
             ></CustomSelect>
             <CustomSelect
               width={'49%'}
-              options={halfHourOptions.map((time) => ({ name: time }))}
+              options={selectOptions}
               iconAfter={<Clock />}
             ></CustomSelect>
           </XStack>
           <StyledButton icon={<Plus />}>Ajouter des horaires</StyledButton>
         </YStack>
       </DayContainer>
+        )
+      })
+      }
+      
     </YStack>
   )
 }

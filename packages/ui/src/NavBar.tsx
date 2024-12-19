@@ -16,7 +16,7 @@ import {
   Users2,
 } from '@tamagui/lucide-icons'
 import { usePathname, useRouter } from 'solito/navigation'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 const StyledYStack = styled(YStack, {
   width: '$20',
@@ -72,6 +72,11 @@ export const NavBar = () => {
 
   const isActive = (path: string) => pathName === path
 
+  useEffect(() => {
+    const isReviewPath = pathName?.endsWith('/stats') || pathName?.endsWith('/template')
+    setIsReviewsOpen(isReviewPath || false)
+  }, [pathName])
+
   return (
     <StyledYStack>
       <H2 color={'black'} marginBottom={'$10'} alignSelf="flex-start">
@@ -85,7 +90,7 @@ export const NavBar = () => {
         <Store color={'black'} />
         <StyledText>Gérer</StyledText>
       </StyledButton>
-      <StyledButton onPress={() => setIsReviewsOpen(!isReviewsOpen)} active={isActive('/stats')}>
+      <StyledButton onPress={() => setIsReviewsOpen(!isReviewsOpen)}>
         <MessageSquareMore color={'black'} />
         <StyledText>Avis</StyledText>
         <Stack f={1}></Stack>
@@ -96,8 +101,8 @@ export const NavBar = () => {
         />
       </StyledButton>
       {isReviewsOpen && (
-        <YStack>
-          <StyledButton active={isActive('/stats')}>
+        <YStack gap={4}>
+          <StyledButton active={isActive('/stats')} onPress={() => router.push('/stats')}>
             <XStack alignItems="center">
               <Dot color={'#475569'} />
               <StyledText color={'#475569'} fontWeight={400}>
@@ -105,7 +110,7 @@ export const NavBar = () => {
               </StyledText>
             </XStack>
           </StyledButton>
-          <StyledButton active={isActive('/stats')}>
+          <StyledButton active={isActive('/template')}>
             <XStack alignItems="center">
               <Dot color={'#475569'} />
 

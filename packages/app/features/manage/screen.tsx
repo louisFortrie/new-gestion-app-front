@@ -1,5 +1,5 @@
 import { styled, YStack, Text, XStack, Label, Stack, Button } from 'tamagui'
-import { CustomInput, BusinessHoursEditor, CustomButton } from '@my/ui'
+import { CustomInput, BusinessHoursEditor, CustomButton, MediasManagement } from '@my/ui'
 import { Check, SquarePen } from '@tamagui/lucide-icons'
 
 const StyledYstack = styled(YStack, {
@@ -11,7 +11,7 @@ const StyledYstack = styled(YStack, {
 
 const StyledXStack = styled(XStack, {
   gap: '$2',
-  padding: '$2',
+  padding: '$4',
   backgroundColor: 'white',
   borderRadius: '$4',
 })
@@ -69,7 +69,9 @@ export const Manage = () => {
         </XStack>
       </StyledYstack>
       <Title>Télécharger ou Remplacer les Photos de l'établissement</Title>
-      <StyledXStack></StyledXStack>
+      <StyledXStack>
+        <MediasManagement></MediasManagement>
+      </StyledXStack>
       <Title>Horaire d'ouvertures</Title>
       <BusinessHoursEditor
         businessHours={{
