@@ -73,7 +73,7 @@ export const NavBar = () => {
   const isActive = (path: string) => pathName === path
 
   useEffect(() => {
-    const isReviewPath = pathName?.endsWith('/stats') || pathName?.endsWith('/template')
+    const isReviewPath = pathName?.endsWith('/stats') || pathName?.endsWith('/templates')
     setIsReviewsOpen(isReviewPath || false)
   }, [pathName])
 
@@ -110,7 +110,7 @@ export const NavBar = () => {
               </StyledText>
             </XStack>
           </StyledButton>
-          <StyledButton active={isActive('/template')}>
+          <StyledButton active={isActive('/templates')} onPress={() => router.push('/templates')}>
             <XStack alignItems="center">
               <Dot color={'#475569'} />
 
