@@ -82,7 +82,7 @@ export const NavBar = () => {
       <H2 color={'black'} marginBottom={'$10'} alignSelf="flex-start">
         Gstar
       </H2>
-      <StyledButton>
+      <StyledButton onPress={() => router.push('/dashboard')} active={isActive('/dashboard')}>
         <LayoutDashboard color={'black'} />
         <StyledText>Dashboard</StyledText>
       </StyledButton>
