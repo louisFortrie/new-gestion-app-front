@@ -27,7 +27,7 @@ const useStores = () => {
   }
 
   useEffect(() => {
-    if (!user) return
+    if (!user || !user.googleAccounts || user.googleAccounts.length === 0) return
     const fetchStores = async () => {
       setLoading(true)
       try {

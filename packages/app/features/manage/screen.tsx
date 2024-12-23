@@ -1,6 +1,8 @@
-import { styled, YStack, Text, XStack, Label, Stack, Button } from 'tamagui'
+import { styled, YStack, Text, XStack, Label, Stack, Button, Spinner } from 'tamagui'
 import { CustomInput, BusinessHoursEditor, CustomButton, MediasManagement } from '@my/ui'
 import { Check, SquarePen } from '@tamagui/lucide-icons'
+import useStores from 'app/hooks/useStores'
+import { useEffect, useState } from 'react'
 
 const StyledYstack = styled(YStack, {
   gap: '$2',
@@ -22,7 +24,25 @@ const Title = styled(Text, {
   fontWeight: 500,
 })
 
+type Day = 'MONDAY' | 'TUESDAY' | 'WEDNESDAY' | 'THURSDAY' | 'FRIDAY' | 'SATURDAY' | 'SUNDAY'
 export const Manage = () => {
+  const [businessHours, setBusinessHours] = useState({
+    periods: [],
+  })
+  const [newStoreInfo, setNewStoreInfo] = useState()
+
+  const { selectedStore } = useStores()
+
+  useEffect(() => {
+    if (!selectedStore) return
+    setBusinessHours(selectedStore.regularHours)
+    setNewStoreInfo(selectedStore)
+  }, [selectedStore])
+
+  if (businessHours.periods.length === 0) {
+    return <Spinner size="large" color={'black'} />
+  }
+
   return (
     <YStack gap={32}>
       <YStack>
@@ -41,30 +61,46 @@ export const Manage = () => {
             <Label>Description</Label>
           </YStack>
           <YStack f={1} gap={24}>
-            <CustomInput placeholder="La maison du convertible"></CustomInput>
+            <CustomInput
+              placeholder="La maison du convertible"
+              value={newStoreInfo?.title}
+            ></CustomInput>
             <XStack gap={32} width={'100%'}>
               <Stack width={'40%'}>
-                <CustomInput placeholder="adresse"></CustomInput>
+                <CustomInput
+                  placeholder="adresse"
+                  value={`${newStoreInfo?.storefrontAddress?.addressLines[0]}, ${newStoreInfo?.storefrontAddress?.locality}`}
+                  disabled
+                ></CustomInput>
               </Stack>
               <XStack gap={16} justifyContent="space-between" f={1}>
                 <Label>Catégorie</Label>
                 <Stack width={'75%'}>
-                  <CustomInput placeholder="Restaurant"></CustomInput>
+                  <CustomInput
+                    placeholder="Restaurant"
+                    value={newStoreInfo?.categories?.primaryCategory?.displayName}
+                  ></CustomInput>
                 </Stack>
               </XStack>
             </XStack>
             <XStack gap={32} width={'100%'}>
               <Stack width={'40%'}>
-                <CustomInput placeholder="www.example.com"></CustomInput>
+                <CustomInput
+                  placeholder="www.example.com"
+                  value={newStoreInfo?.websiteUri}
+                ></CustomInput>
               </Stack>
               <XStack gap={16} justifyContent="space-between" f={1}>
                 <Label>Numéro de téléphone</Label>
                 <Stack width={'75%'}>
-                  <CustomInput placeholder="+33 1 23 45 67 89"></CustomInput>
+                  <CustomInput
+                    placeholder="+33 1 23 45 67 89"
+                    value={newStoreInfo?.phoneNumbers?.primaryPhone}
+                  ></CustomInput>
                 </Stack>
               </XStack>
             </XStack>
-            <CustomInput placeholder="Experience de eodk qsdkpo k"></CustomInput>
+            <CustomInput placeholder="description"></CustomInput>
           </YStack>
         </XStack>
       </StyledYstack>
@@ -74,17 +110,11 @@ export const Manage = () => {
       </StyledXStack>
       <Title>Horaire d'ouvertures</Title>
       <BusinessHoursEditor
-        businessHours={{
-          periods: [
-            {
-              openDay: 'MONDAY',
-              openTime: { hours: 8, minutes: 0 },
-              closeDay: 'MONDAY',
-              closeTime: { hours: 18, minutes: 0 },
-            },
-          ],
+        businessHours={businessHours}
+        onBusinessHoursChange={(businessHoursNew) => {
+          setBusinessHours(businessHoursNew as any)
+          console.log(businessHoursNew)
         }}
-        onBusinessHoursChange={() => {}}
       ></BusinessHoursEditor>
       <XStack justifyContent="flex-end" gap={16}>
         <Button icon={<SquarePen />}>Modifier</Button>

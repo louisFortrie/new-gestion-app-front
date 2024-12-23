@@ -1,6 +1,32 @@
-import { useState } from 'react'
-import { Sheet, Button, YStack, XStack, styled, Text, AnimatePresence, Stack } from 'tamagui'
-import { Calendar, MessagesSquare, Reply, Star, User2 } from '@tamagui/lucide-icons'
+import { use, useEffect, useState } from 'react'
+import {
+  Sheet,
+  Button,
+  YStack,
+  XStack,
+  styled,
+  Text,
+  AnimatePresence,
+  Stack,
+  TextArea,
+  Dialog,
+  Unspaced,
+} from 'tamagui'
+import {
+  Calendar,
+  LayoutTemplate,
+  MessagesSquare,
+  PenSquare,
+  Reply,
+  Sparkles,
+  Star,
+  Trash2,
+  User2,
+  X,
+} from '@tamagui/lucide-icons'
+import { CustomButton } from './CustomButton'
+import axios from 'axios'
+import useAuth from 'app/hooks/useAuth'
 
 const HorizontalSheetStyled = styled(YStack, {
   position: 'fixed',
@@ -47,11 +73,94 @@ const SectionTitle = styled(Text, {
   fontWeight: 600,
 })
 
-export const HorizontalSheet = ({open, selectedReview, handleOpenPressed}) => {
+const TemplateCard = styled(YStack, {
+  gap: '$2',
+  backgroundColor: 'white',
+  padding: '$4',
+  borderRadius: '$4',
+  height: 230,
+  justifyContent: 'space-between',
+  borderColor: '#E2E8F0',
+  borderWidth: 1,
+})
+
+const TemplateCategory = styled(Text, {
+  paddingVertical: '$2',
+  paddingHorizontal: '$3',
+  borderRadius: 1000,
+  borderWidth: 1,
+  width: 'fit-content',
+  fontSize: 14,
+  variants: {
+    positive: {
+      true: {
+        borderColor: '#17B26A',
+        color: '#067647',
+        backgroundColor: '#DCFAE6',
+      },
+    },
+    neutral: {
+      true: {
+        borderColor: '#B54708',
+        color: '#B54708',
+        backgroundColor: '#FEF0C7',
+      },
+    },
+    negative: {
+      true: {
+        borderColor: '#B42318',
+        color: '#B42318',
+        backgroundColor: '#FEE4E2',
+      },
+    },
+  } as const,
+})
+
+const TemplateTitle = styled(Text, {
+  fontSize: 18,
+  fontWeight: 600,
+})
+
+const TemplateDescription = styled(Text, {
+  fontSize: 14,
+  color: '#475569',
+})
+const apiUrl = process.env.NEXT_PUBLIC_API_URL
+
+export const HorizontalSheet = ({ open, selectedReview, handleOpenPressed, handleSendPress }) => {
+  const [response, setResponse] = useState(selectedReview?.reviewReply?.comment || '')
+  const [templates, setTemplates] = useState([])
+
+  const { user } = useAuth()
+  console.log(selectedReview)
+  const getTemplates = () => {
+    axios
+      .get(`${apiUrl}/api/templates/${user.id}`, {
+        withCredentials: true,
+      })
+      .then((response) => {
+        const templates = response.data.responseTemplates
+        setTemplates(templates)
+      })
+  }
+
+  const handleUseTemplate = (templateId) => {
+    const usedTemplate = templates.find((template) => template.id === templateId)
+
+    setResponse(usedTemplate?.message || '')
+  }
+
+  useEffect(() => {
+    if (!user) return
+    getTemplates()
+  }, [user])
+
+  useEffect(() => {
+    setResponse(selectedReview?.reviewReply?.comment || '')
+  }, [selectedReview])
 
   return (
     <YStack padding="$4">
-
       <AnimatePresence>
         {open && (
           <>
@@ -70,7 +179,7 @@ export const HorizontalSheet = ({open, selectedReview, handleOpenPressed}) => {
               exitStyle={{ x: '100%' }}
               x={0}
             >
-              <YStack padding="$4" space="$4">
+              <YStack padding="$4" gap={32}>
                 <XStack alignItems="center" gap="$4">
                   <LogoContainer>
                     <User2 />
@@ -107,17 +216,222 @@ export const HorizontalSheet = ({open, selectedReview, handleOpenPressed}) => {
                     <Text>2024-10-21</Text>
                   </YStack>
                 </XStack>
-                <XStack alignItems="center" gap="$4">
+                <XStack alignItems="flex-start" gap="$4">
                   <LogoContainer>
                     <Reply />
                   </LogoContainer>
-                  <YStack>
-                    <SectionTitle>Calendar</SectionTitle>
-                    <Text>2024-10-21</Text>
+                  <YStack f={1} gap={8}>
+                    <XStack justifyContent="space-between">
+                      <SectionTitle>Réponse</SectionTitle>
+                      <XStack gap={8}>
+                        <Button iconAfter={<Sparkles />}>Générer par l'IA</Button>
+                        <Dialog modal>
+                          <Dialog.Trigger asChild>
+                            <Button iconAfter={<LayoutTemplate />}>Utiliser un template</Button>
+                          </Dialog.Trigger>
+                          <Dialog.Portal>
+                            <Dialog.Overlay
+                              key="overlay"
+                              animation="quick"
+                              opacity={0.5}
+                              enterStyle={{ opacity: 0 }}
+                              exitStyle={{ opacity: 0 }}
+                            />
+                            <Dialog.Content
+                              width={'60%'}
+                              bordered
+                              elevate
+                              key="content"
+                              animateOnly={['transform', 'opacity']}
+                              animation={[
+                                'quicker',
+                                {
+                                  opacity: {
+                                    overshootClamping: true,
+                                  },
+                                },
+                              ]}
+                            >
+                              <Dialog.Title marginBottom={16}>Choisissez un template</Dialog.Title>
+                              <XStack f={1} gap={16}>
+                                <YStack f={1} gap={16} width={'calc(33% - 16px)'}>
+                                  {templates.length > 0 &&
+                                    templates
+                                      .filter((template) => template.category === 'positive')
+                                      .map((template) => (
+                                        <TemplateCard key={template.title}>
+                                          <TemplateCategory positive>Positif</TemplateCategory>
+                                          <TemplateTitle>{template.title}</TemplateTitle>
+                                          <TemplateDescription>
+                                            {template.message}
+                                          </TemplateDescription>
+                                          <XStack gap={16} width={'100%'}>
+                                            <Dialog.Close>
+                                              <CustomButton
+                                                f={1}
+                                                onPress={() => handleUseTemplate(template.id)}
+                                              >
+                                                Utiliser
+                                              </CustomButton>
+                                            </Dialog.Close>
+                                          </XStack>
+                                        </TemplateCard>
+                                      ))}
+                                  {/* <TemplateCard>
+
+            <TemplateCategory positive>Positive</TemplateCategory>
+            <TemplateTitle>Merci pour vos mots doux ! </TemplateTitle>
+            <TemplateDescription>
+              We’re thrilled to know you enjoyed dining with us! Your satisfaction is our priority,
+              and we can’t wait to serve you again soon.
+            </TemplateDescription>
+            <XStack gap={16}>
+              <Button icon={<PenSquare />}>Modifier</Button>
+              <Button icon={<Trash2 />}>Supprimer</Button>
+            </XStack>
+          </TemplateCard>
+          <TemplateCard>
+            <TemplateCategory positive>Positive</TemplateCategory>
+            <TemplateTitle>Merci pour vos mots doux ! </TemplateTitle>
+            <TemplateDescription>
+              We’re thrilled to know you enjoyed dining with us! Your satisfaction is our priority,
+              and we can’t wait to serve you again soon.
+            </TemplateDescription>
+            <XStack gap={16}>
+              <Button icon={<PenSquare />}>Modifier</Button>
+              <Button icon={<Trash2 />}>Supprimer</Button>
+            </XStack>
+          </TemplateCard> */}
+                                </YStack>
+                                <YStack f={1} gap={16} width={'calc(33% - 16px)'}>
+                                  {templates.length > 0 &&
+                                    templates
+                                      .filter((template) => template.category === 'neutral')
+                                      .map((template) => (
+                                        <TemplateCard key={template.title}>
+                                          <TemplateCategory neutral>Neutre</TemplateCategory>
+                                          <TemplateTitle>{template.title}</TemplateTitle>
+                                          <TemplateDescription>
+                                            {template.message}
+                                          </TemplateDescription>
+                                          <XStack gap={16} width={'100%'}>
+                                            <Dialog.Close>
+                                              <CustomButton
+                                                f={1}
+                                                onPress={() => handleUseTemplate(template.id)}
+                                              >
+                                                Utiliser
+                                              </CustomButton>
+                                            </Dialog.Close>
+                                          </XStack>
+                                        </TemplateCard>
+                                      ))}
+
+                                  {/* <TemplateCard>
+            <TemplateCategory positive>Positive</TemplateCategory>
+            <TemplateTitle>Merci pour vos mots doux ! </TemplateTitle>
+            <TemplateDescription>
+              We’re thrilled to know you enjoyed dining with us! Your satisfaction is our priority,
+              and we can’t wait to serve you again soon.
+            </TemplateDescription>
+            <XStack gap={16}>
+              <Button icon={<PenSquare />}>Modifier</Button>
+              <Button icon={<Trash2 />}>Supprimer</Button>
+            </XStack>
+          </TemplateCard> */}
+                                </YStack>
+                                <YStack f={1} gap={16} width={'calc(33% - 16px)'}>
+                                  {templates.length > 0 &&
+                                    templates
+                                      .filter((template) => template.category === 'negative')
+                                      .map((template) => (
+                                        <TemplateCard key={template.title}>
+                                          <TemplateCategory negative>Négatif</TemplateCategory>
+                                          <TemplateTitle>{template.title}</TemplateTitle>
+                                          <TemplateDescription>
+                                            {template.message}
+                                          </TemplateDescription>
+                                          <XStack gap={16} width={'100%'}>
+                                            <Dialog.Close>
+                                              <CustomButton
+                                                f={1}
+                                                onPress={() => handleUseTemplate(template.id)}
+                                              >
+                                                Utiliser
+                                              </CustomButton>
+                                            </Dialog.Close>
+                                          </XStack>
+                                        </TemplateCard>
+                                      ))}
+                                  {/* <TemplateCard>
+            <TemplateCategory positive>Positive</TemplateCategory>
+            <TemplateTitle>Merci pour vos mots doux ! </TemplateTitle>
+            <TemplateDescription>
+              We’re thrilled to know you enjoyed dining with us! Your satisfaction is our priority,
+              and we can’t wait to serve you again soon.
+            </TemplateDescription>
+            <XStack gap={16}>
+              <Button icon={<PenSquare />}>Modifier</Button>
+              <Button icon={<Trash2 />}>Supprimer</Button>
+            </XStack>
+          </TemplateCard>
+          <TemplateCard>
+            <TemplateCategory positive>Positive</TemplateCategory>
+            <TemplateTitle>Merci pour vos mots doux ! </TemplateTitle>
+            <TemplateDescription>
+              We’re thrilled to know you enjoyed dining with us! Your satisfaction is our priority,
+              and we can’t wait to serve you again soon.
+            </TemplateDescription>
+            <XStack gap={16}>
+              <Button icon={<PenSquare />}>Modifier</Button>
+              <Button icon={<Trash2 />}>Supprimer</Button>
+            </XStack>
+          </TemplateCard> */}
+                                </YStack>
+                              </XStack>
+                              <Unspaced>
+                                <Dialog.Close asChild>
+                                  <Button
+                                    position="absolute"
+                                    top="$3"
+                                    right="$3"
+                                    size="$2"
+                                    circular
+                                    icon={X}
+                                  />
+                                </Dialog.Close>
+                              </Unspaced>
+                            </Dialog.Content>
+                          </Dialog.Portal>
+                        </Dialog>
+                      </XStack>
+                    </XStack>
+                    <TextArea
+                      onChangeText={(text) => setResponse(text)}
+                      value={response}
+                    ></TextArea>
                   </YStack>
                 </XStack>
               </YStack>
-              <Button onPress={() => handleOpenPressed(false)}>Cancel</Button>
+              <XStack alignSelf="flex-end" padding={'$4'}>
+                <CustomButton
+                  onPress={() => {
+                    handleSendPress(selectedReview.reviewId, response)
+                    handleOpenPressed(false)
+                  }}
+                  alignSelf="flex-end"
+                  marginRight="$4"
+                >
+                  Envoyer
+                </CustomButton>
+                <Button
+                  onPress={() => handleOpenPressed(false)}
+                  alignSelf="flex-end"
+                  variant="outlined"
+                >
+                  Annuler
+                </Button>
+              </XStack>
             </HorizontalSheetStyled>
           </>
         )}

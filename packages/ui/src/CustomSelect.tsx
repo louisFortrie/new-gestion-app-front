@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Check, ChevronDown, ChevronUp } from '@tamagui/lucide-icons'
-import { Adapt, Label, Select, Sheet, XStack, YStack, getFontSize } from 'tamagui'
+import { Adapt, Label, Select, Sheet, XStack, YStack, getFontSize, SelectProps } from 'tamagui'
 import { LinearGradient } from 'tamagui/linear-gradient'
 import { FixedSizeList as List } from 'react-window'
 
@@ -14,8 +14,11 @@ interface CustomSelectProps extends SelectProps {
 
 export const CustomSelect = React.memo(
   ({ options, label, width, onChange, iconAfter, ...props }: CustomSelectProps) => {
-    const [val, setVal] = useState(options[0].name.toLowerCase() || '')
-
+    const [val, setVal] = useState(props.value || options[0].name.toLowerCase() || '')
+    console.log(
+      val,
+      options.findIndex((option) => option.name.toLowerCase() === val)
+    )
     const handleValueChange = (value: string) => {
       setVal(value)
       onChange && onChange(value)
@@ -97,6 +100,9 @@ export const CustomSelect = React.memo(
             <Select.Group>
               {label && <Select.Label>{label}</Select.Label>}
               <List
+                initialScrollOffset={
+                  options.findIndex((option) => option.name.toLowerCase() === val) * 35
+                }
                 height={150} // Adjust height as needed
                 itemCount={options.length}
                 itemSize={35} // Adjust item size as needed

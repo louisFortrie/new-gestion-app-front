@@ -90,6 +90,7 @@ export const DashboardScreen = () => {
 
   useEffect(() => {
     if (!selectedStore || !user || loading) return
+    console.log(user)
     axios
       .get(
         `${apiUrl}/api/gestion/metrics/${user.googleAccounts[0].googleAccount.accountId}/${selectedStore.name.split('/')[1]}`,

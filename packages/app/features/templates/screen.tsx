@@ -69,48 +69,11 @@ const apiUrl = process.env.NEXT_PUBLIC_API_URL
 
 export const TemplatesScreen = () => {
   const { user } = useAuth()
-  const [templates, setTemplates] = useState([
-    {
-      title: 'Merci pour vos mots doux !',
-      category: 'positive',
-      message:
-        'We’re thrilled to know you enjoyed dining with us! Your satisfaction is our priority, and we can’t wait to serve you again soon.',
-    },
-    {
-      title: 'Merci pour vos mots doux !',
-      category: 'positive',
-      message:
-        'We’re thrilled to know you enjoyed dining with us! Your satisfaction is our priority, and we can’t wait to serve you again soon.',
-    },
-    {
-      title: 'bif bof',
-      category: 'neutral',
-      message:
-        'We’re thrilled to know you enjoyed dining with us! Your satisfaction is our priority, and we can’t wait to serve you again soon.',
-    },
-    {
-      title: 'pas content',
-      category: 'negative',
-      message:
-        'We’re thrilled to know you enjoyed dining with us! Your satisfaction is our priority, and we can’t wait to serve you again soon.',
-    },
-    {
-      title: 'pas content',
-      category: 'negative',
-      message:
-        'We’re thrilled to know you enjoyed dining with us! Your satisfaction is our priority, and we can’t wait to serve you again soon.',
-    },
-    {
-      title: 'pas content',
-      category: 'negative',
-      message:
-        'We’re thrilled to know you enjoyed dining with us! Your satisfaction is our priority, and we can’t wait to serve you again soon.',
-    },
-  ])
+  const [templates, setTemplates] = useState([])
 
   const [newTemplate, setNewTemplate] = useState({
     title: '',
-    category: '',
+    category: 'positive',
     message: '',
   })
 
@@ -137,6 +100,16 @@ export const TemplatesScreen = () => {
     })
   }
 
+  const handleDeleteTemplate = (id: string) => {
+    axios
+      .delete(`${apiUrl}/api/templates/${id}`, {
+        withCredentials: true,
+      })
+      .then((response) => {
+        getTemplates()
+      })
+  }
+
   const handleSave = () => {
     axios
       .post(
@@ -152,24 +125,29 @@ export const TemplatesScreen = () => {
         }
       )
       .then((response) => {
-        setTemplates([...response.data, newTemplate])
         setNewTemplate({
           title: '',
-          category: '',
+          category: 'positive',
           message: '',
         })
+        getTemplates()
       })
   }
 
-  useEffect(() => {
-    if (!user) return
+  const getTemplates = () => {
     axios
       .get(`${apiUrl}/api/templates/${user.id}`, {
         withCredentials: true,
       })
       .then((response) => {
-        setTemplates(response.data)
+        const templates = response.data.responseTemplates
+        setTemplates(templates)
       })
+  }
+
+  useEffect(() => {
+    if (!user) return
+    getTemplates()
   }, [user])
 
   return (
@@ -178,11 +156,16 @@ export const TemplatesScreen = () => {
       <StyledForm>
         <XStack>
           <Text>Titre du template</Text>
-          <CustomInput placeholder="Titre du template" onChange={(e) => handleTitleChange(e)} />
+          <CustomInput
+            value={newTemplate.title}
+            placeholder="Titre du template"
+            onChange={(e) => handleTitleChange(e)}
+          />
         </XStack>
         <XStack>
           <Text>Catégorie</Text>
           <CustomSelect
+            value={newTemplate.category}
             onChange={(e) => handleCategoryChange(e)}
             options={[
               {
@@ -199,13 +182,17 @@ export const TemplatesScreen = () => {
         </XStack>
         <XStack>
           <Text>Contenue de la réponse</Text>
-          <CustomInput placeholder="Déscription" onChange={(e) => handleDescriptionChange(e)} />
+          <CustomInput
+            value={newTemplate.message}
+            placeholder="Déscription"
+            onChange={(e) => handleDescriptionChange(e)}
+          />
         </XStack>
         <CustomButton onPress={() => handleSave()}>Sauvegarder</CustomButton>
       </StyledForm>
       <Text>Templates de réponses sauvegardés</Text>
       <XStack f={1} gap={16}>
-        <YStack f={1} gap={16}>
+        <YStack f={1} gap={16} width={'calc(33% - 16px)'}>
           {templates.length > 0 &&
             templates
               .filter((template) => template.category === 'positive')
@@ -218,7 +205,11 @@ export const TemplatesScreen = () => {
                     <Button icon={<PenSquare />} f={1}>
                       Modifier
                     </Button>
-                    <Button icon={<Trash2 />} f={1}>
+                    <Button
+                      icon={<Trash2 />}
+                      f={1}
+                      onPress={() => handleDeleteTemplate(template.id)}
+                    >
                       Supprimer
                     </Button>
                   </XStack>
@@ -250,7 +241,7 @@ export const TemplatesScreen = () => {
             </XStack>
           </TemplateCard> */}
         </YStack>
-        <YStack f={1} gap={16}>
+        <YStack f={1} gap={16} width={'calc(33% - 16px)'}>
           {templates.length > 0 &&
             templates
               .filter((template) => template.category === 'neutral')
@@ -261,7 +252,9 @@ export const TemplatesScreen = () => {
                   <TemplateDescription>{template.message}</TemplateDescription>
                   <XStack gap={16}>
                     <Button icon={<PenSquare />}>Modifier</Button>
-                    <Button icon={<Trash2 />}>Supprimer</Button>
+                    <Button icon={<Trash2 />} onPress={() => handleDeleteTemplate(template.id)}>
+                      Supprimer
+                    </Button>
                   </XStack>
                 </TemplateCard>
               ))}
@@ -279,7 +272,7 @@ export const TemplatesScreen = () => {
             </XStack>
           </TemplateCard> */}
         </YStack>
-        <YStack f={1} gap={16}>
+        <YStack f={1} gap={16} width={'calc(33% - 16px)'}>
           {templates.length > 0 &&
             templates
               .filter((template) => template.category === 'negative')
@@ -290,7 +283,9 @@ export const TemplatesScreen = () => {
                   <TemplateDescription>{template.message}</TemplateDescription>
                   <XStack gap={16}>
                     <Button icon={<PenSquare />}>Modifier</Button>
-                    <Button icon={<Trash2 />}>Supprimer</Button>
+                    <Button icon={<Trash2 />} onPress={() => handleDeleteTemplate(template.id)}>
+                      Supprimer
+                    </Button>
                   </XStack>
                 </TemplateCard>
               ))}

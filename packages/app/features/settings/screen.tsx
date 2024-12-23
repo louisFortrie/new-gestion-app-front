@@ -25,8 +25,8 @@ const Card = styled(XStack, {
 export const SettingsScreen = () => {
   // TODO make a type for accounts
   const [accounts, setAccounts] = useState<any[]>([])
-
-  const { user, setUser } = useAuth()
+  const [prevUser, setPrevUser] = useState(null)
+  const { user, setUser, loading } = useAuth()
   const toast = useToastController()
 
   const getGoogleAccounts = async () => {
@@ -51,8 +51,10 @@ export const SettingsScreen = () => {
   }
 
   useEffect(() => {
-    if (!user) return
-    getGoogleAccounts()
+    if (user && prevUser === null) {
+      getGoogleAccounts()
+    }
+    setPrevUser(user)
   }, [user])
 
   return (

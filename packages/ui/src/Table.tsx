@@ -4,6 +4,9 @@ import { XStack, YStack, Text, Input, Button, styled, H4, YGroup } from 'tamagui
 import { ArrowLeft, ArrowRight, StarFull } from '@tamagui/lucide-icons'
 import { useState } from 'react'
 import { HorizontalSheet } from './HorizontalSheet'
+import axios from 'axios'
+import useAuth from 'app/hooks/useAuth'
+import useStores from 'app/hooks/useStores'
 
 // Styled components using Tamagui
 const TableContainer = styled(YGroup, {
@@ -117,19 +120,56 @@ const PageButton = styled(Button, {
   } as const,
 })
 
+const convertStarRatingToNumber = (starRating: string) => {
+  switch (starRating) {
+    case 'ONE':
+      return 1
+    case 'TWO':
+      return 2
+    case 'THREE':
+      return 3
+    case 'FOUR':
+      return 4
+    case 'FIVE':
+      return 5
+    default:
+      return 0
+  }
+}
+const apiUrl = process.env.NEXT_PUBLIC_API_URL
+
 export const ReviewTable = ({ reviews }) => {
   const [responseSheetOpen, setResponseSheetOpen] = useState(false)
   const [selectedReview, setSelectedReview] = useState({})
-  const handleClickResponse = (reviewId :string) => {
+  const { user } = useAuth()
+  const { selectedStore } = useStores()
+
+  const handleClickResponse = (reviewId: string) => {
     setResponseSheetOpen(true)
-    setSelectedReview(reviews.find(review => review.id === reviewId))
+    setSelectedReview(reviews.find((review) => review.id === reviewId))
+    console.log('selectedReview', selectedReview)
+  }
+
+  const handleSendResponse = (reviewId, responseText) => {
+    axios.put(
+      `${apiUrl}/api/mybusiness/locations/reviews/updateReply`,
+      {
+        reviewId,
+        reply: responseText,
+        accountId: user.googleAccounts[0].googleAccount.accountId,
+        locationId: selectedStore.name.split('/')[1],
+      },
+      {
+        withCredentials: true,
+      }
+    )
   }
 
   return (
     <>
       <TableContainer>
         <TableHeader>
-          <H4 fontSize={18}>Centralized Review</H4>
+          <H4 fontSize={18}>Avis centralisés</H4>
           <XStack gap="$4">
             <SearchInput placeholder="Search" />
             <Button>Filters</Button>
@@ -159,7 +199,7 @@ export const ReviewTable = ({ reviews }) => {
                 Commentaire
               </Text>
             </TableCell>
-           
+
             <TableCell>
               <Text color={'#475569'} fontWeight={500} fontSize={12}>
                 Status
@@ -184,13 +224,13 @@ export const ReviewTable = ({ reviews }) => {
               <TableCell>
                 <XStack alignItems="center" gap="$1">
                   <StarFull color={'orange'} size={'$1'} />
-                  <Text>{review.starRating}</Text>
+                  <Text>{convertStarRatingToNumber(review.starRating)}</Text>
                 </XStack>
               </TableCell>
               <TableCell>
                 <Text numberOfLines={1}>{review.comment}</Text>
               </TableCell>
-            
+
               <TableCell>
                 <StatusIndicator status={review.reviewReply ? 'responded' : 'notResponded'}>
                   <Dot />
@@ -224,7 +264,12 @@ export const ReviewTable = ({ reviews }) => {
       </TableContainer>
 
       {/* Response Sheet */}
-      <HorizontalSheet handleOpenPressed={(isOpen) => setResponseSheetOpen(isOpen) } open={responseSheetOpen} selectedReview={selectedReview}></HorizontalSheet>
+      <HorizontalSheet
+        handleSendPress={(reviewId, responseText) => handleSendResponse(reviewId, responseText)}
+        handleOpenPressed={(isOpen) => setResponseSheetOpen(isOpen)}
+        open={responseSheetOpen}
+        selectedReview={selectedReview}
+      ></HorizontalSheet>
     </>
   )
 }
