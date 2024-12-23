@@ -47,12 +47,10 @@ const SectionTitle = styled(Text, {
   fontWeight: 600,
 })
 
-export const HorizontalSheet = () => {
-  const [open, setOpen] = useState(false)
+export const HorizontalSheet = ({open, selectedReview, handleOpenPressed}) => {
 
   return (
     <YStack padding="$4">
-      <Button onPress={() => setOpen(true)}>Open Sheet</Button>
 
       <AnimatePresence>
         {open && (
@@ -62,7 +60,7 @@ export const HorizontalSheet = () => {
               enterStyle={{ opacity: 0 }}
               exitStyle={{ opacity: 0 }}
               opacity={1}
-              onPress={() => setOpen(false)}
+              onPress={() => handleOpenPressed(false)}
             />
 
             <HorizontalSheetStyled
@@ -79,7 +77,7 @@ export const HorizontalSheet = () => {
                   </LogoContainer>
                   <YStack>
                     <SectionTitle>Reviewer</SectionTitle>
-                    <Text>Arlene McCoy</Text>
+                    <Text>{selectedReview.reviewer.displayName}</Text>
                   </YStack>
                 </XStack>
                 <XStack alignItems="center" gap="$4">
@@ -88,7 +86,7 @@ export const HorizontalSheet = () => {
                   </LogoContainer>
                   <YStack>
                     <SectionTitle>Note</SectionTitle>
-                    <Text>4.8</Text>
+                    <Text>{selectedReview.starRating}</Text>
                   </YStack>
                 </XStack>
                 <XStack alignItems="center" gap="$4">
@@ -97,7 +95,7 @@ export const HorizontalSheet = () => {
                   </LogoContainer>
                   <YStack>
                     <SectionTitle>Commentaire</SectionTitle>
-                    <Text>sdqihfsidohfkjsdhfjsdbfujhsdbfjkhsbqdfkjhbsqdkjhfbsqkjhfdb</Text>
+                    <Text>{selectedReview.comment}</Text>
                   </YStack>
                 </XStack>
                 <XStack alignItems="center" gap="$4">
@@ -119,7 +117,7 @@ export const HorizontalSheet = () => {
                   </YStack>
                 </XStack>
               </YStack>
-              <Button onPress={() => setOpen(false)}>Cancel</Button>
+              <Button onPress={() => handleOpenPressed(false)}>Cancel</Button>
             </HorizontalSheetStyled>
           </>
         )}

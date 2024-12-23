@@ -1,8 +1,10 @@
 'use client'
 import { CustomButton, CustomInput, CustomSelect } from '@my/ui'
 import { PenSquare, Trash2 } from '@tamagui/lucide-icons'
-import { useState } from 'react'
+import axios from 'axios'
+import { useEffect, useState } from 'react'
 import { YStack, Text, styled, Form, XStack, Stack, Button } from 'tamagui'
+import useAuth from 'app/hooks/useAuth'
 
 const StyledForm = styled(Form, {
   width: '100%',
@@ -63,42 +65,45 @@ const TemplateDescription = styled(Text, {
   color: '#475569',
 })
 
+const apiUrl = process.env.NEXT_PUBLIC_API_URL
+
 export const TemplatesScreen = () => {
+  const { user } = useAuth()
   const [templates, setTemplates] = useState([
     {
       title: 'Merci pour vos mots doux !',
       category: 'positive',
-      description:
+      message:
         'We’re thrilled to know you enjoyed dining with us! Your satisfaction is our priority, and we can’t wait to serve you again soon.',
     },
     {
       title: 'Merci pour vos mots doux !',
       category: 'positive',
-      description:
+      message:
         'We’re thrilled to know you enjoyed dining with us! Your satisfaction is our priority, and we can’t wait to serve you again soon.',
     },
     {
       title: 'bif bof',
       category: 'neutral',
-      description:
+      message:
         'We’re thrilled to know you enjoyed dining with us! Your satisfaction is our priority, and we can’t wait to serve you again soon.',
     },
     {
       title: 'pas content',
       category: 'negative',
-      description:
+      message:
         'We’re thrilled to know you enjoyed dining with us! Your satisfaction is our priority, and we can’t wait to serve you again soon.',
     },
     {
       title: 'pas content',
       category: 'negative',
-      description:
+      message:
         'We’re thrilled to know you enjoyed dining with us! Your satisfaction is our priority, and we can’t wait to serve you again soon.',
     },
     {
       title: 'pas content',
       category: 'negative',
-      description:
+      message:
         'We’re thrilled to know you enjoyed dining with us! Your satisfaction is our priority, and we can’t wait to serve you again soon.',
     },
   ])
@@ -106,7 +111,7 @@ export const TemplatesScreen = () => {
   const [newTemplate, setNewTemplate] = useState({
     title: '',
     category: '',
-    description: '',
+    message: '',
   })
 
   const handleTitleChange = (e) => {
@@ -128,18 +133,44 @@ export const TemplatesScreen = () => {
   const handleDescriptionChange = (e) => {
     setNewTemplate({
       ...newTemplate,
-      description: e.target.value,
+      message: e.target.value,
     })
   }
 
   const handleSave = () => {
-    setTemplates([...templates, newTemplate])
-    setNewTemplate({
-      title: '',
-      category: '',
-      description: '',
-    })
+    axios
+      .post(
+        `${apiUrl}/api/templates`,
+        {
+          template: {
+            ...newTemplate,
+            userId: user.id,
+          },
+        },
+        {
+          withCredentials: true,
+        }
+      )
+      .then((response) => {
+        setTemplates([...response.data, newTemplate])
+        setNewTemplate({
+          title: '',
+          category: '',
+          message: '',
+        })
+      })
   }
+
+  useEffect(() => {
+    if (!user) return
+    axios
+      .get(`${apiUrl}/api/templates/${user.id}`, {
+        withCredentials: true,
+      })
+      .then((response) => {
+        setTemplates(response.data)
+      })
+  }, [user])
 
   return (
     <YStack>
@@ -175,23 +206,24 @@ export const TemplatesScreen = () => {
       <Text>Templates de réponses sauvegardés</Text>
       <XStack f={1} gap={16}>
         <YStack f={1} gap={16}>
-          {templates
-            .filter((template) => template.category === 'positive')
-            .map((template) => (
-              <TemplateCard key={template.title}>
-                <TemplateCategory positive>Positif</TemplateCategory>
-                <TemplateTitle>{template.title}</TemplateTitle>
-                <TemplateDescription>{template.description}</TemplateDescription>
-                <XStack gap={16}>
-                  <Button icon={<PenSquare />} f={1}>
-                    Modifier
-                  </Button>
-                  <Button icon={<Trash2 />} f={1}>
-                    Supprimer
-                  </Button>
-                </XStack>
-              </TemplateCard>
-            ))}
+          {templates.length > 0 &&
+            templates
+              .filter((template) => template.category === 'positive')
+              .map((template) => (
+                <TemplateCard key={template.title}>
+                  <TemplateCategory positive>Positif</TemplateCategory>
+                  <TemplateTitle>{template.title}</TemplateTitle>
+                  <TemplateDescription>{template.message}</TemplateDescription>
+                  <XStack gap={16}>
+                    <Button icon={<PenSquare />} f={1}>
+                      Modifier
+                    </Button>
+                    <Button icon={<Trash2 />} f={1}>
+                      Supprimer
+                    </Button>
+                  </XStack>
+                </TemplateCard>
+              ))}
           {/* <TemplateCard>
 
             <TemplateCategory positive>Positive</TemplateCategory>
@@ -219,19 +251,20 @@ export const TemplatesScreen = () => {
           </TemplateCard> */}
         </YStack>
         <YStack f={1} gap={16}>
-          {templates
-            .filter((template) => template.category === 'neutral')
-            .map((template) => (
-              <TemplateCard key={template.title}>
-                <TemplateCategory neutral>Neutre</TemplateCategory>
-                <TemplateTitle>{template.title}</TemplateTitle>
-                <TemplateDescription>{template.description}</TemplateDescription>
-                <XStack gap={16}>
-                  <Button icon={<PenSquare />}>Modifier</Button>
-                  <Button icon={<Trash2 />}>Supprimer</Button>
-                </XStack>
-              </TemplateCard>
-            ))}
+          {templates.length > 0 &&
+            templates
+              .filter((template) => template.category === 'neutral')
+              .map((template) => (
+                <TemplateCard key={template.title}>
+                  <TemplateCategory neutral>Neutre</TemplateCategory>
+                  <TemplateTitle>{template.title}</TemplateTitle>
+                  <TemplateDescription>{template.message}</TemplateDescription>
+                  <XStack gap={16}>
+                    <Button icon={<PenSquare />}>Modifier</Button>
+                    <Button icon={<Trash2 />}>Supprimer</Button>
+                  </XStack>
+                </TemplateCard>
+              ))}
 
           {/* <TemplateCard>
             <TemplateCategory positive>Positive</TemplateCategory>
@@ -247,19 +280,20 @@ export const TemplatesScreen = () => {
           </TemplateCard> */}
         </YStack>
         <YStack f={1} gap={16}>
-          {templates
-            .filter((template) => template.category === 'negative')
-            .map((template) => (
-              <TemplateCard key={template.title}>
-                <TemplateCategory negative>Négatif</TemplateCategory>
-                <TemplateTitle>{template.title}</TemplateTitle>
-                <TemplateDescription>{template.description}</TemplateDescription>
-                <XStack gap={16}>
-                  <Button icon={<PenSquare />}>Modifier</Button>
-                  <Button icon={<Trash2 />}>Supprimer</Button>
-                </XStack>
-              </TemplateCard>
-            ))}
+          {templates.length > 0 &&
+            templates
+              .filter((template) => template.category === 'negative')
+              .map((template) => (
+                <TemplateCard key={template.title}>
+                  <TemplateCategory negative>Négatif</TemplateCategory>
+                  <TemplateTitle>{template.title}</TemplateTitle>
+                  <TemplateDescription>{template.message}</TemplateDescription>
+                  <XStack gap={16}>
+                    <Button icon={<PenSquare />}>Modifier</Button>
+                    <Button icon={<Trash2 />}>Supprimer</Button>
+                  </XStack>
+                </TemplateCard>
+              ))}
           {/* <TemplateCard>
             <TemplateCategory positive>Positive</TemplateCategory>
             <TemplateTitle>Merci pour vos mots doux ! </TemplateTitle>

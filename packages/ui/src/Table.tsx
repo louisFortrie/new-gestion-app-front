@@ -119,8 +119,10 @@ const PageButton = styled(Button, {
 
 export const ReviewTable = ({ reviews }) => {
   const [responseSheetOpen, setResponseSheetOpen] = useState(false)
-  const handleClickResponse = () => {
+  const [selectedReview, setSelectedReview] = useState({})
+  const handleClickResponse = (reviewId :string) => {
     setResponseSheetOpen(true)
+    setSelectedReview(reviews.find(review => review.id === reviewId))
   }
 
   return (
@@ -149,19 +151,15 @@ export const ReviewTable = ({ reviews }) => {
             </TableCell>
             <TableCell>
               <Text color={'#475569'} fontWeight={500} fontSize={12}>
-                Rating
+                Note
               </Text>
             </TableCell>
             <TableCell>
               <Text color={'#475569'} fontWeight={500} fontSize={12}>
-                Reviews
+                Commentaire
               </Text>
             </TableCell>
-            <TableCell>
-              <Text color={'#475569'} fontWeight={500} fontSize={12}>
-                Tags
-              </Text>
-            </TableCell>
+           
             <TableCell>
               <Text color={'#475569'} fontWeight={500} fontSize={12}>
                 Status
@@ -178,41 +176,37 @@ export const ReviewTable = ({ reviews }) => {
           {reviews.map((review, index) => (
             <TableRow key={index} pressStyle={{ backgroundColor: '$backgroundHover' }}>
               <TableCell>
-                <Text>{review.reviewer}</Text>
+                <Text>{review.reviewer.displayName}</Text>
               </TableCell>
               <TableCell>
-                <Text>{review.date}</Text>
+                <Text>{new Date(review.createTime).toLocaleDateString('fr')}</Text>
               </TableCell>
               <TableCell>
                 <XStack alignItems="center" gap="$1">
                   <StarFull color={'orange'} size={'$1'} />
-                  <Text>{review.rating}</Text>
+                  <Text>{review.starRating}</Text>
                 </XStack>
               </TableCell>
               <TableCell>
                 <Text numberOfLines={1}>{review.comment}</Text>
               </TableCell>
+            
               <TableCell>
-                <Tag type={review.tag.toLowerCase()}>
-                  <Text>{review.tag}</Text>
-                </Tag>
-              </TableCell>
-              <TableCell>
-                <StatusIndicator status={review.responded ? 'responded' : 'notResponded'}>
+                <StatusIndicator status={review.reviewReply ? 'responded' : 'notResponded'}>
                   <Dot />
-                  <Text>{review.responded ? 'Responded' : 'Not Responded'}</Text>
+                  <Text>{review.reviewReply ? 'Répondu' : 'Pas répondu'}</Text>
                 </StatusIndicator>
               </TableCell>
               <TableCell>
-                <Button variant="outlined" onPress={() => handleClickResponse()}>
-                  Response
+                <Button variant="outlined" onPress={() => handleClickResponse(review.id)}>
+                  Répondre
                 </Button>
               </TableCell>
             </TableRow>
           ))}
         </Table>
 
-        <PaginationContainer>
+        {/* <PaginationContainer>
           <Button variant="outlined" icon={<ArrowLeft />}>
             Previous
           </Button>
@@ -226,11 +220,11 @@ export const ReviewTable = ({ reviews }) => {
           <Button variant="outlined" iconAfter={<ArrowRight />}>
             Next
           </Button>
-        </PaginationContainer>
+        </PaginationContainer> */}
       </TableContainer>
 
       {/* Response Sheet */}
-      <HorizontalSheet></HorizontalSheet>
+      <HorizontalSheet handleOpenPressed={(isOpen) => setResponseSheetOpen(isOpen) } open={responseSheetOpen} selectedReview={selectedReview}></HorizontalSheet>
     </>
   )
 }

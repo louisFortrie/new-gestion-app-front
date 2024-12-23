@@ -2,6 +2,8 @@ import { Text, YStack, styled, Group, XStack, Stack } from 'tamagui'
 import {Star} from '@tamagui/lucide-icons'
 import { Doughnut } from 'react-chartjs-2'
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js'
+import { TimeSpanGroup } from '@my/ui'
+import { useEffect, useState } from 'react'
 
 // Enregistrer les composants nécessaires de Chart.js
 ChartJS.register(ArcElement, Tooltip, Legend)
@@ -50,7 +52,68 @@ interface DoughnutChartCardProps {
 }
 
 export const DoughnutChartCard = ({ title, dataProps, icon }: DoughnutChartCardProps) => {
+  const {daily, weekly, monthly} = dataProps
+  const [insideText, setInsideText] = useState('0')
+  const [dataToUse, setDataToUse] = useState(daily)
+  const [data, setData] = useState( { labels: ['1 Star', '2 Stars', '3 Stars', '4 Stars', '5 Stars'],
+    datasets: [
+      {
+        data: [0],
+        backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'],
+        hoverBackgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'],
+      },
+    ],})
 
+  const handleTimeSpanChange = (timeSpan: string) => {
+    switch (timeSpan) {
+      case 'daily':
+        setDataToUse(daily)
+        break
+      case 'weekly':
+        setDataToUse(weekly)
+        break
+      case 'monthly':
+        setDataToUse(monthly)
+        break
+    }
+  }
+
+  useEffect(() => {
+    const allZero = Object.values(dataToUse.current).every((value) => value === 0);
+
+    if (allZero) {
+      setInsideText('-')
+      setData({
+        labels: ['No Data'],
+        datasets: [
+          {
+            data: [1],
+            backgroundColor: ['#D3D3D3'],
+            hoverBackgroundColor: ['#D3D3D3'],
+          },
+        ],
+      });
+    } else {
+      setInsideText(dataToUse.current.average)
+      setData({
+        labels: ['1 Star', '2 Stars', '3 Stars', '4 Stars', '5 Stars'],
+        datasets: [
+          {
+            data: [
+              dataToUse.current.oneStar,
+              dataToUse.current.twoStars,
+              dataToUse.current.threeStars,
+              dataToUse.current.fourStars,
+              dataToUse.current.fiveStars,
+            ],
+            backgroundColor: ['#F04438', '#F97066', '#FAC515', '#EAAA08', '#17B26A'],
+            hoverBackgroundColor: ['#F04438', '#F97066', '#FAC515', '#EAAA08', '#17B26A'],
+          },
+        ],
+      });
+    }
+    
+  }, [dataToUse])
 
   // Options du graphique
   const options = {
@@ -69,12 +132,14 @@ export const DoughnutChartCard = ({ title, dataProps, icon }: DoughnutChartCardP
   return (
     <StyledDoughnutChartCard>
       <XStack borderBottomColor={'#E2E8F0'} borderBottomWidth={1} gap={16} width={'100%'}>
-        <XStack paddingVertical={'$3'} paddingHorizontal={"$4"} alignItems='center' gap={16}>
+        <XStack f={1} paddingVertical={'$3'} paddingHorizontal={"$4"} alignItems='center' gap={16}>
 
             {icon}
         <Text fontWeight={600} fontSize={18} color={"#0F172A"} >
           {title}
           </Text>
+          <Stack f={1}></Stack>
+          <TimeSpanGroup onTimeSpanChange={(timeSpan) => handleTimeSpanChange(timeSpan)}></TimeSpanGroup>
         </XStack>
       </XStack>
       <Stack f={1} width={'100%'} padding={'$4'} gap={16}>
@@ -87,28 +152,28 @@ export const DoughnutChartCard = ({ title, dataProps, icon }: DoughnutChartCardP
             alignItems: 'center',
           }}
         >
-          <Doughnut data={dataProps} options={options} />
-          <InsideText>OUI</InsideText>
+          <Doughnut data={data} options={options} />
+          <InsideText>{insideText}</InsideText>
         </Stack>
         <XStack gap={16} width={'100%'}>
           <RatingCard borderBottomWidth={4} borderBottomColor={'#17B26A'}>
-            <Text fontSize={14}>10</Text>
+            <Text fontSize={14}>{dataToUse.current.fiveStar}</Text>
             <Text fontSize={12}>5 étoiles</Text>
           </RatingCard>
           <RatingCard borderBottomWidth={4} borderBottomColor={'#EAAA08'}>
-            <Text fontSize={14}>10</Text>
+            <Text fontSize={14}>{dataToUse.current.fourStar}</Text>
             <Text fontSize={12}>4 étoiles</Text>
           </RatingCard>
           <RatingCard borderBottomWidth={4} borderBottomColor={'#FAC515'}>
-            <Text fontSize={14}>10</Text>
+            <Text fontSize={14}>{dataToUse.current.threeStar}</Text>
             <Text fontSize={12}>3 étoiles</Text>
           </RatingCard>
           <RatingCard borderBottomWidth={4} borderBottomColor={'#F97066'}>
-            <Text fontSize={14}>10</Text>
+            <Text fontSize={14}>{dataToUse.current.twoStar}</Text>
             <Text fontSize={12}>2 étoiles</Text>
           </RatingCard>
           <RatingCard borderBottomWidth={4} borderBottomColor={'#F04438'}>
-            <Text fontSize={14}>10</Text>
+            <Text fontSize={14}>{dataToUse.current.oneStar}</Text>
             <Text fontSize={12}>1 étoiles</Text>
           </RatingCard>
         </XStack>
