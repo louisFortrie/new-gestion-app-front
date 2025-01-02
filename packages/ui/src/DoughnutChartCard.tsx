@@ -80,7 +80,7 @@ export const DoughnutChartCard = ({ title, dataProps, icon }: DoughnutChartCardP
 
   useEffect(() => {
     const allZero = Object.values(dataToUse.current).every((value) => value === 0);
-
+    console.log(allZero, dataToUse.current, 'data to use')
     if (allZero) {
       setInsideText('-')
       setData({

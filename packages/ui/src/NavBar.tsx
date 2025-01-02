@@ -7,6 +7,7 @@ import {
   Cog,
   Dot,
   LayoutDashboard,
+  LayoutList,
   LogOut,
   MessageSquareMore,
   Settings,
@@ -133,14 +134,14 @@ export const NavBar = () => {
         </>
       )}
 
-      <StyledButton active={isActive('/help')} onPress={() => router.push('/help')}>
+      {/* <StyledButton active={isActive('/help')} onPress={() => router.push('/help')}>
         <ShieldCheck color={'black'} />
         <StyledText>Aide et support</StyledText>
-      </StyledButton>
+      </StyledButton> */}
       <Separator alignSelf="stretch" marginVertical={16}></Separator>
       {!isInStoreListPage && (
         <StyledButton onPress={() => router.push('/stores-list')}>
-          <Settings color={'black'} />
+          <LayoutList color={'black'} />
           <StyledText>Choix de boutique</StyledText>
         </StyledButton>
       )}

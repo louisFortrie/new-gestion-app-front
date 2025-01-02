@@ -86,7 +86,7 @@ export const StoresListScreen = () => {
           <StoreCard
             key={store.id}
             title={store.title}
-            averageRating={store.reviews.averageRating}
+            averageRating={Math.round(store.reviews.averageRating * 10) / 10}
             totalReviews={store.reviews.totalReviewCount}
             imageUrl={store.medias?.[0]?.googleUrl}
             onPress={() => handleSelectStore(store)}

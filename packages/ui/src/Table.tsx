@@ -56,6 +56,10 @@ const TableRow = styled(XStack, {
 const TableCell = styled(XStack, {
   flex: 1,
   paddingHorizontal: '$2',
+  width: 'calc(100% / 6)',
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+  whiteSpace: 'nowrap',
 })
 
 const Tag = styled(XStack, {
@@ -147,7 +151,7 @@ export const ReviewTable = ({ reviews }) => {
   const handleClickResponse = (reviewId: string) => {
     setResponseSheetOpen(true)
     setSelectedReview(reviews.find((review) => review.id === reviewId))
-    console.log('selectedReview', selectedReview)
+    console.log('selectedReview', selectedReview, reviewId)
   }
 
   const handleSendResponse = (reviewId, responseText) => {

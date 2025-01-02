@@ -89,7 +89,7 @@ export const DashboardScreen = () => {
   })
 
   useEffect(() => {
-    if (!selectedStore || !user || loading) return
+    if (!selectedStore || !user || user.googleAccounts.length === 0 || loading) return
     console.log(user)
     axios
       .get(
@@ -213,7 +213,7 @@ export const DashboardScreen = () => {
               <YStack gap={8}>
                 <Text>Note moyenne</Text>
                 <Text fontSize={32} fontWeight={600}>
-                  {selectedStore?.reviews?.averageRating}
+                  {Math.round(selectedStore?.reviews?.averageRating * 10) / 10}
                 </Text>
               </YStack>
             </HeadCard>
