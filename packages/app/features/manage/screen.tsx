@@ -1,8 +1,14 @@
-import { styled, YStack, Text, XStack, Label, Stack, Button, Spinner } from 'tamagui'
-import { CustomInput, BusinessHoursEditor, CustomButton, MediasManagement } from '@my/ui'
+import { styled, YStack, Text, XStack, Label, Stack, Button, Spinner, Switch } from 'tamagui'
+import {
+  CustomInput,
+  BusinessHoursEditor,
+  CustomButton,
+  MediasManagement,
+  SpecialBusinessHoursEditor,
+} from '@my/ui'
 import { Check, SquarePen } from '@tamagui/lucide-icons'
 import useStores from 'app/hooks/useStores'
-import { memo, useEffect, useState } from 'react'
+import { memo, useCallback, useEffect, useMemo, useState } from 'react'
 
 const StyledYstack = styled(YStack, {
   gap: '$2',
@@ -24,10 +30,10 @@ const Title = styled(Text, {
   fontWeight: 500,
 })
 
-const MemoizedBusinessHoursEditor = memo(BusinessHoursEditor)
-
 type Day = 'MONDAY' | 'TUESDAY' | 'WEDNESDAY' | 'THURSDAY' | 'FRIDAY' | 'SATURDAY' | 'SUNDAY'
 export const Manage = () => {
+  console.log('render manage')
+
   const [businessHours, setBusinessHours] = useState({
     periods: [],
   })
@@ -48,13 +54,27 @@ export const Manage = () => {
     },
   })
 
+  const [isEditingSpecialHours, setIsEditingSpecialHours] = useState(false)
+
   const { selectedStore } = useStores()
 
   useEffect(() => {
     if (!selectedStore) return
     setBusinessHours(selectedStore.regularHours)
     setNewStoreInfo(selectedStore)
+    console.log('selectedStore use effect')
   }, [selectedStore])
+
+  const handleIsEditingSpecialHours = useCallback((checked) => {
+    setIsEditingSpecialHours(checked)
+  }, [])
+
+  const handleBusinessHoursChange = useCallback((businessHoursNew) => {
+    setBusinessHours(businessHoursNew)
+    console.log('business hours changed', businessHoursNew)
+  }, [])
+
+  const memoizedBusinessHours = useMemo(() => businessHours, [businessHours])
 
   if (businessHours.periods.length === 0) {
     return <Spinner size="large" color={'black'} />
@@ -138,14 +158,27 @@ export const Manage = () => {
       <StyledXStack>
         <MediasManagement></MediasManagement>
       </StyledXStack> */}
-      <Title>Horaire d'ouvertures</Title>
-      <MemoizedBusinessHoursEditor
-        businessHours={businessHours}
-        onBusinessHoursChange={(businessHoursNew) => {
-          setBusinessHours(businessHoursNew as any)
-          console.log(businessHoursNew)
-        }}
-      ></MemoizedBusinessHoursEditor>
+      <XStack alignItems="center" gap={32}>
+        <Title>Horaire d'ouvertures</Title>
+        <Switch
+          backgroundColor={'#CDF463'}
+          size={'$3'}
+          onCheckedChange={(checked) => handleIsEditingSpecialHours(checked)}
+        >
+          <Switch.Thumb animation={'quick'} />
+        </Switch>
+        <Text>Horaires {isEditingSpecialHours ? 'exceptionnels' : 'basiques'}</Text>
+      </XStack>
+
+      {isEditingSpecialHours ? (
+        <SpecialBusinessHoursEditor />
+      ) : (
+        <BusinessHoursEditor
+          businessHours={memoizedBusinessHours}
+          onBusinessHoursChange={handleBusinessHoursChange}
+        ></BusinessHoursEditor>
+      )}
+
       <XStack justifyContent="flex-end" gap={16}>
         <Button icon={<SquarePen />}>Modifier</Button>
         <CustomButton onPress={() => handleSaveModifications()} icon={<Check />}>

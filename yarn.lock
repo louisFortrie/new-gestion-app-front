@@ -6845,6 +6845,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@wojtekmaj/date-utils@npm:^1.1.3":
+  version: 1.5.1
+  resolution: "@wojtekmaj/date-utils@npm:1.5.1"
+  checksum: 10/73dced08ab39fadc92a5bb95153b1bb068d006911db11521078aec878a5029d65a966abead333a43c0997197a52da6edf542e37c7fbb36b780f97d3451ece69f
+  languageName: node
+  linkType: hard
+
 "@xmldom/xmldom@npm:^0.8.8":
   version: 0.8.10
   resolution: "@xmldom/xmldom@npm:0.8.10"
@@ -8370,6 +8377,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"clsx@npm:^2.0.0":
+  version: 2.1.1
+  resolution: "clsx@npm:2.1.1"
+  checksum: 10/cdfb57fa6c7649bbff98d9028c2f0de2f91c86f551179541cf784b1cfdc1562dcb951955f46d54d930a3879931a980e32a46b598acaea274728dbe068deca919
+  languageName: node
+  linkType: hard
+
 "code-block-writer@npm:^10.1.1":
   version: 10.1.1
   resolution: "code-block-writer@npm:10.1.1"
@@ -9210,6 +9224,13 @@ __metadata:
   version: 1.2.0
   resolution: "destroy@npm:1.2.0"
   checksum: 10/0acb300b7478a08b92d810ab229d5afe0d2f4399272045ab22affa0d99dbaf12637659411530a6fcd597a9bdac718fc94373a61a95b4651bbc7b83684a565e38
+  languageName: node
+  linkType: hard
+
+"detect-element-overflow@npm:^1.4.0":
+  version: 1.4.2
+  resolution: "detect-element-overflow@npm:1.4.2"
+  checksum: 10/102a0bb7f51dbeb546979495b461ebcf4d9dc9d7c0674c519d8a8fdac833a88234d42a9838316f350a05dc835f9ccfb19b1e9f1171b9eb46e8ec27eb8205d258
   languageName: node
   linkType: hard
 
@@ -11751,6 +11772,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"get-user-locale@npm:^2.2.1":
+  version: 2.3.2
+  resolution: "get-user-locale@npm:2.3.2"
+  dependencies:
+    mem: "npm:^8.0.0"
+  checksum: 10/58c1dd99b803731238640181335fc86b0bb27ed7fcec39233f1fdbee8a2d98bea44c9897e0d0f4f78b1b40c82d26449f82b1823e320c796bb5974198aa8cdde2
+  languageName: node
+  linkType: hard
+
 "getenv@npm:^1.0.0":
   version: 1.0.0
   resolution: "getenv@npm:1.0.0"
@@ -13872,6 +13902,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"make-event-props@npm:^1.6.0":
+  version: 1.6.2
+  resolution: "make-event-props@npm:1.6.2"
+  checksum: 10/9728126c93465d14d624bd00e2542ab9e180d19ac1669f58c121910645bd1d6d0d10a77b832e3e6254b912780a01408da3dd00dba4a823653b503f14ff9b4760
+  languageName: node
+  linkType: hard
+
 "make-fetch-happen@npm:^13.0.0":
   version: 13.0.1
   resolution: "make-fetch-happen@npm:13.0.1"
@@ -13898,6 +13935,15 @@ __metadata:
   dependencies:
     tmpl: "npm:1.0.5"
   checksum: 10/4c66ddfc654537333da952c084f507fa4c30c707b1635344eb35be894d797ba44c901a9cebe914aa29a7f61357543ba09b09dddbd7f65b4aee756b450f169f40
+  languageName: node
+  linkType: hard
+
+"map-age-cleaner@npm:^0.1.3":
+  version: 0.1.3
+  resolution: "map-age-cleaner@npm:0.1.3"
+  dependencies:
+    p-defer: "npm:^1.0.0"
+  checksum: 10/cb2804a5bcb3cbdfe4b59066ea6d19f5e7c8c196cd55795ea4c28f792b192e4c442426ae52524e5e1acbccf393d3bddacefc3d41f803e66453f6c4eda3650bc1
   languageName: node
   linkType: hard
 
@@ -13984,6 +14030,16 @@ __metadata:
   version: 0.3.0
   resolution: "media-typer@npm:0.3.0"
   checksum: 10/38e0984db39139604756903a01397e29e17dcb04207bb3e081412ce725ab17338ecc47220c1b186b6bbe79a658aad1b0d41142884f5a481f36290cdefbe6aa46
+  languageName: node
+  linkType: hard
+
+"mem@npm:^8.0.0":
+  version: 8.1.1
+  resolution: "mem@npm:8.1.1"
+  dependencies:
+    map-age-cleaner: "npm:^0.1.3"
+    mimic-fn: "npm:^3.1.0"
+  checksum: 10/5f22117d8a24775f0a61d333bd7fdbe19f7a9f8dc8ccee66f57ba98aeb4ed67e83cc130c482b78fd6a39887547749d8fe376fc44ca7efa81579ad9d0c0fa5acd
   languageName: node
   linkType: hard
 
@@ -14355,6 +14411,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"mimic-fn@npm:^3.1.0":
+  version: 3.1.0
+  resolution: "mimic-fn@npm:3.1.0"
+  checksum: 10/f7b167f9115b8bbdf2c3ee55dce9149d14be9e54b237259c4bc1d8d0512ea60f25a1b323f814eb1fe8f5a541662804bcfcfff3202ca58df143edb986849d58db
+  languageName: node
+  linkType: hard
+
 "mimic-fn@npm:^4.0.0":
   version: 4.0.0
   resolution: "mimic-fn@npm:4.0.0"
@@ -14683,6 +14746,7 @@ __metadata:
     node-gyp: "npm:^10.1.0"
     prettier: "npm:^3.3.3"
     react-chartjs-2: "npm:^5.2.0"
+    react-date-picker: "npm:^11.0.0"
     react-window: "npm:^1.8.11"
     turbo: "npm:^1.13.4"
     typescript: "npm:^5.6.2"
@@ -15376,6 +15440,13 @@ __metadata:
   version: 0.8.0
   resolution: "outdent@npm:0.8.0"
   checksum: 10/a556c5c308705ad4e3441be435f2b2cf014cb5f9753a24cbd080eadc473b988c77d0d529a6a9a57c3931fb4178e5a81d668cc4bc49892b668191a5d0ba3df76e
+  languageName: node
+  linkType: hard
+
+"p-defer@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "p-defer@npm:1.0.0"
+  checksum: 10/1d8fb7138a0ccebb65479160fd93f245303c06c977c976105d75838f7f504a9a6ef11b7e058f98b4c957a6a8df268c616da1ee339285d565f9e5ba00304e027b
   languageName: node
   linkType: hard
 
@@ -16246,6 +16317,25 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-calendar@npm:^5.0.0":
+  version: 5.1.0
+  resolution: "react-calendar@npm:5.1.0"
+  dependencies:
+    "@wojtekmaj/date-utils": "npm:^1.1.3"
+    clsx: "npm:^2.0.0"
+    get-user-locale: "npm:^2.2.1"
+    warning: "npm:^4.0.0"
+  peerDependencies:
+    "@types/react": ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+    react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+    react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+  peerDependenciesMeta:
+    "@types/react":
+      optional: true
+  checksum: 10/69c5f809646edae64dc75d8709ccac979723fde2d5752f0992e429d09a1caf45e6c2d340563dfec2cf27e22a19b5f51f65c05decfcae9860c34470c08261de43
+  languageName: node
+  linkType: hard
+
 "react-chartjs-2@npm:^5.2.0":
   version: 5.2.0
   resolution: "react-chartjs-2@npm:5.2.0"
@@ -16253,6 +16343,28 @@ __metadata:
     chart.js: ^4.1.1
     react: ^16.8.0 || ^17.0.0 || ^18.0.0
   checksum: 10/0a70b60e1a0d1f0cecdd69d70d9ac1c191618c1033d8f942d4728f5eb84c893c82c9e3318be8a3158eb3a7186c0251a8fe0356c9610ea0f0f3f2d4a9c4a0b388
+  languageName: node
+  linkType: hard
+
+"react-date-picker@npm:^11.0.0":
+  version: 11.0.0
+  resolution: "react-date-picker@npm:11.0.0"
+  dependencies:
+    "@wojtekmaj/date-utils": "npm:^1.1.3"
+    clsx: "npm:^2.0.0"
+    get-user-locale: "npm:^2.2.1"
+    make-event-props: "npm:^1.6.0"
+    react-calendar: "npm:^5.0.0"
+    react-fit: "npm:^2.0.0"
+    update-input-width: "npm:^1.4.0"
+  peerDependencies:
+    "@types/react": ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+    react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+    react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+  peerDependenciesMeta:
+    "@types/react":
+      optional: true
+  checksum: 10/0326eabbda38fb5c80021146849fd88f6dae3fb790a17d7207e2265b0f0481a753c8f8f0806267f700b207ce085d07ff56a928dab420a5711a92f1e9cf337972
   languageName: node
   linkType: hard
 
@@ -16282,6 +16394,25 @@ __metadata:
   version: 3.2.2
   resolution: "react-fast-compare@npm:3.2.2"
   checksum: 10/a6826180ba75cefba1c8d3ac539735f9b627ca05d3d307fe155487f5d0228d376dac6c9708d04a283a7b9f9aee599b637446635b79c8c8753d0b4eece56c125c
+  languageName: node
+  linkType: hard
+
+"react-fit@npm:^2.0.0":
+  version: 2.0.1
+  resolution: "react-fit@npm:2.0.1"
+  dependencies:
+    detect-element-overflow: "npm:^1.4.0"
+    warning: "npm:^4.0.0"
+  peerDependencies:
+    "@types/react": ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+    react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+    react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+  peerDependenciesMeta:
+    "@types/react":
+      optional: true
+    "@types/react-dom":
+      optional: true
+  checksum: 10/df21243525b21484666e8cdde29f2811cd0d06a5d7de73b61a472f2799cf0850f27dce23c66ddff0a87f3c6d02627bd54c03232366da01371259b6232f61b682
   languageName: node
   linkType: hard
 
@@ -19153,6 +19284,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"update-input-width@npm:^1.4.0":
+  version: 1.4.2
+  resolution: "update-input-width@npm:1.4.2"
+  checksum: 10/c7ff5c6ad1b2c15859ab97a438f8a62c1f698ab0746092c7d206ea98f6e72f9c5ee2118105a198649c88318422db9afaa5962309170ae7a5b2b02e1563497d54
+  languageName: node
+  linkType: hard
+
 "upper-case-first@npm:^2.0.2":
   version: 2.0.2
   resolution: "upper-case-first@npm:2.0.2"
@@ -19617,6 +19755,15 @@ __metadata:
   version: 0.1.1
   resolution: "warn-once@npm:0.1.1"
   checksum: 10/e6a5a1f5a8dba7744399743d3cfb571db4c3947897875d4962a7c5b1bf2195ab4518c838cb4cea652e71729f21bba2e98dc75686f5fccde0fabbd894e2ed0c0d
+  languageName: node
+  linkType: hard
+
+"warning@npm:^4.0.0":
+  version: 4.0.3
+  resolution: "warning@npm:4.0.3"
+  dependencies:
+    loose-envify: "npm:^1.0.0"
+  checksum: 10/e7842aff036e2e07ce7a6cc3225e707775b969fe3d0577ad64bd24660e3a9ce3017f0b8c22a136566dcd3a151f37b8ed1ccee103b3bd82bd8a571bf80b247bc4
   languageName: node
   linkType: hard
 
