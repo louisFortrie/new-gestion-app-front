@@ -13,7 +13,7 @@ import {
 // Enregistrement des modules nécessaires
 ChartJS.register(BarElement, CategoryScale, LinearScale, Title, Tooltip, Legend)
 
-export const BarChart = () => {
+export const BarChart = ({ dataProps }) => {
   // Données du graphique
   const data = {
     labels: ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin'],
@@ -25,7 +25,6 @@ export const BarChart = () => {
         borderWidth: 1, // Épaisseur de la bordure
         borderRadius: 4,
       },
-    
     ],
   }
 
@@ -46,9 +45,9 @@ export const BarChart = () => {
         title: {
           display: false,
         },
-        grid : {
-          display : false
-        }
+        grid: {
+          display: false,
+        },
       },
       y: {
         title: {
@@ -59,5 +58,5 @@ export const BarChart = () => {
     },
   }
 
-  return <Bar data={data} options={options} />
+  return <Bar data={dataProps} options={options} />
 }

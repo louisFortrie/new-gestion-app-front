@@ -1,8 +1,8 @@
 'use client'
 
-import { XStack, YStack, Text, Input, Button, styled, H4, YGroup } from 'tamagui'
+import { XStack, YStack, Text, Input, Button, styled, H4, YGroup, Image, Stack, XGroup, Separator, View } from 'tamagui'
 import { ArrowLeft, ArrowRight, StarFull } from '@tamagui/lucide-icons'
-import { useState } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 import { HorizontalSheet } from './HorizontalSheet'
 import axios from 'axios'
 import useAuth from 'app/hooks/useAuth'
@@ -21,8 +21,6 @@ const TableHeader = styled(XStack, {
   alignItems: 'center',
   borderWidth: 1,
   borderColor: '#E2E8F0',
-  // borderTopEndRadius: '$4',
-  // borderTopStartRadius: '$4',
 })
 
 const SearchInput = styled(Input, {
@@ -87,15 +85,17 @@ const Tag = styled(XStack, {
 const StatusIndicator = styled(XStack, {
   alignItems: 'center',
   gap: '$2',
+  backgroundColor: '#FFFAEB',
+  borderRadius: 100,
+  paddingHorizontal: '$3',
+  paddingVertical: '$2',
   variants: {
-    status: {
-      responded: {
-        color: '$green11',
-      },
-      notResponded: {
-        color: '$orange11',
-      },
+    responded: {
+      true : {
+        backgroundColor: '#ECFDF3',
+      }
     },
+    
   } as const,
 })
 
@@ -103,7 +103,6 @@ const Dot = styled(XStack, {
   width: 8,
   height: 8,
   borderRadius: 1000,
-  // backgroundColor: 'currentColor',
 })
 
 const PaginationContainer = styled(XStack, {
@@ -142,16 +141,41 @@ const convertStarRatingToNumber = (starRating: string) => {
 }
 const apiUrl = process.env.NEXT_PUBLIC_API_URL
 
-export const ReviewTable = ({ reviews }) => {
+export const ReviewTable = ({ reviews, totalCount, pageChange }) => {
+  const [currentPage, setCurrentPage] = useState(1)
+  const [searchQuery, setSearchQuery] = useState('')
   const [responseSheetOpen, setResponseSheetOpen] = useState(false)
   const [selectedReview, setSelectedReview] = useState({})
   const { user } = useAuth()
   const { selectedStore } = useStores()
+  
+  const itemsPerPage = 10
+  const [hasNextPage, setHasNextPage] = useState(true) // Whether there are more reviews to load
+
+  // Filter and paginate reviews
+  const filteredReviews = useMemo(() => {
+    return reviews.filter(review => 
+      review.reviewer.displayName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      review.comment?.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+  }, [reviews, searchQuery])
+
+  useEffect(() => {
+    pageChange(currentPage)
+  }, [currentPage])
+
+  const totalPages = Math.ceil(totalCount / itemsPerPage)
+ 
+  
+  
+  const paginatedReviews = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage
+    return filteredReviews.slice(startIndex, startIndex + itemsPerPage)
+  }, [filteredReviews, currentPage])
 
   const handleClickResponse = (reviewId: string) => {
     setResponseSheetOpen(true)
-    setSelectedReview(reviews.find((review) => review.id === reviewId))
-    console.log('selectedReview', selectedReview, reviewId)
+    setSelectedReview(reviews.find((review) => review.reviewId === reviewId))
   }
 
   const handleSendResponse = (reviewId, responseText) => {
@@ -167,133 +191,203 @@ export const ReviewTable = ({ reviews }) => {
         withCredentials: true,
       }
     )
+      .then(() => {
+        setResponseSheetOpen(false)
+        setSelectedReview({})
+        const reviewIndex = reviews.findIndex((review) => review.reviewId === reviewId)
+        reviews[reviewIndex].reviewReply = responseText
+      })
+      .catch((error) => {
+        console.error('Erreur lors de la réponse à l\'avis:', error)
+      })
   }
 
   return (
     <>
-      <TableContainer>
-        <TableHeader>
-          <H4 fontSize={18}>Avis centralisés</H4>
-          <XStack gap="$4">
-            <SearchInput placeholder="Search" />
-            <Button>Filters</Button>
+      <YGroup f={1} width={'100%'} borderRadius={4} borderWidth={1} borderColor={'#E2E8F0'} separator={<Separator backgroundColor="#E2E8F0" height={1}/>}>
+        <YGroup.Item>
+          <XStack f={1} backgroundColor={"white"} justifyContent='space-between' alignItems='center' padding={16} gap={8}>
+            <H4 fontSize={18}>Avis centralisés</H4>
+            <XStack gap="$4">
+              <SearchInput 
+                placeholder="Search" 
+                value={searchQuery}
+                onChangeText={setSearchQuery}
+              />
+              <Button>Filters</Button>
+            </XStack>
           </XStack>
-        </TableHeader>
+        </YGroup.Item>
 
-        <Table>
-          {/* Header */}
-          <TableRow isHeader>
-            <TableCell>
-              <Text color={'#475569'} fontWeight={500} fontSize={12}>
-                Reviewer
-              </Text>
-            </TableCell>
-            <TableCell>
-              <Text color={'#475569'} fontWeight={500} fontSize={12}>
-                Date
-              </Text>
-            </TableCell>
-            <TableCell>
-              <Text color={'#475569'} fontWeight={500} fontSize={12}>
-                Note
-              </Text>
-            </TableCell>
-            <TableCell>
-              <Text color={'#475569'} fontWeight={500} fontSize={12}>
-                Commentaire
-              </Text>
-            </TableCell>
+        <YGroup.Item>
+          <XGroup f={1} width={'100%'}>
+            {/* Your existing columns structure */}
+            <XGroup.Item>
+              <YGroup justifyContent='flex-start' f={1} separator={<Separator backgroundColor="#E2E8F0" height={1}/>} borderRadius={0}>
+                <YGroup.Item>
+                  <Text paddingVertical={16}  paddingHorizontal={32} color={'#475569'} fontWeight={500} fontSize={12}>
+                    Reviewer
+                  </Text>
+                </YGroup.Item>
+                {paginatedReviews.map((review, index) => (
+                  <YGroup.Item key={index} f={1}>
+                    <View f={1} backgroundColor="white" padding={32}  flexDirection='row' alignItems='center' gap={8}>
+                      <Image 
+                        source={{
+                          uri: review.reviewer.profilePhotoUrl
+                        }}
+                        width={32}
+                        height={32}
+                      />
+                      <Text color={"#475569"}>{review.reviewer.displayName}</Text>
+                    </View>
+                  </YGroup.Item>
+                ))}
+              </YGroup>
+            </XGroup.Item>
 
-            <TableCell>
-              <Text color={'#475569'} fontWeight={500} fontSize={12}>
-                Status
-              </Text>
-            </TableCell>
-            <TableCell>
-              <Text color={'#475569'} fontWeight={500} fontSize={12}>
-                Action
-              </Text>
-            </TableCell>
-          </TableRow>
+            <XGroup.Item>
+              <YGroup justifyContent='flex-start' f={1} separator={<Separator backgroundColor="#E2E8F0" height={1}/>} borderRadius={0}>
+                <YGroup.Item>
+                  <Text paddingVertical={16}  paddingHorizontal={32} color={'#475569'} fontWeight={500} fontSize={12}>
+                    Date
+                  </Text>
+                </YGroup.Item>
+                {paginatedReviews.map((review, index) => (
+                  <YGroup.Item key={index} f={1}>
+                    <View f={1} backgroundColor="white" padding={32} justifyContent='center'>
+                      <Text color={"#475569"}>{new Date(review.createTime).toLocaleDateString('fr')}</Text>
+                    </View>
+                  </YGroup.Item>
+                ))}
+              </YGroup>
+            </XGroup.Item>
 
-          {/* Rows */}
-          {reviews.map((review, index) => (
-            <TableRow key={index} pressStyle={{ backgroundColor: '$backgroundHover' }}>
-              <TableCell>
-                <Text>{review.reviewer.displayName}</Text>
-              </TableCell>
-              <TableCell>
-                <Text>{new Date(review.createTime).toLocaleDateString('fr')}</Text>
-              </TableCell>
-              <TableCell>
-                <XStack alignItems="center" gap="$1">
-                  <StarFull color={'orange'} size={'$1'} />
-                  <Text>{convertStarRatingToNumber(review.starRating)}</Text>
-                </XStack>
-              </TableCell>
-              <TableCell>
-                <Text numberOfLines={1}>{review.comment}</Text>
-              </TableCell>
+            <XGroup.Item>
+              <YGroup justifyContent='flex-start' f={1} separator={<Separator backgroundColor="#E2E8F0" height={1}/>} borderRadius={0}>
+                <YGroup.Item>
+                  <Text paddingVertical={16}  paddingHorizontal={32} color={'#475569'} fontWeight={500} fontSize={12}>
+                    Note
+                  </Text>
+                </YGroup.Item>
+                {paginatedReviews.map((review, index) => (
+                  <YGroup.Item key={index} f={1}>
+                    <View backgroundColor="white" padding={32} f={1}  flexDirection='row' alignItems='center' gap={8}>
+                      <StarFull color={'orange'} size={'$1'} />
+                      <Text color={'orange'}>{convertStarRatingToNumber(review.starRating)}</Text>
+                    </View>
+                  </YGroup.Item>
+                ))}
+              </YGroup>
+            </XGroup.Item>
 
-              <TableCell>
-                <StatusIndicator status={review.reviewReply ? 'responded' : 'notResponded'}>
-                  <Dot />
-                  <Text>{review.reviewReply ? 'Répondu' : 'Pas répondu'}</Text>
-                </StatusIndicator>
-              </TableCell>
-              <TableCell>
-                <Button variant="outlined" onPress={() => handleClickResponse(review.id)}>
-                  Répondre
+            <XGroup.Item >
+              <YGroup  justifyContent='flex-start' f={1} separator={<Separator backgroundColor="#E2E8F0" height={1}/>} borderRadius={0}>
+                <YGroup.Item  >
+                  <Text paddingVertical={16}  paddingHorizontal={32} color={'#475569'} fontWeight={500} fontSize={12}>
+                    Commentaire
+                  </Text>
+                </YGroup.Item>
+                {paginatedReviews.map((review, index) => (
+                  <YGroup.Item key={index} f={1}   width={200} height={"100%"}>
+                    <View  f={1} backgroundColor="white" padding={32} justifyContent='center' >
+                      <Text width={200} numberOfLines={1} height={20} color={"#475569"}>{review.comment || " "}</Text>
+                    </View>
+                  </YGroup.Item>
+                ))}
+              </YGroup>
+            </XGroup.Item>
+
+            <XGroup.Item>
+              <YGroup justifyContent='flex-start' f={1} separator={<Separator backgroundColor="#E2E8F0" height={1}/>} borderRadius={0}>
+                <YGroup.Item>
+                  <Text paddingVertical={16}  paddingHorizontal={32} color={'#475569'} fontWeight={500} fontSize={12}>
+                    Status
+                  </Text>
+                </YGroup.Item>
+                {paginatedReviews.map((review, index) => (
+                  <YGroup.Item key={index} f={1} >
+                    <View f={1} backgroundColor="white" padding={32} justifyContent='center'>
+                      <StatusIndicator responded={review.reviewReply ? true : false} alignSelf='flex-start'>
+                        <Dot backgroundColor={review.reviewReply ? "#17B26A" : "#F79009"} />
+                        <Text color={review.reviewReply ? "#067647" : "#B54708"} >{review.reviewReply ? 'Répondu' : 'Pas répondu'}</Text>
+                      </StatusIndicator>
+                    </View>
+                  </YGroup.Item>
+                ))}
+              </YGroup>
+            </XGroup.Item>
+
+            <XGroup.Item>
+              <YGroup justifyContent='flex-start' f={1} separator={<Separator backgroundColor="#E2E8F0" height={1}/>} borderRadius={0}>
+                <YGroup.Item>
+                  <Text paddingVertical={16}  paddingHorizontal={32} color={'#475569'} fontWeight={500} fontSize={12}>
+                    Action
+                  </Text>
+                </YGroup.Item>
+                {paginatedReviews.map((review, index) => (
+                  <YGroup.Item key={index} f={1}>
+                    <View f={1} backgroundColor="white" padding={32} justifyContent='center'>
+                      <Button variant="outlined" onPress={() => handleClickResponse(review.reviewId)} >
+                        Répondre
+                      </Button>
+                    </View>
+                  </YGroup.Item>
+                ))}
+              </YGroup>
+            </XGroup.Item>
+          </XGroup>
+        </YGroup.Item>
+
+        <YGroup.Item>
+          <XStack 
+            backgroundColor="white" 
+            padding={16} 
+            justifyContent="space-between" 
+            alignItems="center"
+            borderTopWidth={1}
+            borderColor="#E2E8F0"
+          >
+            <Text color="#475569">
+              Affichage de {((currentPage - 1) * itemsPerPage) + 1} à {Math.min(currentPage * itemsPerPage, filteredReviews.length)} des {totalCount} avis
+            </Text>
+            <XStack gap={8}>
+                <Button variant="outlined" disabled={currentPage === 1} onPress={() => setCurrentPage(1)}>
+                  Revenir au début
                 </Button>
-              </TableCell>
-            </TableRow>
-          ))}
-        </Table>
 
-        {/* <PaginationContainer>
-          <Button variant="outlined" icon={<ArrowLeft />}>
-            Previous
-          </Button>
-          <XStack gap="$2">
-            {[1, 2, 3, '...', 8, 9, 10].map((page, index) => (
-              <PageButton key={index} isActive={page === 1} circular>
-                <Text>{page}</Text>
-              </PageButton>
-            ))}
+              <Button 
+                variant="outlined" 
+                disabled={currentPage === 1}
+                onPress={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+              >
+                <ArrowLeft />
+                Précédent
+              </Button>
+              
+              <Text color="#475569">
+                Page {currentPage}
+              </Text>
+              
+              <Button 
+                variant="outlined"
+                disabled={currentPage === totalPages}
+                onPress={() => setCurrentPage(prev => prev + 1)}
+              >
+                Suivant
+                <ArrowRight />
+              </Button>
+            </XStack>
           </XStack>
-          <Button variant="outlined" iconAfter={<ArrowRight />}>
-            Next
-          </Button>
-        </PaginationContainer> */}
-      </TableContainer>
+        </YGroup.Item>
+      </YGroup>
 
-      {/* Response Sheet */}
       <HorizontalSheet
-        handleSendPress={(reviewId, responseText) => handleSendResponse(reviewId, responseText)}
-        handleOpenPressed={(isOpen) => setResponseSheetOpen(isOpen)}
+        handleSendPress={handleSendResponse}
+        handleOpenPressed={setResponseSheetOpen}
         open={responseSheetOpen}
         selectedReview={selectedReview}
-      ></HorizontalSheet>
+      />
     </>
   )
 }
-
-// Usage example:
-const reviews = [
-  {
-    reviewer: 'Arlene McCoy',
-    date: '2024-12-01',
-    rating: 4.8,
-    comment: 'Excellent service and friendly...',
-    tag: 'Price',
-    responded: false,
-  },
-  {
-    reviewer: 'Eleanor Pena',
-    date: '2024-11-28',
-    rating: 4.5,
-    comment: 'Good quality but a bit expen...',
-    tag: 'Quality',
-    responded: true,
-  },
-]

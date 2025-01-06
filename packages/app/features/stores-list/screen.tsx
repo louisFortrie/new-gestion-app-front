@@ -85,6 +85,7 @@ export const StoresListScreen = () => {
         {stores.map((store) => (
           <StoreCard
             key={store.id}
+            locationId={store.name.split('/')[1]}
             title={store.title}
             averageRating={Math.round(store.reviews.averageRating * 10) / 10}
             totalReviews={store.reviews.totalReviewCount}

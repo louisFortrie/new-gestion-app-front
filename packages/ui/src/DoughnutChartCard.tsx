@@ -1,5 +1,5 @@
 import { Text, YStack, styled, Group, XStack, Stack } from 'tamagui'
-import {Star} from '@tamagui/lucide-icons'
+import { Star } from '@tamagui/lucide-icons'
 import { Doughnut } from 'react-chartjs-2'
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js'
 import { TimeSpanGroup } from '@my/ui'
@@ -29,7 +29,7 @@ const InsideText = styled(Text, {
   transform: 'translate(-50%, -50%)',
   fontSize: 26,
   fontWeight: 600,
-  color : "#0F172A"
+  color: '#0F172A',
 })
 
 const RatingCard = styled(YStack, {
@@ -48,23 +48,27 @@ const RatingCard = styled(YStack, {
 interface DoughnutChartCardProps {
   title: string
   dataProps: any
-  icon?: React.ReactNode 
+  icon?: React.ReactNode
 }
 
 export const DoughnutChartCard = ({ title, dataProps, icon }: DoughnutChartCardProps) => {
-  const {daily, weekly, monthly} = dataProps
+  const { daily, weekly, monthly } = dataProps
   const [insideText, setInsideText] = useState('0')
   const [dataToUse, setDataToUse] = useState(daily)
-  const [data, setData] = useState( { labels: ['1 Star', '2 Stars', '3 Stars', '4 Stars', '5 Stars'],
+  const [data, setData] = useState({
+    labels: ['1 Star', '2 Stars', '3 Stars', '4 Stars', '5 Stars'],
     datasets: [
       {
         data: [0],
         backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'],
         hoverBackgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'],
       },
-    ],})
+    ],
+  })
 
   const handleTimeSpanChange = (timeSpan: string) => {
+    console.log(timeSpan, 'timeSpan')
+
     switch (timeSpan) {
       case 'daily':
         setDataToUse(daily)
@@ -79,8 +83,13 @@ export const DoughnutChartCard = ({ title, dataProps, icon }: DoughnutChartCardP
   }
 
   useEffect(() => {
-    const allZero = Object.values(dataToUse.current).every((value) => value === 0);
-    console.log(allZero, dataToUse.current, 'data to use')
+    setDataToUse(daily)
+  }, [dataProps])
+
+  useEffect(() => {
+    const allZero = Object.values(dataToUse.comparison.current).every((value) => value === 0)
+    console.log(dataToUse, 'dataToUse')
+
     if (allZero) {
       setInsideText('-')
       setData({
@@ -92,27 +101,26 @@ export const DoughnutChartCard = ({ title, dataProps, icon }: DoughnutChartCardP
             hoverBackgroundColor: ['#D3D3D3'],
           },
         ],
-      });
+      })
     } else {
-      setInsideText(dataToUse.current.average)
+      setInsideText(dataToUse.comparison.current.average)
       setData({
         labels: ['1 Star', '2 Stars', '3 Stars', '4 Stars', '5 Stars'],
         datasets: [
           {
             data: [
-              dataToUse.current.oneStar,
-              dataToUse.current.twoStars,
-              dataToUse.current.threeStars,
-              dataToUse.current.fourStars,
-              dataToUse.current.fiveStars,
+              dataToUse.comparison.current.oneStar,
+              dataToUse.comparison.current.twoStars,
+              dataToUse.comparison.current.threeStars,
+              dataToUse.comparison.current.fourStars,
+              dataToUse.comparison.current.fiveStars,
             ],
             backgroundColor: ['#F04438', '#F97066', '#FAC515', '#EAAA08', '#17B26A'],
             hoverBackgroundColor: ['#F04438', '#F97066', '#FAC515', '#EAAA08', '#17B26A'],
           },
         ],
-      });
+      })
     }
-    
   }, [dataToUse])
 
   // Options du graphique
@@ -132,14 +140,15 @@ export const DoughnutChartCard = ({ title, dataProps, icon }: DoughnutChartCardP
   return (
     <StyledDoughnutChartCard>
       <XStack borderBottomColor={'#E2E8F0'} borderBottomWidth={1} gap={16} width={'100%'}>
-        <XStack f={1} paddingVertical={'$3'} paddingHorizontal={"$4"} alignItems='center' gap={16}>
-
-            {icon}
-        <Text fontWeight={600} fontSize={18} color={"#0F172A"} >
-          {title}
+        <XStack f={1} paddingVertical={'$3'} paddingHorizontal={'$4'} alignItems="center" gap={16}>
+          {icon}
+          <Text fontWeight={600} fontSize={18} color={'#0F172A'}>
+            {title}
           </Text>
           <Stack f={1}></Stack>
-          <TimeSpanGroup onTimeSpanChange={(timeSpan) => handleTimeSpanChange(timeSpan)}></TimeSpanGroup>
+          <TimeSpanGroup
+            onTimeSpanChange={(timeSpan) => handleTimeSpanChange(timeSpan)}
+          ></TimeSpanGroup>
         </XStack>
       </XStack>
       <Stack f={1} width={'100%'} padding={'$4'} gap={16}>
@@ -157,23 +166,23 @@ export const DoughnutChartCard = ({ title, dataProps, icon }: DoughnutChartCardP
         </Stack>
         <XStack gap={16} width={'100%'}>
           <RatingCard borderBottomWidth={4} borderBottomColor={'#17B26A'}>
-            <Text fontSize={14}>{dataToUse.current.fiveStar}</Text>
+            <Text fontSize={14}>{dataToUse.comparison.current.fiveStars}</Text>
             <Text fontSize={12}>5 étoiles</Text>
           </RatingCard>
           <RatingCard borderBottomWidth={4} borderBottomColor={'#EAAA08'}>
-            <Text fontSize={14}>{dataToUse.current.fourStar}</Text>
+            <Text fontSize={14}>{dataToUse.comparison.current.fourStars}</Text>
             <Text fontSize={12}>4 étoiles</Text>
           </RatingCard>
           <RatingCard borderBottomWidth={4} borderBottomColor={'#FAC515'}>
-            <Text fontSize={14}>{dataToUse.current.threeStar}</Text>
+            <Text fontSize={14}>{dataToUse.comparison.current.threeStars}</Text>
             <Text fontSize={12}>3 étoiles</Text>
           </RatingCard>
           <RatingCard borderBottomWidth={4} borderBottomColor={'#F97066'}>
-            <Text fontSize={14}>{dataToUse.current.twoStar}</Text>
+            <Text fontSize={14}>{dataToUse.comparison.current.twoStars}</Text>
             <Text fontSize={12}>2 étoiles</Text>
           </RatingCard>
           <RatingCard borderBottomWidth={4} borderBottomColor={'#F04438'}>
-            <Text fontSize={14}>{dataToUse.current.oneStar}</Text>
+            <Text fontSize={14}>{dataToUse.comparison.current.oneStar}</Text>
             <Text fontSize={12}>1 étoiles</Text>
           </RatingCard>
         </XStack>

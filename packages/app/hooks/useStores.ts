@@ -21,6 +21,7 @@ const useStores = () => {
           withCredentials: true,
         }
       )
+      console.log('Token refreshed')
     } catch (error) {
       console.error('Erreur lors de la récupération des magasins:', error)
     }

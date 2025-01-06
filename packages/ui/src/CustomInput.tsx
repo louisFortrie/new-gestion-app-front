@@ -28,6 +28,15 @@ const StyledInput = styled(Input, {
     borderColor: 'transparent',
     outlineColor: 'transparent',
   },
+  variants: {
+    disabled: {
+      true: {
+        backgroundColor: '#F1F5F9',
+        color: '#64748B',
+        cursor: 'not-allowed',
+      },
+    },
+  } as const,
 })
 
 export const CustomInput: React.FC<CustomInputProps> = ({ PreIcon, PostIcon, ...props }) => {
@@ -39,12 +48,12 @@ export const CustomInput: React.FC<CustomInputProps> = ({ PreIcon, PostIcon, ...
     <XStack
       alignItems="center"
       style={{
-        backgroundColor: 'white',
+        backgroundColor: props.disabled ? '#F1F5F9' : 'white',
         borderRadius: 10,
         padding: '0 10px',
         borderColor: isFocused ? '#475569' : '#E2E8F0',
         borderWidth: 2,
-        flex : 1
+        flex: 1,
       }}
     >
       <Label htmlFor="Input"> {PreIcon && <XStack marginRight="$2">{PreIcon}</XStack>} </Label>

@@ -19,10 +19,20 @@ const Card = styled(Group, {
 interface GraphCardProps {
   title: string
   graph: React.ReactNode
+  prevValue?: number
+  currValue?: number
+  onTimeSpanChange?: (timeSpan: 'daily' | 'weekly' | 'monthly') => void
   icon?: React.ReactNode
 }
 
-export const GraphCard = ({ title, graph, icon }: GraphCardProps) => {
+export const GraphCard = ({
+  title,
+  graph,
+  onTimeSpanChange = () => {},
+  icon,
+  prevValue,
+  currValue,
+}: GraphCardProps) => {
   return (
     <Card>
       <XStack
@@ -50,12 +60,14 @@ export const GraphCard = ({ title, graph, icon }: GraphCardProps) => {
         alignItems="center"
         justifyContent="center"
       >
-        <TimeSpanGroup></TimeSpanGroup>
+        <TimeSpanGroup
+          onTimeSpanChange={(timespan) => onTimeSpanChange && onTimeSpanChange(timespan)}
+        ></TimeSpanGroup>
       </XStack>
       <EvolutionGraphIndicator
         alignSelf="flex-start"
-        prevValue={4}
-        currValue={5}
+        prevValue={prevValue || 0}
+        currValue={currValue || 0}
         marginLeft={16}
       ></EvolutionGraphIndicator>
       <Stack paddingVertical={'$3'} paddingHorizontal={'$6'} width={'100%'} gap={16} height={300}>

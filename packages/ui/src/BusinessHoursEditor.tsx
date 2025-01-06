@@ -1,7 +1,7 @@
 import { Button, XStack, YStack, styled, Text, Switch, Spinner } from 'tamagui'
 import { CustomSelect } from '@my/ui'
 import { Clock, Plus } from '@tamagui/lucide-icons'
-import { useState } from 'react'
+import { memo, useState } from 'react'
 
 type Day = 'MONDAY' | 'TUESDAY' | 'WEDNESDAY' | 'THURSDAY' | 'FRIDAY' | 'SATURDAY' | 'SUNDAY'
 
@@ -65,7 +65,7 @@ const StyledButton = styled(Button, {
   width: 'fit-content',
 })
 
-export const BusinessHoursEditor: React.FC<BusinessHoursEditorProps> = ({
+export const BusinessHoursEditor: React.FC<BusinessHoursEditorProps> = memo(({
   businessHours,
   onBusinessHoursChange,
 }) => {
@@ -188,4 +188,4 @@ export const BusinessHoursEditor: React.FC<BusinessHoursEditorProps> = ({
       })}
     </YStack>
   )
-}
+})

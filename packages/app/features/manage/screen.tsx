@@ -2,7 +2,7 @@ import { styled, YStack, Text, XStack, Label, Stack, Button, Spinner } from 'tam
 import { CustomInput, BusinessHoursEditor, CustomButton, MediasManagement } from '@my/ui'
 import { Check, SquarePen } from '@tamagui/lucide-icons'
 import useStores from 'app/hooks/useStores'
-import { useEffect, useState } from 'react'
+import { memo, useEffect, useState } from 'react'
 
 const StyledYstack = styled(YStack, {
   gap: '$2',
@@ -24,12 +24,29 @@ const Title = styled(Text, {
   fontWeight: 500,
 })
 
+const MemoizedBusinessHoursEditor = memo(BusinessHoursEditor)
+
 type Day = 'MONDAY' | 'TUESDAY' | 'WEDNESDAY' | 'THURSDAY' | 'FRIDAY' | 'SATURDAY' | 'SUNDAY'
 export const Manage = () => {
   const [businessHours, setBusinessHours] = useState({
     periods: [],
   })
-  const [newStoreInfo, setNewStoreInfo] = useState()
+  const [newStoreInfo, setNewStoreInfo] = useState({
+    title: '',
+    storefrontAddress: {
+      addressLines: [''],
+      locality: '',
+    },
+    categories: {
+      primaryCategory: {
+        displayName: '',
+      },
+    },
+    websiteUri: '',
+    phoneNumbers: {
+      primaryPhone: '',
+    },
+  })
 
   const { selectedStore } = useStores()
 
@@ -41,6 +58,10 @@ export const Manage = () => {
 
   if (businessHours.periods.length === 0) {
     return <Spinner size="large" color={'black'} />
+  }
+
+  const handleSaveModifications = () => {
+    console.log('save', businessHours, newStoreInfo)
   }
 
   return (
@@ -64,6 +85,9 @@ export const Manage = () => {
             <CustomInput
               placeholder="La maison du convertible"
               value={newStoreInfo?.title}
+              onChangeText={(text) => {
+                setNewStoreInfo((prev) => ({ ...prev, title: text }))
+              }}
             ></CustomInput>
             <XStack gap={32} width={'100%'}>
               <Stack width={'40%'}>
@@ -88,6 +112,9 @@ export const Manage = () => {
                 <CustomInput
                   placeholder="www.example.com"
                   value={newStoreInfo?.websiteUri}
+                  onChangeText={(text) => {
+                    setNewStoreInfo({ ...newStoreInfo, websiteUri: text })
+                  }}
                 ></CustomInput>
               </Stack>
               <XStack gap={16} justifyContent="space-between" f={1}>
@@ -96,6 +123,9 @@ export const Manage = () => {
                   <CustomInput
                     placeholder="+33 1 23 45 67 89"
                     value={newStoreInfo?.phoneNumbers?.primaryPhone}
+                    onChangeText={(text) => {
+                      setNewStoreInfo({ ...newStoreInfo, phoneNumbers: { primaryPhone: text } })
+                    }}
                   ></CustomInput>
                 </Stack>
               </XStack>
@@ -104,21 +134,23 @@ export const Manage = () => {
           </YStack>
         </XStack>
       </StyledYstack>
-      <Title>Télécharger ou Remplacer les Photos de l'établissement</Title>
+      {/* <Title>Télécharger ou Remplacer les Photos de l'établissement</Title>
       <StyledXStack>
         <MediasManagement></MediasManagement>
-      </StyledXStack>
+      </StyledXStack> */}
       <Title>Horaire d'ouvertures</Title>
-      <BusinessHoursEditor
+      <MemoizedBusinessHoursEditor
         businessHours={businessHours}
         onBusinessHoursChange={(businessHoursNew) => {
           setBusinessHours(businessHoursNew as any)
           console.log(businessHoursNew)
         }}
-      ></BusinessHoursEditor>
+      ></MemoizedBusinessHoursEditor>
       <XStack justifyContent="flex-end" gap={16}>
         <Button icon={<SquarePen />}>Modifier</Button>
-        <CustomButton icon={<Check />}>Approuver</CustomButton>
+        <CustomButton onPress={() => handleSaveModifications()} icon={<Check />}>
+          Approuver
+        </CustomButton>
       </XStack>
     </YStack>
   )

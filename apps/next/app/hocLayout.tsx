@@ -12,7 +12,7 @@ const HocLayout: React.FC<HocLayoutProps> = ({ children, ...rest }) => {
   const isInloginpage = pathname?.startsWith('/login')
 
   return (
-    <XStack {...rest} width={'100%'}>
+    <XStack {...rest} width={'100%'} position="relative">
       {!isInloginpage && <NavBar />}
       <YStack
         paddingHorizontal={!isInloginpage ? '$10' : 0}

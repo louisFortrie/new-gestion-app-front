@@ -3,7 +3,7 @@ import { CustomButton, CustomInput, CustomSelect } from '@my/ui'
 import { PenSquare, Trash2 } from '@tamagui/lucide-icons'
 import axios from 'axios'
 import { useEffect, useState } from 'react'
-import { YStack, Text, styled, Form, XStack, Stack, Button } from 'tamagui'
+import { YStack, Text, styled, Form, XStack, Stack, Button, TextArea } from 'tamagui'
 import useAuth from 'app/hooks/useAuth'
 
 const StyledForm = styled(Form, {
@@ -151,71 +151,88 @@ export const TemplatesScreen = () => {
   }, [user])
 
   return (
-    <YStack>
-      <Text>Créer un nouveau template de réponse</Text>
-      <StyledForm>
-        <XStack>
-          <Text>Titre du template</Text>
-          <CustomInput
-            value={newTemplate.title}
-            placeholder="Titre du template"
-            onChange={(e) => handleTitleChange(e)}
-          />
-        </XStack>
-        <XStack>
-          <Text>Catégorie</Text>
-          <CustomSelect
-            value={newTemplate.category}
-            onChange={(e) => handleCategoryChange(e)}
-            options={[
-              {
-                name: 'positive',
-              },
-              {
-                name: 'neutral',
-              },
-              {
-                name: 'negative',
-              },
-            ]}
-          ></CustomSelect>
-        </XStack>
-        <XStack>
-          <Text>Contenue de la réponse</Text>
-          <CustomInput
-            value={newTemplate.message}
-            placeholder="Déscription"
-            onChange={(e) => handleDescriptionChange(e)}
-          />
-        </XStack>
-        <CustomButton onPress={() => handleSave()}>Sauvegarder</CustomButton>
-      </StyledForm>
-      <Text>Templates de réponses sauvegardés</Text>
-      <XStack f={1} gap={16}>
-        <YStack f={1} gap={16} width={'calc(33% - 16px)'}>
-          {templates.length > 0 &&
-            templates
-              .filter((template) => template.category === 'positive')
-              .map((template) => (
-                <TemplateCard key={template.title}>
-                  <TemplateCategory positive>Positif</TemplateCategory>
-                  <TemplateTitle>{template.title}</TemplateTitle>
-                  <TemplateDescription>{template.message}</TemplateDescription>
-                  <XStack gap={16}>
-                    <Button icon={<PenSquare />} f={1}>
-                      Modifier
-                    </Button>
-                    <Button
-                      icon={<Trash2 />}
-                      f={1}
-                      onPress={() => handleDeleteTemplate(template.id)}
-                    >
-                      Supprimer
-                    </Button>
-                  </XStack>
-                </TemplateCard>
-              ))}
-          {/* <TemplateCard>
+    <YStack gap={32}>
+      <YStack gap={16}>
+        <Text col={'#0F172A'} fontSize={24} fontWeight={600}>
+          Créer un nouveau template de réponse
+        </Text>
+        <StyledForm gap={16}>
+          <XStack alignItems="center">
+            <Text width={200} col={'#334155'}>
+              Titre du template
+            </Text>
+            <CustomInput
+              value={newTemplate.title}
+              placeholder="Titre du template"
+              onChange={(e) => handleTitleChange(e)}
+            />
+          </XStack>
+          <XStack alignItems="center">
+            <Text width={200} col={'#334155'}>
+              Catégorie
+            </Text>
+            <CustomSelect
+              value={newTemplate.category}
+              onChange={(e) => handleCategoryChange(e)}
+              options={[
+                {
+                  name: 'positive',
+                },
+                {
+                  name: 'neutral',
+                },
+                {
+                  name: 'negative',
+                },
+              ]}
+            ></CustomSelect>
+          </XStack>
+          <XStack>
+            <Text width={200} col={'#334155'}>
+              Contenue de la réponse
+            </Text>
+            <TextArea
+              f={1}
+              backgroundColor={'white'}
+              value={newTemplate.message}
+              placeholder="Déscription"
+              onChange={(e) => handleDescriptionChange(e)}
+            />
+          </XStack>
+          <CustomButton alignSelf="flex-end" onPress={() => handleSave()}>
+            Sauvegarder
+          </CustomButton>
+        </StyledForm>
+      </YStack>
+      <YStack gap={16}>
+        <Text col={'#0F172A'} fontSize={24} fontWeight={600}>
+          Templates de réponses sauvegardés
+        </Text>
+        <XStack f={1} gap={16}>
+          <YStack f={1} gap={16} width={'calc(33% - 16px)'}>
+            {templates.length > 0 &&
+              templates
+                .filter((template) => template.category === 'positive')
+                .map((template) => (
+                  <TemplateCard key={template.title}>
+                    <TemplateCategory positive>Positif</TemplateCategory>
+                    <TemplateTitle>{template.title}</TemplateTitle>
+                    <TemplateDescription>{template.message}</TemplateDescription>
+                    <XStack gap={16}>
+                      <Button icon={<PenSquare />} f={1}>
+                        Modifier
+                      </Button>
+                      <Button
+                        icon={<Trash2 />}
+                        f={1}
+                        onPress={() => handleDeleteTemplate(template.id)}
+                      >
+                        Supprimer
+                      </Button>
+                    </XStack>
+                  </TemplateCard>
+                ))}
+            {/* <TemplateCard>
 
             <TemplateCategory positive>Positive</TemplateCategory>
             <TemplateTitle>Merci pour vos mots doux ! </TemplateTitle>
@@ -240,26 +257,26 @@ export const TemplatesScreen = () => {
               <Button icon={<Trash2 />}>Supprimer</Button>
             </XStack>
           </TemplateCard> */}
-        </YStack>
-        <YStack f={1} gap={16} width={'calc(33% - 16px)'}>
-          {templates.length > 0 &&
-            templates
-              .filter((template) => template.category === 'neutral')
-              .map((template) => (
-                <TemplateCard key={template.title}>
-                  <TemplateCategory neutral>Neutre</TemplateCategory>
-                  <TemplateTitle>{template.title}</TemplateTitle>
-                  <TemplateDescription>{template.message}</TemplateDescription>
-                  <XStack gap={16}>
-                    <Button icon={<PenSquare />}>Modifier</Button>
-                    <Button icon={<Trash2 />} onPress={() => handleDeleteTemplate(template.id)}>
-                      Supprimer
-                    </Button>
-                  </XStack>
-                </TemplateCard>
-              ))}
+          </YStack>
+          <YStack f={1} gap={16} width={'calc(33% - 16px)'}>
+            {templates.length > 0 &&
+              templates
+                .filter((template) => template.category === 'neutral')
+                .map((template) => (
+                  <TemplateCard key={template.title}>
+                    <TemplateCategory neutral>Neutre</TemplateCategory>
+                    <TemplateTitle>{template.title}</TemplateTitle>
+                    <TemplateDescription>{template.message}</TemplateDescription>
+                    <XStack gap={16}>
+                      <Button icon={<PenSquare />}>Modifier</Button>
+                      <Button icon={<Trash2 />} onPress={() => handleDeleteTemplate(template.id)}>
+                        Supprimer
+                      </Button>
+                    </XStack>
+                  </TemplateCard>
+                ))}
 
-          {/* <TemplateCard>
+            {/* <TemplateCard>
             <TemplateCategory positive>Positive</TemplateCategory>
             <TemplateTitle>Merci pour vos mots doux ! </TemplateTitle>
             <TemplateDescription>
@@ -271,25 +288,25 @@ export const TemplatesScreen = () => {
               <Button icon={<Trash2 />}>Supprimer</Button>
             </XStack>
           </TemplateCard> */}
-        </YStack>
-        <YStack f={1} gap={16} width={'calc(33% - 16px)'}>
-          {templates.length > 0 &&
-            templates
-              .filter((template) => template.category === 'negative')
-              .map((template) => (
-                <TemplateCard key={template.title}>
-                  <TemplateCategory negative>Négatif</TemplateCategory>
-                  <TemplateTitle>{template.title}</TemplateTitle>
-                  <TemplateDescription>{template.message}</TemplateDescription>
-                  <XStack gap={16}>
-                    <Button icon={<PenSquare />}>Modifier</Button>
-                    <Button icon={<Trash2 />} onPress={() => handleDeleteTemplate(template.id)}>
-                      Supprimer
-                    </Button>
-                  </XStack>
-                </TemplateCard>
-              ))}
-          {/* <TemplateCard>
+          </YStack>
+          <YStack f={1} gap={16} width={'calc(33% - 16px)'}>
+            {templates.length > 0 &&
+              templates
+                .filter((template) => template.category === 'negative')
+                .map((template) => (
+                  <TemplateCard key={template.title}>
+                    <TemplateCategory negative>Négatif</TemplateCategory>
+                    <TemplateTitle>{template.title}</TemplateTitle>
+                    <TemplateDescription>{template.message}</TemplateDescription>
+                    <XStack gap={16}>
+                      <Button icon={<PenSquare />}>Modifier</Button>
+                      <Button icon={<Trash2 />} onPress={() => handleDeleteTemplate(template.id)}>
+                        Supprimer
+                      </Button>
+                    </XStack>
+                  </TemplateCard>
+                ))}
+            {/* <TemplateCard>
             <TemplateCategory positive>Positive</TemplateCategory>
             <TemplateTitle>Merci pour vos mots doux ! </TemplateTitle>
             <TemplateDescription>
@@ -313,8 +330,9 @@ export const TemplatesScreen = () => {
               <Button icon={<Trash2 />}>Supprimer</Button>
             </XStack>
           </TemplateCard> */}
-        </YStack>
-      </XStack>
+          </YStack>
+        </XStack>
+      </YStack>
     </YStack>
   )
 }

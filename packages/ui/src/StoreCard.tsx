@@ -1,5 +1,8 @@
 import { Text, YStack, YStackProps, styled, Stack, XStack, Popover, Button, Image  } from 'tamagui'
 import { MoreVertical, StarFull } from '@tamagui/lucide-icons'
+import { useEffect } from 'react'
+import axios from 'axios'
+import useAuth from 'app/hooks/useAuth'
 
 const Card = styled(YStack, {
   borderWidth: 2,
@@ -25,12 +28,32 @@ const CoverContainer = styled(Stack, {
   backgroundColor: 'lightgray',
 })
 interface StoreCardProps extends YStackProps {
+  locationId : string
   title: string
   averageRating: number
   totalReviews: number
   imageUrl ?: string
 }
-export const StoreCard = ({ title, averageRating, totalReviews, imageUrl, ...props }: StoreCardProps) => {
+
+const apiUrl = process.env.NEXT_PUBLIC_API_URL
+
+export const StoreCard = ({ locationId,  title, averageRating, totalReviews, imageUrl, ...props }: StoreCardProps) => {
+  const {user } = useAuth()
+
+  useEffect(() => {
+    if(!user) return
+
+    axios.get(`${apiUrl}/api/gestionStore/checkIfStoreExists/locationId/${locationId}/accountId/${user.googleAccounts[0].googleAccount.accountId}`, {
+      withCredentials: true,
+    }).then((response) => {
+      console.log(response.data)
+    }).catch((error) => {
+      console.error('Erreur lors de la récupération des avis:', error)
+    }
+    )
+  }
+  , [user])
+
   return (
     <Card {...props}>
       <CoverContainer backgroundImage={`url(${imageUrl})`} backgroundSize="cover" backgroundPosition="center">

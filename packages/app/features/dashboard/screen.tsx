@@ -60,72 +60,135 @@ export const DashboardScreen = () => {
   })
   const [groupedReviews, setGroupedReviews] = useState<any>({
     daily: {
-      current: {
-        oneStar: 0,
-        twoStar: 0,
-        threeStar: 0,
-        fourStar: 0,
-        fiveStar: 0,
+      comparison: {
+        current: {
+          oneStar: 0,
+          twoStars: 0,
+          threeStars: 0,
+          fourStars: 0,
+          fiveStars: 0,
+        },
       },
     },
     weekly: {
-      current: {
-        oneStar: 0,
-        twoStar: 0,
-        threeStar: 0,
-        fourStar: 0,
-        fiveStar: 0,
+      comparison: {
+        current: {
+          oneStar: 0,
+          twoStars: 0,
+          threeStars: 0,
+          fourStars: 0,
+          fiveStars: 0,
+        },
       },
     },
     monthly: {
-      current: {
-        oneStar: 0,
-        twoStar: 0,
-        threeStar: 0,
-        fourStar: 0,
-        fiveStar: 0,
+      comparison: {
+        current: {
+          oneStar: 0,
+          twoStars: 0,
+          threeStars: 0,
+          fourStars: 0,
+          fiveStars: 0,
+        },
       },
     },
   })
 
+  const [googleMetrics, setGoogleMetrics] = useState<any>(undefined)
+
+  const [gestionStoreMetrics, setGestionStoreMetrics] = useState<any>({
+    averageResponseTime: 0,
+    responseRate: 0,
+  })
   useEffect(() => {
     if (!selectedStore || !user || user.googleAccounts.length === 0 || loading) return
-    console.log(user)
     axios
-      .get(
-        `${apiUrl}/api/gestion/metrics/${user.googleAccounts[0].googleAccount.accountId}/${selectedStore.name.split('/')[1]}`,
-        {
-          withCredentials: true,
-        }
-      )
-      .then((response) => {
-        setMetrics(response.data)
-      })
-      .catch((error) => {
-        console.error('Erreur lors de la récupération des métriques:', error)
-      })
-
-    axios
-      .get(
-        `${apiUrl}/api/gestion/groupedReviews/${user.googleAccounts[0].googleAccount.accountId}/${selectedStore.name.split('/')[1]}`,
-        {
-          withCredentials: true,
-        }
-      )
-      .then((response) => {
-        setGroupedReviews(response.data)
-      })
-      .catch((error) => {
-        console.error('Erreur lors de la récupération des métriques:', error)
-      })
-
-    axios.get(
-      `${apiUrl}/api/gestion/ratingEvolution/${user.googleAccounts[0].googleAccount.accountId}/${selectedStore.name.split('/')[1]}`,
-      {
+      .get(`${apiUrl}/api/gestionStore/storeMetrics/${selectedStore.name.split('/')[1]}`, {
         withCredentials: true,
-      }
-    )
+      })
+      .then((response) => {
+        setGestionStoreMetrics(response.data)
+        setGroupedReviews(response.data.googleRatingGrouped)
+      })
+      .catch((error) => {
+        console.error('Erreur lors de la récupération des métriques:', error)
+      })
+
+    axios
+      .get(`${apiUrl}/api/mybusiness/locations/${selectedStore.name.split('/')[1]}/metrics`, {
+        withCredentials: true,
+      })
+      .then((response) => {
+        console.log(response.data)
+        setGoogleMetrics(response.data)
+      })
+      .catch((error) => {
+        console.error('Erreur lors de la récupération des métriques:', error)
+      })
   }, [loading])
+
+  // useEffect(() => {
+  //   if (!selectedStore || !user || user.googleAccounts.length === 0 || loading) return
+  //   console.log(user)
+  //   axios
+  //     .get(
+  //       `${apiUrl}/api/gestion/metrics/${user.googleAccounts[0].googleAccount.accountId}/${selectedStore.name.split('/')[1]}`,
+  //       {
+  //         withCredentials: true,
+  //       }
+  //     )
+  //     .then((response) => {
+  //       setMetrics(response.data)
+  //       console.log(response.data)
+  //     })
+  //     .catch((error) => {
+  //       console.error('Erreur lors de la récupération des métriques:', error)
+  //     })
+
+  //   axios
+  //     .get(
+  //       `${apiUrl}/api/gestion/groupedReviews/${user.googleAccounts[0].googleAccount.accountId}/${selectedStore.name.split('/')[1]}`,
+  //       {
+  //         withCredentials: true,
+  //       }
+  //     )
+  //     .then((response) => {
+  //       setGroupedReviews(response.data)
+  //       console.log(response.data)
+  //     })
+  //     .catch((error) => {
+  //       console.error('Erreur lors de la récupération des métriques:', error)
+  //     })
+
+  //   // axios.get(
+  //   //   `${apiUrl}/api/gestion/ratingEvolution/${user.googleAccounts[0].googleAccount.accountId}/${selectedStore.name.split('/')[1]}`,
+  //   //   {
+  //   //     withCredentials: true,
+  //   //   }
+  //   // )
+
+  //   axios
+  //     .get(`${apiUrl}/api/mybusiness/locations/${selectedStore.name.split('/')[1]}/metrics`, {
+  //       withCredentials: true,
+  //     })
+  //     .then((response) => {
+  //       console.log(response.data)
+  //       setGoogleMetrics(response.data)
+  //     })
+  //     .catch((error) => {
+  //       console.error('Erreur lors de la récupération des métriques:', error)
+  //     })
+  // }, [loading])
+
+  // useEffect(() => {
+  //   if (!selectedStore || !user || user.googleAccounts.length === 0 || loading) return
+  //   axios.get(
+  //     `${apiUrl}/api/gestion/account/${user.googleAccounts[0].googleAccount.accountId}/location/${selectedStore.name.split('/')[1]}/store/${selectedStore.id}/initialize`,
+  //     {
+  //       withCredentials: true,
+  //     }
+  //   )
+  // }, [loading])
 
   const data = {
     labels: ['Rouge', 'Bleu', 'Jaune'],
@@ -168,17 +231,296 @@ export const DashboardScreen = () => {
     ],
   }
 
+  const [selectedPeriod, setSelectedPeriod] = useState('daily')
+  const [chartData, setChartData] = useState<{
+    labels: string[]
+    datasets: {
+      label: string
+      data: number[]
+      borderColor: string
+      backgroundColor: any
+      tension: number
+      fill: boolean
+    }[]
+  }>({ labels: [], datasets: [] })
+
+  useEffect(() => {
+    if (!googleMetrics) return
+    console.log(googleMetrics)
+
+    const formatDataForChart = () => {
+      let dates: string[] = []
+      let values: any[] = []
+
+      if (selectedPeriod === 'daily') {
+        Object.entries(googleMetrics.metrics.daily.data).forEach(([date, data]) => {
+          dates.push(date)
+          values.push((data as any).BUSINESS_DIRECTION_REQUESTS)
+        })
+      } else if (selectedPeriod === 'weekly') {
+        Object.entries(googleMetrics.metrics.weekly.data).forEach(([week, data]) => {
+          dates.push(week)
+          values.push((data as any).BUSINESS_DIRECTION_REQUESTS)
+        })
+      } else {
+        Object.entries(googleMetrics.metrics.monthly.data).forEach(([month, data]) => {
+          dates.push(month)
+          values.push((data as any).BUSINESS_DIRECTION_REQUESTS)
+        })
+      }
+
+      setChartData({
+        labels: dates,
+        datasets: [
+          {
+            label: 'Demandes de direction',
+            data: values,
+            borderColor: '#C8DCFF',
+            backgroundColor: (context) => {
+              const chart = context.chart
+              const { ctx, chartArea } = chart
+
+              if (!chartArea) {
+                return null // Retourne null tant que le chartArea n'est pas calculé
+              }
+
+              // Crée un gradient avec les couleurs spécifiées
+              const gradient = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom)
+              gradient.addColorStop(0, 'rgba(200, 220, 255, 0.5)') // Couleur au sommet
+              gradient.addColorStop(1, 'rgba(200, 220, 255, 0.2)') // Couleur à la base
+              return gradient
+            },
+            tension: 0.4,
+            fill: true,
+          },
+        ],
+      })
+    }
+    formatDataForChart()
+  }, [selectedPeriod, googleMetrics])
+
+  const [selectedPeriodCalls, setSelectedPeriodCalls] = useState('daily')
+  const [chartDataCalls, setChartDataCalls] = useState<{
+    labels: string[]
+    datasets: {
+      label: string
+      data: number[]
+      borderColor: string
+      backgroundColor: any
+      tension: number
+      fill: boolean
+    }[]
+  }>({ labels: [], datasets: [] })
+
+  useEffect(() => {
+    if (!googleMetrics) return
+    console.log(googleMetrics)
+
+    const formatDataForChart = () => {
+      let dates: string[] = []
+      let values: any[] = []
+
+      if (selectedPeriodCalls === 'daily') {
+        Object.entries(googleMetrics.metrics.daily.data).forEach(([date, data]) => {
+          dates.push(date)
+          values.push((data as any).CALL_CLICKS)
+        })
+      } else if (selectedPeriodCalls === 'weekly') {
+        Object.entries(googleMetrics.metrics.weekly.data).forEach(([week, data]) => {
+          dates.push(week)
+          values.push((data as any).CALL_CLICKS)
+        })
+      } else {
+        Object.entries(googleMetrics.metrics.monthly.data).forEach(([month, data]) => {
+          dates.push(month)
+          values.push((data as any).CALL_CLICKS)
+        })
+      }
+
+      setChartDataCalls({
+        labels: dates,
+        datasets: [
+          {
+            label: 'Cliques sur "Appeler"',
+            data: values,
+            borderColor: '#C8DCFF',
+            backgroundColor: (context) => {
+              const chart = context.chart
+              const { ctx, chartArea } = chart
+
+              if (!chartArea) {
+                return null // Retourne null tant que le chartArea n'est pas calculé
+              }
+
+              // Crée un gradient avec les couleurs spécifiées
+              const gradient = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom)
+              gradient.addColorStop(0, 'rgba(200, 220, 255, 0.5)') // Couleur au sommet
+              gradient.addColorStop(1, 'rgba(200, 220, 255, 0.2)') // Couleur à la base
+              return gradient
+            },
+            tension: 0.4,
+            fill: true,
+          },
+        ],
+      })
+    }
+    formatDataForChart()
+  }, [selectedPeriodCalls, googleMetrics])
+
+  const [selectedPeriodViews, setSelectedPeriodViews] = useState('daily')
+  const [chartDataViews, setChartDataViews] = useState<{
+    labels: string[]
+    datasets: {
+      label: string
+      data: number[]
+      borderColor: string
+      backgroundColor: any
+      tension: number
+      fill: boolean
+    }[]
+  }>({ labels: [], datasets: [] })
+
+  useEffect(() => {
+    if (!googleMetrics) return
+    console.log(googleMetrics)
+
+    const formatDataForChart = () => {
+      let dates: string[] = []
+      let values: any[] = []
+
+      if (selectedPeriodViews === 'daily') {
+        Object.entries(googleMetrics.metrics.daily.data).forEach(([date, data]) => {
+          dates.push(date)
+          values.push(
+            (data as any).BUSINESS_IMPRESSIONS_DESKTOP_MAPS +
+              (data as any).BUSINESS_IMPRESSIONS_MOBILE_MAPS +
+              (data as any).BUSINESS_IMPRESSIONS_MOBILE_SEARCH +
+              (data as any).BUSINESS_IMPRESSIONS_DESKTOP_SEARCH
+          )
+        })
+      } else if (selectedPeriodViews === 'weekly') {
+        Object.entries(googleMetrics.metrics.weekly.data).forEach(([week, data]) => {
+          dates.push(week)
+          values.push(
+            (data as any).BUSINESS_IMPRESSIONS_DESKTOP_MAPS +
+              (data as any).BUSINESS_IMPRESSIONS_MOBILE_MAPS +
+              (data as any).BUSINESS_IMPRESSIONS_MOBILE_SEARCH +
+              (data as any).BUSINESS_IMPRESSIONS_DESKTOP_SEARCH
+          )
+        })
+      } else {
+        Object.entries(googleMetrics.metrics.monthly.data).forEach(([month, data]) => {
+          dates.push(month)
+          values.push(
+            (data as any).BUSINESS_IMPRESSIONS_DESKTOP_MAPS +
+              (data as any).BUSINESS_IMPRESSIONS_MOBILE_MAPS +
+              (data as any).BUSINESS_IMPRESSIONS_MOBILE_SEARCH +
+              (data as any).BUSINESS_IMPRESSIONS_DESKTOP_SEARCH
+          )
+        })
+      }
+
+      setChartDataViews({
+        labels: dates,
+        datasets: [
+          {
+            label: 'Vue de la page',
+            data: values,
+            borderColor: '#C8DCFF',
+            backgroundColor: (context) => {
+              const chart = context.chart
+              const { ctx, chartArea } = chart
+
+              if (!chartArea) {
+                return null // Retourne null tant que le chartArea n'est pas calculé
+              }
+
+              // Crée un gradient avec les couleurs spécifiées
+              const gradient = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom)
+              gradient.addColorStop(0, 'rgba(200, 220, 255, 0.5)') // Couleur au sommet
+              gradient.addColorStop(1, 'rgba(200, 220, 255, 0.2)') // Couleur à la base
+              return gradient
+            },
+            tension: 0.4,
+            fill: true,
+          },
+        ],
+      })
+    }
+    formatDataForChart()
+  }, [selectedPeriodViews, googleMetrics])
+
+  const [selectedPeriodClicks, setSelectedPeriodClicks] = useState('daily')
+  const [chartDataClicks, setChartDataClicks] = useState<{
+    labels: string[]
+    datasets: {
+      label: string
+      data: number[]
+      borderColor: string
+      backgroundColor: any
+      tension?: number
+      fill?: boolean
+      borderWidth?: number
+      borderRadius?: number
+    }[]
+  }>({ labels: [], datasets: [] })
+
+  useEffect(() => {
+    if (!googleMetrics) return
+    console.log(googleMetrics)
+
+    const formatDataForChart = () => {
+      let dates: string[] = []
+      let values: any[] = []
+
+      if (selectedPeriodClicks === 'daily') {
+        Object.entries(googleMetrics.metrics.daily.data).forEach(([date, data]) => {
+          dates.push(date)
+          values.push((data as any).WEBSITE_CLICKS)
+        })
+      } else if (selectedPeriodClicks === 'weekly') {
+        Object.entries(googleMetrics.metrics.weekly.data).forEach(([week, data]) => {
+          dates.push(week)
+          values.push((data as any).WEBSITE_CLICKS)
+        })
+      } else {
+        Object.entries(googleMetrics.metrics.monthly.data).forEach(([month, data]) => {
+          dates.push(month)
+          values.push((data as any).WEBSITE_CLICKS)
+        })
+      }
+
+      setChartDataClicks({
+        labels: dates,
+        datasets: [
+          {
+            label: 'Cliques vers le site web',
+            data: values,
+            borderColor: '#C8DCFF',
+            backgroundColor: '#E3DEFF',
+            borderWidth: 1,
+            borderRadius: 4,
+          },
+        ],
+      })
+    }
+    formatDataForChart()
+  }, [selectedPeriodClicks, googleMetrics])
+
   return (
     <YStack gap={32}>
-      <Text>Dashboard</Text>
+      <Text col={'#0F172A'} fontSize={24} fontWeight={600}>
+        Dashboard
+      </Text>
       <XStack height={270} gap={16}>
         {/* TODO faire un composant HeadCard */}
         <HeadCard
           height={'100%'}
-          backgroundImage={`url(${selectedStore?.medias[0]?.googleUrl})`}
+          backgroundImage={`url(${selectedStore?.medias ? selectedStore?.medias[0]?.googleUrl : ''})`}
           backgroundSize="cover"
           backgroundPosition="center"
           width={'35%'}
+          backgroundColor={'#E3DEFF'}
         ></HeadCard>
         <YStack f={1} gap={16}>
           <XStack f={1} gap={16}>
@@ -200,7 +542,7 @@ export const DashboardScreen = () => {
               <YStack gap={8}>
                 <Text>Temps de réponse moyen</Text>
                 <Text fontSize={32} fontWeight={600}>
-                  {metrics.averageResponseTimeHours} H
+                  {gestionStoreMetrics.averageResponseTime || 0} H
                 </Text>
               </YStack>
             </HeadCard>
@@ -224,7 +566,7 @@ export const DashboardScreen = () => {
               <YStack>
                 <Text>Taux de réponse</Text>
                 <Text fontSize={32} fontWeight={600}>
-                  {metrics.responseRate}%
+                  {gestionStoreMetrics.responseRate}%
                 </Text>
               </YStack>
             </HeadCard>
@@ -255,28 +597,74 @@ export const DashboardScreen = () => {
           <GraphCard
             title="Cliques généré vers le site web"
             icon={<Laptop size={20} color={'#94A3B8'} />}
-            graph={<BarChart></BarChart>}
+            currValue={
+              googleMetrics?.metrics[selectedPeriodClicks].comparison.current.totals.WEBSITE_CLICKS
+            }
+            prevValue={
+              googleMetrics?.metrics[selectedPeriodClicks].comparison.previous.totals.WEBSITE_CLICKS
+            }
+            onTimeSpanChange={(timeSpan) => setSelectedPeriodClicks(timeSpan)}
+            graph={<BarChart dataProps={chartDataClicks}></BarChart>}
           ></GraphCard>
           <GraphCard
             title="Vue de la page"
+            currValue={
+              googleMetrics?.metrics[selectedPeriodViews].comparison.current.totals
+                .BUSINESS_IMPRESSIONS_DESKTOP_SEARCH +
+              googleMetrics?.metrics[selectedPeriodViews].comparison.current.totals
+                .BUSINESS_IMPRESSIONS_MOBILE_SEARCH +
+              googleMetrics?.metrics[selectedPeriodViews].comparison.current.totals
+                .BUSINESS_IMPRESSIONS_DESKTOP_MAPS +
+              googleMetrics?.metrics[selectedPeriodViews].comparison.current.totals
+                .BUSINESS_IMPRESSIONS_MOBILE_MAPS
+            }
+            prevValue={
+              googleMetrics?.metrics[selectedPeriodViews].comparison.previous.totals
+                .BUSINESS_IMPRESSIONS_DESKTOP_SEARCH +
+              googleMetrics?.metrics[selectedPeriodViews].comparison.previous.totals
+                .BUSINESS_IMPRESSIONS_MOBILE_SEARCH +
+              googleMetrics?.metrics[selectedPeriodViews].comparison.previous.totals
+                .BUSINESS_IMPRESSIONS_DESKTOP_MAPS +
+              googleMetrics?.metrics[selectedPeriodViews].comparison.previous.totals
+                .BUSINESS_IMPRESSIONS_MOBILE_MAPS
+            }
+            onTimeSpanChange={(timeSpan) => setSelectedPeriodViews(timeSpan)}
             icon={<Eye size={20} color={'#94A3B8'} />}
-            graph={<LineChart dataprops={AverageGoogleratingLineData}></LineChart>}
+            graph={<LineChart dataprops={chartDataViews}></LineChart>}
           ></GraphCard>
         </XStack>
         <XStack f={1} gap={16} width={'100%'}>
           <GraphCard
             title='Cliques sur "itinéraire"'
             icon={<MapPin size={20} color={'#94A3B8'} />}
-            graph={<LineChart dataprops={AverageGoogleratingLineData}></LineChart>}
+            graph={<LineChart dataprops={chartData}></LineChart>}
+            currValue={
+              googleMetrics?.metrics[selectedPeriod].comparison.current.totals
+                .BUSINESS_DIRECTION_REQUESTS
+            }
+            prevValue={
+              googleMetrics?.metrics[selectedPeriod].comparison.previous.totals
+                .BUSINESS_DIRECTION_REQUESTS
+            }
+            onTimeSpanChange={(timeSpan) => setSelectedPeriod(timeSpan)}
           ></GraphCard>
           <GraphCard
+            currValue={
+              googleMetrics?.metrics[selectedPeriodCalls].comparison.current.totals.CALL_CLICKS
+            }
+            prevValue={
+              googleMetrics?.metrics[selectedPeriodCalls].comparison.previous.totals.CALL_CLICKS
+            }
+            onTimeSpanChange={(timeSpan) => setSelectedPeriodCalls(timeSpan)}
             title="Appels téléphoniques"
             icon={<Phone size={20} color={'#94A3B8'} />}
-            graph={<LineChart dataprops={AverageGoogleratingLineData}></LineChart>}
+            graph={<LineChart dataprops={chartDataCalls}></LineChart>}
           ></GraphCard>
           <GraphCard
             title="Nombre d'avis"
             icon={<MessagesSquare size={20} color={'#94A3B8'} />}
+            prevValue={2}
+            currValue={2}
             graph={<LineChart dataprops={AverageGoogleratingLineData}></LineChart>}
           ></GraphCard>
         </XStack>

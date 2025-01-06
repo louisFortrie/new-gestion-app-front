@@ -4,7 +4,7 @@ import { Search, Command } from '@tamagui/lucide-icons'
 
 export const CustomHeader = () => {
   return (
-    <XStack>
+    <XStack marginBottom={32}>
       <CustomInput
         placeholder="Search"
         PreIcon={<Search color={'#94A3B8'} size={'$1'} />}

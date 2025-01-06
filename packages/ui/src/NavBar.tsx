@@ -22,7 +22,7 @@ import useAuth from 'app/hooks/useAuth'
 
 const StyledYStack = styled(YStack, {
   width: '$20',
-  height: '100vh',
+  minHeight: '100vh',
   backgroundColor: 'white',
   alignItems: 'center',
   gap: '$2',

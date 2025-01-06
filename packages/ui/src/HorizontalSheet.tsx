@@ -20,6 +20,7 @@ import {
   Reply,
   Sparkles,
   Star,
+  StarFull,
   Trash2,
   User2,
   X,
@@ -459,6 +460,22 @@ export const HorizontalSheet = ({ open, selectedReview, handleOpenPressed, handl
 
     setResponse(usedTemplate?.message || '')
   }
+  const convertStarRatingToNumber = (starRating: string) => {
+  switch (starRating) {
+    case 'ONE':
+      return 1
+    case 'TWO':
+      return 2
+    case 'THREE':
+      return 3
+    case 'FOUR':
+      return 4
+    case 'FIVE':
+      return 5
+    default:
+      return 0
+  }
+}
 
   const handleGenerateResponse = () => {
     const reviewerName = selectedReview?.reviewer?.displayName
@@ -523,7 +540,11 @@ export const HorizontalSheet = ({ open, selectedReview, handleOpenPressed, handl
                   </LogoContainer>
                   <YStack>
                     <SectionTitle>Note</SectionTitle>
-                    <Text>{selectedReview.starRating}</Text>
+                    <XStack gap={8}>
+
+                     <StarFull color={'orange'} size={'$1'} />
+                      <Text color={'orange'}>{convertStarRatingToNumber(selectedReview.starRating)}</Text>
+                    </XStack>
                   </YStack>
                 </XStack>
                 <XStack alignItems="center" gap="$4">
@@ -540,8 +561,8 @@ export const HorizontalSheet = ({ open, selectedReview, handleOpenPressed, handl
                     <Calendar />
                   </LogoContainer>
                   <YStack>
-                    <SectionTitle>Calendar</SectionTitle>
-                    <Text>2024-10-21</Text>
+                    <SectionTitle>Date</SectionTitle>
+                    <Text>{new Date(selectedReview.createTime).toLocaleDateString('fr')}</Text>
                   </YStack>
                 </XStack>
                 <XStack alignItems="flex-start" gap="$4">
