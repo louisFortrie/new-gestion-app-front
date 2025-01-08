@@ -34,6 +34,7 @@ export const LineChart = ({ dataprops }: LineChartProps) => {
     },
     scales: {
       x: {
+      
         title: {
           display: false,
         },
@@ -42,10 +43,13 @@ export const LineChart = ({ dataprops }: LineChartProps) => {
         }
       },
       y: {
+        // beginAtZero: true,
+        // max : 5,
         title: {
           display: false,
         },
       },
+     
     },
   }
 

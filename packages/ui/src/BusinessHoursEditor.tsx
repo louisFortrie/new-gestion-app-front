@@ -1,9 +1,11 @@
-import { Button, XStack, YStack, styled, Text, Switch, Spinner } from 'tamagui'
-import { CustomSelect } from '@my/ui'
-import { Clock, Plus } from '@tamagui/lucide-icons'
-import { memo, useState } from 'react'
+'use client'
 
-type Day = 'MONDAY' | 'TUESDAY' | 'WEDNESDAY' | 'THURSDAY' | 'FRIDAY' | 'SATURDAY' | 'SUNDAY'
+import React, { useState, useEffect, useCallback, useMemo, memo } from 'react';
+import { XStack, YStack, styled, Text, Switch, Button } from 'tamagui';
+import { CustomSelect } from '@my/ui';
+import { Clock, Plus, Trash } from '@tamagui/lucide-icons';
+
+type Day = 'MONDAY' | 'TUESDAY' | 'WEDNESDAY' | 'THURSDAY' | 'FRIDAY' | 'SATURDAY' | 'SUNDAY';
 
 const displayDay: Readonly<Record<Day, string>> = {
   MONDAY: 'Lundi',
@@ -13,98 +15,29 @@ const displayDay: Readonly<Record<Day, string>> = {
   FRIDAY: 'Vendredi',
   SATURDAY: 'Samedi',
   SUNDAY: 'Dimanche',
-} as const
+} as const;
 
 interface TimePeriod {
-  openDay: Day
-  openTime: { hours?: number; minutes?: number }
-  closeDay: Day
-  closeTime: { hours: number; minutes?: number }
+  openDay: Day;
+  openTime: { hours?: number; minutes?: number };
+  closeDay: Day;
+  closeTime: { hours: number; minutes?: number };
 }
 
 interface BusinessHours {
-  periods: TimePeriod[]
+  periods: TimePeriod[];
 }
 
 interface BusinessHoursEditorProps {
-  businessHours: BusinessHours
-  onBusinessHoursChange: (businessHours: BusinessHours) => void
+  businessHours: BusinessHours;
+  onBusinessHoursChange: (businessHours: BusinessHours) => void;
 }
 
-// const halfHourOptions = Array.from({ length: 48 }, (_, i) => {
-//   const hour = Math.floor(i / 2)
-//   const minute = i % 2 === 0 ? '00' : '30'
-//   return `${hour.toString().padStart(2, '0')}:${minute}`
-// }).concat(['24h/24'])
-
-// const selectOptions = halfHourOptions.map((time) => ({ name: time }))
-
-// const openTimeOptions = Array.from({ length: 48 }, (_, i) => {
-//   const hour = Math.floor(i / 2)
-//   const minute = i % 2 === 0 ? '00' : '30'
-//   return { name: `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}` }
-// }).concat([{ name: '24h/24' }])
-
-// const closeTimeOptions = Array.from({ length: 48 }, (_, i) => {
-//   const hour = Math.floor(i / 2)
-//   const minute = i % 2 === 0 ? '00' : '30'
-//   return { name: `${hour.toString().padStart(2, '0')}:${minute}` }
-// }).concat([{ name: '24:00' }])
-
-const timeOptions = [
-  { name: '00:00' },
-  { name: '00:30' },
-  { name: '01:00' },
-  { name: '01:30' },
-  { name: '02:00' },
-  { name: '02:30' },
-  { name: '03:00' },
-  { name: '03:30' },
-  { name: '04:00' },
-  { name: '04:30' },
-  { name: '05:00' },
-  { name: '05:30' },
-  { name: '06:00' },
-  { name: '06:30' },
-  { name: '07:00' },
-  { name: '07:30' },
-  { name: '08:00' },
-  { name: '08:30' },
-  { name: '09:00' },
-  { name: '09:30' },
-  { name: '10:00' },
-  { name: '10:30' },
-  { name: '11:00' },
-  { name: '11:30' },
-  { name: '12:00' },
-  { name: '12:30' },
-  { name: '13:00' },
-  { name: '13:30' },
-  { name: '14:00' },
-  { name: '14:30' },
-  { name: '15:00' },
-  { name: '15:30' },
-  { name: '16:00' },
-  { name: '16:30' },
-  { name: '17:00' },
-  { name: '17:30' },
-  { name: '18:00' },
-  { name: '18:30' },
-  { name: '19:00' },
-  { name: '19:30' },
-  { name: '20:00' },
-  { name: '20:30' },
-  { name: '21:00' },
-  { name: '21:30' },
-  { name: '22:00' },
-  { name: '22:30' },
-  { name: '23:00' },
-  { name: '23:30' },
-  { name: '24:00' },
-];
-
-const openTimeOptions = timeOptions
-const closeTimeOptions = timeOptions
+const timeOptions = Array.from({ length: 49 }, (_, i) => {
+  const hour = Math.floor(i / 2);
+  const minute = i % 2 === 0 ? '00' : '30';
+  return { name: `${hour.toString().padStart(2, '0')}:${minute}` };
+});
 
 const DayContainer = styled(XStack, {
   backgroundColor: '#F8FAFC',
@@ -114,140 +47,240 @@ const DayContainer = styled(XStack, {
   paddingHorizontal: '$4',
   paddingVertical: '$3',
   justifyContent: 'space-between',
-})
+});
 
 const StyledButton = styled(Button, {
   width: 'fit-content',
-})
+});
 
-export const BusinessHoursEditor: React.FC<BusinessHoursEditorProps> = memo(
-  ({ businessHours, onBusinessHoursChange }) => {
-    console.log('render business hours editor')
+const PeriodRow = ({ 
+  period,
+  dayKey,
+  index,
+  onUpdate,
+  onDelete,
+  showDelete
+}: {
+  period: TimePeriod
+  dayKey: Day
+  index: number
+  onUpdate: (updatedPeriod: TimePeriod) => void
+  onDelete: () => void
+  showDelete: boolean
+}) => {
+  const [localPeriod, setLocalPeriod] = useState(period);
 
-    const days = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche']
-    if (!businessHours) {
-      return <Spinner size={'large'} color={'black'} />
+  useEffect(() => {
+    setLocalPeriod(period);
+  }, [period]);
+
+  const openTimeValue = useMemo(() => {
+    if (localPeriod.closeTime.hours === 24 && !localPeriod.openTime.hours) return '24h/24';
+    return `${localPeriod.openTime.hours?.toString().padStart(2, '0') || '00'}:${
+      localPeriod.openTime.minutes?.toString().padStart(2, '0') || '00'
+    }`;
+  }, [localPeriod]);
+
+  const closeTimeValue = useMemo(() => {
+    return `${localPeriod.closeTime.hours?.toString().padStart(2, '0')}:${
+      localPeriod.closeTime.minutes?.toString().padStart(2, '0') || '00'
+    }`;
+  }, [localPeriod]);
+
+  const is24Hours = period.closeTime.hours === 24 && !period.openTime.hours;
+
+  const handleOpenTimeChange = useCallback((value: string) => {
+    if (value === '24h/24') {
+      const newPeriod = {
+        ...period,
+        openTime: {},
+        closeTime: { hours: 24 }
+      };
+      onUpdate(newPeriod);
+      setLocalPeriod(newPeriod);
+    } else {
+      const [hours, minutes] = value.split(':').map(Number);
+      const newPeriod = {
+        ...period,
+        openTime: { hours, minutes }
+      };
+      onUpdate(newPeriod);
+      setLocalPeriod(newPeriod);
     }
+  }, [period, onUpdate]);
 
-    return (
-      <YStack gap={16}>
-        {days.map((day) => {
-          const dayKey = Object.keys(displayDay).find(
-            (key) => displayDay[key as Day] === day
-          ) as Day
-          const dayHours = businessHours.periods.filter((period) => period.openDay === dayKey)
-          const isOpen = dayHours.length > 0
-          console.log('isOpen', isOpen, dayHours, businessHours, dayKey, day)
-          return (
-            <DayContainer key={day}>
-              <Text width={100}>{day}</Text>
-              <XStack alignItems="center" height={'fit-content'} gap={16}>
-                <Switch
-                  backgroundColor={'#CDF463'}
-                  size={'$3'}
-                  defaultChecked={isOpen}
-                  onCheckedChange={(checked) => {
-                    if (checked) {
-                      onBusinessHoursChange({
-                        ...businessHours,
-                        periods: [
-                          ...businessHours.periods,
-                          {
-                            openDay: dayKey,
-                            openTime: { hours: 9, minutes: 0 },
-                            closeDay: dayKey,
-                            closeTime: { hours: 17, minutes: 0 },
-                          },
-                        ],
-                      })
-                    } else {
-                      onBusinessHoursChange({
-                        ...businessHours,
-                        periods: businessHours.periods.filter(
-                          (period) => period.openDay !== dayKey
-                        ),
-                      })
-                    }
-                  }}
-                >
-                  <Switch.Thumb animation={'quick'} />
-                </Switch>
-                <Text>{isOpen ? 'Ouvert' : 'Fermé'}</Text>
-              </XStack>
-              <YStack gap={8} width={'75%'}>
-                {isOpen && (
-                  <>
-                    {dayHours.map((period, index) => {
-                      const openTime = `${period.openTime.hours?.toString().padStart(2, '0')}:${period.openTime.minutes?.toString().padStart(2, '0') || '00'}`
-                      const closeTime = `${period.closeTime.hours?.toString().padStart(2, '0')}:${period.closeTime.minutes?.toString().padStart(2, '0') || '00'}`
-                      const is24Hours =
-                        closeTime === '24:00' && !period.openTime.hours && !period.openTime.minutes
-                      console.log(
-                        'is24Hours',
-                        is24Hours,
-                        openTime,
-                        closeTime,
-                        is24Hours ? '24h/24' : openTime
-                      )
+  const handleCloseTimeChange = useCallback((value: string) => {
+    const [hours, minutes] = value.split(':').map(Number);
+    onUpdate({
+      ...period,
+      closeTime: {
+        hours: value.split(':')[0] === '00' ? 24 : hours,
+        minutes
+      }
+    });
+  }, [period, onUpdate]);
 
-                      return (
-                        <XStack key={index} gap={16} f={1}>
-                          <CustomSelect
-                            width={'49%'}
-                            value={is24Hours ? '24h/24' : openTime}
-                            options={openTimeOptions}
-                            iconAfter={<Clock />}
-                            onChange={(value) => {
-                              const [hours, minutes] = value.split(':').map(Number)
-                              const newPeriods = businessHours.periods.map((period) =>
-                                period.openDay === dayKey
-                                  ? { ...period, openTime: { hours, minutes } }
-                                  : period
-                              )
-                              console.log('newPeriods', newPeriods)
+  return (
+    <XStack gap={16} f={1}>
+      <CustomSelect
+        width={'46%'}
+        value={is24Hours ? '24h/24' : openTimeValue}
+        options={timeOptions.concat({ name: '24h/24' })}
+        iconAfter={<Clock />}
+        onChange={handleOpenTimeChange}
+      />
+      {!is24Hours && (
+        <CustomSelect
+          width={'46%'}
+          value={closeTimeValue}
+          options={timeOptions}
+          iconAfter={<Clock />}
+          onChange={handleCloseTimeChange}
+        />
+      )}
+      {showDelete && (
+        <Button theme={'red'} icon={<Trash />} onPress={onDelete} />
+      )}
+    </XStack>
+  );
+};
 
-                              onBusinessHoursChange({ ...businessHours, periods: newPeriods })
-                            }}
-                          />
-                          {!is24Hours && (
-                            <CustomSelect
-                              width={'49%'}
-                              value={closeTime}
-                              options={closeTimeOptions}
-                              iconAfter={<Clock />}
-                              onChange={(value) => {
-                                const [hours, minutes] = value.split(':').map(Number)
-                                const newPeriods = [...businessHours.periods]
-                                newPeriods[index].closeTime = { hours, minutes }
-                                onBusinessHoursChange({ ...businessHours, periods: newPeriods })
-                              }}
-                            />
-                          )}
-                        </XStack>
-                      )
-                    })}
-                    <StyledButton
-                      icon={<Plus />}
-                      onPress={() => {
-                        const newPeriods = [...businessHours.periods]
-                        newPeriods.push({
-                          openDay: dayKey,
-                          openTime: { hours: 9, minutes: 0 },
-                          closeDay: dayKey,
-                          closeTime: { hours: 17, minutes: 0 },
-                        })
-                        onBusinessHoursChange({ ...businessHours, periods: newPeriods })
-                      }}
-                    >
-                      Ajouter des horaires
-                    </StyledButton>
-                  </>
-                )}
-              </YStack>
-            </DayContainer>
-          )
-        })}
+const DaySection = ({ 
+  day,
+  periods,
+  onChange
+}: {
+  day: Day
+  periods: TimePeriod[]
+  onChange: (periods: TimePeriod[]) => void
+}) => {
+  const handleToggle = useCallback((checked: boolean) => {
+    if (checked) {
+      onChange([{
+        openDay: day,
+        openTime: {},
+        closeDay: day,
+        closeTime: { hours: 24 }
+      }]);
+    } else {
+      onChange([]);
+    }
+  }, [day, onChange]);
+
+  const updatePeriod = useCallback((index: number, updatedPeriod: TimePeriod) => {
+    const newPeriods = [...periods];
+    newPeriods[index] = updatedPeriod;
+    onChange(newPeriods);
+  }, [periods, onChange]);
+
+  const deletePeriod = useCallback((index: number) => {
+    
+    onChange(periods.filter((_, i) => i !== index));
+  }, [periods, onChange]);
+
+  const addPeriod = useCallback(() => {
+    onChange([
+      ...periods,
+      {
+        openDay: day,
+        openTime: {},
+        closeDay: day,
+        closeTime: { hours: 24 }
+      }
+    ]);
+  }, [day, periods, onChange]);
+
+  return (
+    <DayContainer>
+      <Text width={100}>{displayDay[day]}</Text>
+      <XStack alignItems="center" height={'fit-content'} gap={16}>
+        <Switch
+          backgroundColor={'#CDF463'}
+          size={'$3'}
+          checked={periods.length > 0}
+          onCheckedChange={handleToggle}
+        >
+          <Switch.Thumb animation={'quick'} />
+        </Switch>
+        <Text>{periods.length > 0 ? 'Ouvert' : 'Fermé'}</Text>
+      </XStack>
+      <YStack gap={8} width={'75%'}>
+        {periods.length > 0 && (
+          <>
+            {periods.map((period, index) => (
+              <PeriodRow
+                key={`${day}-${index}`}
+                period={period}
+                dayKey={day}
+                index={index}
+                onUpdate={(updatedPeriod) => updatePeriod(index, updatedPeriod)}
+                onDelete={() => deletePeriod(index)}
+                showDelete={index > 0}
+              />
+            ))}
+            <Button icon={<Plus />} onPress={addPeriod} alignSelf='flex-start'>
+              Ajouter des horaires
+            </Button>
+          </>
+        )}
       </YStack>
-    )
-  }
-)
+    </DayContainer>
+  );
+};
+
+export const BusinessHoursEditor = memo(({ 
+  businessHours,
+  onBusinessHoursChange 
+}: BusinessHoursEditorProps) => {
+  const days = useMemo(() => Object.keys(displayDay) as Day[], []);
+  
+  const [periodsByDay, setPeriodsByDay] = useState(() => {
+    const initial: Record<Day, TimePeriod[]> = {
+      MONDAY: [],
+      TUESDAY: [],
+      WEDNESDAY: [],
+      THURSDAY: [],
+      FRIDAY: [],
+      SATURDAY: [],
+      SUNDAY: [],
+    };
+    console.log("initial", initial);
+    
+    businessHours.periods.forEach(period => {
+      initial[period.openDay].push(period);
+    });
+
+    return initial;
+  });
+
+  const handleDayChange = useCallback((day: Day, newPeriods: TimePeriod[]) => {
+    console.log("handleDayChange", day, newPeriods);
+    
+    setPeriodsByDay(prev => ({
+      ...prev,
+      [day]: newPeriods
+    }));
+  }, []);
+
+  useEffect(() => {
+    const periods = Object.values(periodsByDay).flat();
+    console.log("periods", periods);
+    
+    onBusinessHoursChange({ periods });
+  }, [periodsByDay, onBusinessHoursChange]);
+
+  return (
+    <YStack gap={16}>
+      {days.map(day => (
+        <DaySection
+          key={day}
+          day={day}
+          periods={periodsByDay[day]}
+          onChange={(periods) => handleDayChange(day, periods)}
+        />
+      ))}
+    </YStack>
+  );
+});
+
+BusinessHoursEditor.displayName = 'BusinessHoursEditor';

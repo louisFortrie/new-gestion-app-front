@@ -45,19 +45,19 @@ export const TimeSpanGroup = ({ onTimeSpanChange = () => {} }: TimeSpanGroupProp
         active={timeSpanSelected === 'daily'}
         onPress={() => setTimeSpanSelected('daily')}
       >
-        Jour
+        Hebdo
       </StyledButton>
       <StyledButton
         active={timeSpanSelected === 'weekly'}
         onPress={() => setTimeSpanSelected('weekly')}
       >
-        Semaine
+        Mensuelle
       </StyledButton>
       <StyledButton
         active={timeSpanSelected === 'monthly'}
         onPress={() => setTimeSpanSelected('monthly')}
       >
-        Mois
+        Semestrielle
       </StyledButton>
     </XStack>
   )

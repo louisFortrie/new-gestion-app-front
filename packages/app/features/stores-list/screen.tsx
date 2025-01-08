@@ -7,6 +7,7 @@ import { useRouter } from 'solito/navigation'
 import useAuth from 'app/hooks/useAuth'
 import axios from 'axios'
 import { useEffect, useState } from 'react'
+import { Plus } from '@tamagui/lucide-icons'
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL
 
@@ -20,6 +21,10 @@ export const StoresListScreen = () => {
     setSelectedStore(store)
     localStorage.setItem('selectedStore', JSON.stringify(store))
     router.push('/dashboard')
+  }
+
+  const handleAddAccount = async () => {
+    window.location.href = apiUrl + '/api/gestion/google'
   }
 
   // const refreshToken = async () => {
@@ -81,7 +86,7 @@ export const StoresListScreen = () => {
       <Text fontSize={24} color={'#0F172A'} fontWeight={600}>
         Choix de la boutique
       </Text>
-      <XStack gap={16} flexWrap="wrap">
+      <XStack gap={16} flexWrap="wrap" alignItems="center">
         {stores.map((store) => (
           <StoreCard
             key={store.id}
@@ -93,6 +98,9 @@ export const StoresListScreen = () => {
             onPress={() => handleSelectStore(store)}
           />
         ))}
+        <CustomButton width={200} height={200} onPress={handleAddAccount}>
+          <Plus></Plus>
+        </CustomButton>
       </XStack>
     </YStack>
   )

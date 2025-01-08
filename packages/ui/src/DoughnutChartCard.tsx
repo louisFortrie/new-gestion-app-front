@@ -66,7 +66,7 @@ export const DoughnutChartCard = ({ title, dataProps, icon }: DoughnutChartCardP
     ],
   })
 
-  const handleTimeSpanChange = (timeSpan: string) => {
+  const handleTimeSpanChange = (timeSpan: 'daily' | 'weekly' | 'monthly') => {
     console.log(timeSpan, 'timeSpan')
 
     switch (timeSpan) {
@@ -80,6 +80,7 @@ export const DoughnutChartCard = ({ title, dataProps, icon }: DoughnutChartCardP
         setDataToUse(monthly)
         break
     }
+
   }
 
   useEffect(() => {

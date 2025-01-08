@@ -4,10 +4,13 @@ import {
   Eye,
   Laptop,
   MapPin,
+  MessageSquare,
   MessagesSquare,
   Phone,
   PieChart,
+  Reply,
   Star,
+  StarFull,
 } from '@tamagui/lucide-icons'
 import { Text, XStack, Stack, YStack, styled } from 'tamagui'
 import useStores from 'app/hooks/useStores'
@@ -99,6 +102,26 @@ export const DashboardScreen = () => {
   const [gestionStoreMetrics, setGestionStoreMetrics] = useState<any>({
     averageResponseTime: 0,
     responseRate: 0,
+    metric: {
+      daily: {
+        comparison: {
+          current: [],
+          previous: [],
+        },
+      },
+      weekly: {
+        comparison: {
+          current: [],
+          previous: [],
+        },
+      },
+      monthly: {
+        comparison: {
+          current: [],
+          previous: [],
+        },
+      },
+    },
   })
   useEffect(() => {
     if (!selectedStore || !user || user.googleAccounts.length === 0 || loading) return
@@ -202,6 +225,137 @@ export const DashboardScreen = () => {
       },
     ],
   }
+
+  const [averageRatingEvolutionChartData, setAverageRatingEvolutionChartData] = useState<{
+    labels: string[]
+    datasets: {
+      label: string
+      data: number[]
+      borderColor: string
+      backgroundColor: any
+      tension: number
+      fill: boolean
+    }[]
+  }>({
+    labels: [],
+    datasets: [],
+  })
+  const [selectedPeriodRatingEvolution, setSelectedPeriodRatingEvolution] = useState<
+    'daily' | 'weekly' | 'monthly'
+  >('daily')
+
+  useEffect(() => {
+    console.log(gestionStoreMetrics, 'gestionStoreMetrics')
+    if (gestionStoreMetrics.metric.daily.comparison.current.length == 0) return
+
+    const getMetricData = (period) => {
+      switch (period) {
+        case 'daily':
+          return gestionStoreMetrics.metric.daily.comparison.current
+        case 'weekly':
+          return gestionStoreMetrics.metric.weekly.comparison.current
+        case 'monthly':
+          return gestionStoreMetrics.metric.monthly.comparison.current
+        default:
+          return gestionStoreMetrics.metric.daily.comparison.current
+      }
+    }
+
+    const metricData = getMetricData(selectedPeriodRatingEvolution)
+
+    console.log(metricData)
+
+    setAverageRatingEvolutionChartData({
+      labels: metricData.map((item: any) => item.key),
+      datasets: [
+        {
+          label: 'Note moyenne',
+          data: metricData.map((item: any) => item.value.average),
+          borderColor: '#17B26A',
+          backgroundColor: (context) => {
+            const chart = context.chart
+            const { ctx, chartArea } = chart
+
+            if (!chartArea) {
+              return null // Retourne null tant que le chartArea n'est pas calculé
+            }
+
+            // Crée un gradient avec les couleurs spécifiées
+            const gradient = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom)
+            gradient.addColorStop(0, 'rgba(23, 178, 106, 0.3)') // Couleur au sommet
+            gradient.addColorStop(1, 'rgba(23, 178, 106, 0.1)') // Couleur à la base
+            return gradient
+          },
+          tension: 0.4,
+          fill: true,
+        },
+      ],
+    })
+  }, [gestionStoreMetrics, selectedPeriodRatingEvolution])
+
+  const [selectedPeriodTotalReviews, setSelectedPeriodTotalReviews] = useState<
+    'daily' | 'weekly' | 'monthly'
+  >('daily')
+  const [chartDataTotalReviews, setChartDataTotalReviews] = useState<{
+    labels: string[]
+    datasets: {
+      label: string
+      data: number[]
+      borderColor: string
+      backgroundColor: any
+      tension: number
+      fill: boolean
+    }[]
+  }>({ labels: [], datasets: [] })
+
+  useEffect(() => {
+    console.log(gestionStoreMetrics, 'gestionStoreMetrics')
+    if (gestionStoreMetrics.metric.daily.comparison.current.length == 0) return
+
+    const getMetricData = (period) => {
+      switch (period) {
+        case 'daily':
+          return gestionStoreMetrics.metric.daily.comparison.current
+        case 'weekly':
+          return gestionStoreMetrics.metric.weekly.comparison.current
+        case 'monthly':
+          return gestionStoreMetrics.metric.monthly.comparison.current
+        default:
+          return gestionStoreMetrics.metric.daily.comparison.current
+      }
+    }
+
+    const metricData = getMetricData(selectedPeriodTotalReviews)
+
+    console.log(metricData)
+
+    setChartDataTotalReviews({
+      labels: metricData.map((item: any) => item.key),
+      datasets: [
+        {
+          label: "Nombre d'avis",
+          data: metricData.map((item: any) => item.value.total),
+          borderColor: '#17B26A',
+          backgroundColor: (context) => {
+            const chart = context.chart
+            const { ctx, chartArea } = chart
+
+            if (!chartArea) {
+              return null // Retourne null tant que le chartArea n'est pas calculé
+            }
+
+            // Crée un gradient avec les couleurs spécifiées
+            const gradient = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom)
+            gradient.addColorStop(0, 'rgba(23, 178, 106, 0.3)') // Couleur au sommet
+            gradient.addColorStop(1, 'rgba(23, 178, 106, 0.1)') // Couleur à la base
+            return gradient
+          },
+          tension: 0.4,
+          fill: true,
+        },
+      ],
+    })
+  }, [gestionStoreMetrics, selectedPeriodTotalReviews])
 
   const AverageGoogleratingLineData = {
     // Données du graphique
@@ -526,7 +680,7 @@ export const DashboardScreen = () => {
           <XStack f={1} gap={16}>
             <HeadCard>
               <IconContainer>
-                <Clock></Clock>
+                <MessageSquare></MessageSquare>
               </IconContainer>
               <YStack gap={8}>
                 <Text>Nombre total d'avis</Text>
@@ -542,7 +696,11 @@ export const DashboardScreen = () => {
               <YStack gap={8}>
                 <Text>Temps de réponse moyen</Text>
                 <Text fontSize={32} fontWeight={600}>
-                  {gestionStoreMetrics.averageResponseTime || 0} H
+                  {gestionStoreMetrics.averageResponseTime > 2160
+                    ? `${Math.floor(gestionStoreMetrics.averageResponseTime / 168)} Sem.`
+                    : gestionStoreMetrics.averageResponseTime > 24
+                      ? `${Math.floor(gestionStoreMetrics.averageResponseTime / 24)} J`
+                      : `${gestionStoreMetrics.averageResponseTime} H`}
                 </Text>
               </YStack>
             </HeadCard>
@@ -550,7 +708,7 @@ export const DashboardScreen = () => {
           <XStack f={1} gap={16}>
             <HeadCard backgroundColor={'#C5F4F7'}>
               <IconContainer>
-                <Clock></Clock>
+                <Star color={'#06B6D4'}></Star>
               </IconContainer>
               <YStack gap={8}>
                 <Text>Note moyenne</Text>
@@ -561,7 +719,7 @@ export const DashboardScreen = () => {
             </HeadCard>
             <HeadCard backgroundColor={'#BBF6D7'}>
               <IconContainer>
-                <Clock></Clock>
+                <Reply color={'#10B981'}></Reply>
               </IconContainer>
               <YStack>
                 <Text>Taux de réponse</Text>
@@ -592,7 +750,8 @@ export const DashboardScreen = () => {
           <GraphCard
             title="Evolution de la note moyenne"
             icon={<Star size={20} color={'#94A3B8'} />}
-            graph={<LineChart dataprops={AverageGoogleratingLineData}></LineChart>}
+            graph={<LineChart dataprops={averageRatingEvolutionChartData}></LineChart>}
+            onTimeSpanChange={(timeSpan) => setSelectedPeriodRatingEvolution(timeSpan)}
           ></GraphCard>
           <GraphCard
             title="Cliques généré vers le site web"
@@ -665,7 +824,8 @@ export const DashboardScreen = () => {
             icon={<MessagesSquare size={20} color={'#94A3B8'} />}
             prevValue={2}
             currValue={2}
-            graph={<LineChart dataprops={AverageGoogleratingLineData}></LineChart>}
+            graph={<LineChart dataprops={chartDataTotalReviews}></LineChart>}
+            onTimeSpanChange={(timeSpan) => setSelectedPeriodTotalReviews(timeSpan)}
           ></GraphCard>
         </XStack>
       </YStack>

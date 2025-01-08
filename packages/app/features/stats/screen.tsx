@@ -92,7 +92,13 @@ export const StatsScreen = () => {
           />
           <StatsCard
             title="Temps de réponse moyen"
-            value={`${metrics.averageResponseTime}h`}
+            value={
+              metrics.averageResponseTime > 2160
+                ? `${Math.floor(metrics.averageResponseTime / 168)} Sem.`
+                : metrics.averageResponseTime > 24
+                  ? `${Math.floor(metrics.averageResponseTime / 24)} J`
+                  : `${metrics.averageResponseTime} H`
+            }
             backgroundColor={'#C8DCFF'}
             f={1}
             icon={<Clock color={'#3B82F6'} />}
@@ -105,8 +111,8 @@ export const StatsScreen = () => {
             icon={<Reply color={'#06B6D4'} />}
           />
           <StatsCard
-            title="Change"
-            value={'+10%'}
+            title="Avis pas répondues"
+            value={`${Math.round(totalReviews * (1 - metrics.responseRate / 100))}`}
             backgroundColor={'#BBF6D7'}
             f={1}
             icon={<ArrowUp color={'#10B981'} />}

@@ -30,7 +30,7 @@ export const EvolutionGraphIndicator = ({ currValue, prevValue, ...props }: Grap
   return (
     <Container backgroundColor={backgroundColor} {...props}>
       <Text fontSize={16} fontWeight={600} color={'#0F172A'}>
-        {currValue}
+        {currValue.toLocaleString('fr')}
       </Text>
       <XStack
         gap={8}

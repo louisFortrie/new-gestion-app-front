@@ -11,6 +11,7 @@ import {
   TextArea,
   Dialog,
   Unspaced,
+  Spinner,
 } from 'tamagui'
 import {
   Calendar,
@@ -28,6 +29,7 @@ import {
 import { CustomButton } from './CustomButton'
 import axios from 'axios'
 import useAuth from 'app/hooks/useAuth'
+import useStores from 'app/hooks/useStores'
 
 interface ReviewResponse {
   id: number
@@ -440,9 +442,10 @@ const apiUrl = process.env.NEXT_PUBLIC_API_URL
 
 export const HorizontalSheet = ({ open, selectedReview, handleOpenPressed, handleSendPress }) => {
   const [response, setResponse] = useState(selectedReview?.reviewReply?.comment || '')
-  const [templates, setTemplates] = useState([])
+  const [templates, setTemplates] = useState<any[]>([])
 
   const { user } = useAuth()
+  const { selectedStore } = useStores()
   console.log(selectedReview)
   const getTemplates = () => {
     axios
@@ -461,38 +464,40 @@ export const HorizontalSheet = ({ open, selectedReview, handleOpenPressed, handl
     setResponse(usedTemplate?.message || '')
   }
   const convertStarRatingToNumber = (starRating: string) => {
-  switch (starRating) {
-    case 'ONE':
-      return 1
-    case 'TWO':
-      return 2
-    case 'THREE':
-      return 3
-    case 'FOUR':
-      return 4
-    case 'FIVE':
-      return 5
-    default:
-      return 0
-  }
-}
-
-  const handleGenerateResponse = () => {
-    const reviewerName = selectedReview?.reviewer?.displayName
-    console.log(reviewerName)
-    if (reviewerName) {
-      const authorResponses = RESTAURANT_RESPONSES.find(
-        (response) => response.author === reviewerName
-      )?.responses
-      if (authorResponses && authorResponses.length > 0) {
-        const randomResponse = authorResponses[Math.floor(Math.random() * authorResponses.length)]
-        setResponse(randomResponse.text)
-      } else {
-        setResponse('Aucune réponse disponible pour cet auteur.')
-      }
-    } else {
-      setResponse('Aucun nom de reviewer trouvé.')
+    switch (starRating) {
+      case 'ONE':
+        return 1
+      case 'TWO':
+        return 2
+      case 'THREE':
+        return 3
+      case 'FOUR':
+        return 4
+      case 'FIVE':
+        return 5
+      default:
+        return 0
     }
+  }
+
+  const [loading, setLoading] = useState(false)
+  const handleGenerateResponse = async () => {
+    if (!selectedReview || !selectedStore) return
+    setLoading(true)
+    const response = await axios.post(
+      `${apiUrl}/api/openAi/reply`,
+      {
+        review: selectedReview,
+        businessName: selectedStore.title,
+        reviewerName: selectedReview.reviewer.displayName,
+      },
+      {
+        withCredentials: true,
+      }
+    )
+    setResponse(response.data.message)
+    setLoading(false)
+    console.log(response)
   }
 
   useEffect(() => {
@@ -541,9 +546,10 @@ export const HorizontalSheet = ({ open, selectedReview, handleOpenPressed, handl
                   <YStack>
                     <SectionTitle>Note</SectionTitle>
                     <XStack gap={8}>
-
-                     <StarFull color={'orange'} size={'$1'} />
-                      <Text color={'orange'}>{convertStarRatingToNumber(selectedReview.starRating)}</Text>
+                      <StarFull color={'orange'} size={'$1'} />
+                      <Text color={'orange'}>
+                        {convertStarRatingToNumber(selectedReview.starRating)}
+                      </Text>
                     </XStack>
                   </YStack>
                 </XStack>
@@ -573,7 +579,11 @@ export const HorizontalSheet = ({ open, selectedReview, handleOpenPressed, handl
                     <XStack justifyContent="space-between">
                       <SectionTitle>Réponse</SectionTitle>
                       <XStack gap={8}>
-                        <Button iconAfter={<Sparkles />} onPress={() => handleGenerateResponse()}>
+                        <Button
+                          icon={loading && <Spinner />}
+                          iconAfter={<Sparkles />}
+                          onPress={() => handleGenerateResponse()}
+                        >
                           Générer par l'IA
                         </Button>
                         <Dialog modal>
@@ -602,6 +612,8 @@ export const HorizontalSheet = ({ open, selectedReview, handleOpenPressed, handl
                                   },
                                 },
                               ]}
+                              enterStyle={{ x: 0, y: -20, opacity: 0, scale: 0.9 }}
+                              exitStyle={{ x: 0, y: 10, opacity: 0, scale: 0.95 }}
                             >
                               <Dialog.Title marginBottom={16}>Choisissez un template</Dialog.Title>
                               <XStack f={1} gap={16}>

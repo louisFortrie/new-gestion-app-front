@@ -268,8 +268,14 @@ export const TemplatesScreen = () => {
                     <TemplateTitle>{template.title}</TemplateTitle>
                     <TemplateDescription>{template.message}</TemplateDescription>
                     <XStack gap={16}>
-                      <Button icon={<PenSquare />}>Modifier</Button>
-                      <Button icon={<Trash2 />} onPress={() => handleDeleteTemplate(template.id)}>
+                      <Button icon={<PenSquare />} f={1}>
+                        Modifier
+                      </Button>
+                      <Button
+                        icon={<Trash2 />}
+                        onPress={() => handleDeleteTemplate(template.id)}
+                        f={1}
+                      >
                         Supprimer
                       </Button>
                     </XStack>
@@ -299,8 +305,14 @@ export const TemplatesScreen = () => {
                     <TemplateTitle>{template.title}</TemplateTitle>
                     <TemplateDescription>{template.message}</TemplateDescription>
                     <XStack gap={16}>
-                      <Button icon={<PenSquare />}>Modifier</Button>
-                      <Button icon={<Trash2 />} onPress={() => handleDeleteTemplate(template.id)}>
+                      <Button icon={<PenSquare />} f={1}>
+                        Modifier
+                      </Button>
+                      <Button
+                        icon={<Trash2 />}
+                        onPress={() => handleDeleteTemplate(template.id)}
+                        f={1}
+                      >
                         Supprimer
                       </Button>
                     </XStack>

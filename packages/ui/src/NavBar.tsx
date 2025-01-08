@@ -14,6 +14,7 @@ import {
   ShieldCheck,
   Store,
   TicketCheck,
+  User,
   Users2,
 } from '@tamagui/lucide-icons'
 import { usePathname, useRouter } from 'solito/navigation'
@@ -146,8 +147,8 @@ export const NavBar = () => {
         </StyledButton>
       )}
       <StyledButton active={isActive('/settings')} onPress={() => router.push('/settings')}>
-        <Settings color={'black'} />
-        <StyledText>Paramètres</StyledText>
+        <User color={'black'} />
+        <StyledText>Comptes</StyledText>
       </StyledButton>
       <StyledButton onPress={() => logout()}>
         <LogOut color={'black'} />

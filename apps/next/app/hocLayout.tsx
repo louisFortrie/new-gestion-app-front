@@ -19,7 +19,7 @@ const HocLayout: React.FC<HocLayoutProps> = ({ children, ...rest }) => {
         paddingVertical={!isInloginpage ? '$5' : 0}
         f={1}
       >
-        {!isInloginpage && <CustomHeader></CustomHeader>}
+        {/* {!isInloginpage && <CustomHeader></CustomHeader>} */}
 
         {children}
       </YStack>

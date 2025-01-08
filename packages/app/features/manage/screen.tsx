@@ -9,6 +9,7 @@ import {
 import { Check, SquarePen } from '@tamagui/lucide-icons'
 import useStores from 'app/hooks/useStores'
 import { memo, useCallback, useEffect, useMemo, useState } from 'react'
+import axios from 'axios'
 
 const StyledYstack = styled(YStack, {
   gap: '$2',
@@ -30,12 +31,17 @@ const Title = styled(Text, {
   fontWeight: 500,
 })
 
+const apiUrl = process.env.NEXT_PUBLIC_API_URL
+
 type Day = 'MONDAY' | 'TUESDAY' | 'WEDNESDAY' | 'THURSDAY' | 'FRIDAY' | 'SATURDAY' | 'SUNDAY'
 export const Manage = () => {
   console.log('render manage')
 
   const [businessHours, setBusinessHours] = useState({
     periods: [],
+  })
+  const [specialHours, setSpecialHours] = useState<any>({
+    specialHourPeriods: [],
   })
   const [newStoreInfo, setNewStoreInfo] = useState({
     title: '',
@@ -60,8 +66,10 @@ export const Manage = () => {
 
   useEffect(() => {
     if (!selectedStore) return
+    const { reviews, storeCode, ...storeInfo } = selectedStore
     setBusinessHours(selectedStore.regularHours)
-    setNewStoreInfo(selectedStore)
+    setSpecialHours(selectedStore.specialHours || { specialHourPeriods: [] })
+    setNewStoreInfo(storeInfo)
     console.log('selectedStore use effect')
   }, [selectedStore])
 
@@ -74,14 +82,28 @@ export const Manage = () => {
     console.log('business hours changed', businessHoursNew)
   }, [])
 
-  const memoizedBusinessHours = useMemo(() => businessHours, [businessHours])
-
   if (businessHours.periods.length === 0) {
     return <Spinner size="large" color={'black'} />
   }
 
   const handleSaveModifications = () => {
-    console.log('save', businessHours, newStoreInfo)
+    axios
+      .put(
+        `${apiUrl}/api/mybusiness/locations/${selectedStore?.name.split('/')[1]}`,
+        {
+          newLocation: {
+            ...newStoreInfo,
+            regularHours: businessHours,
+            specialHours: specialHours,
+          },
+        },
+        {
+          withCredentials: true,
+        }
+      )
+      .then((res) => {
+        console.log('res', res)
+      })
   }
 
   return (
@@ -167,14 +189,19 @@ export const Manage = () => {
         >
           <Switch.Thumb animation={'quick'} />
         </Switch>
-        <Text>Horaires {isEditingSpecialHours ? 'exceptionnels' : 'basiques'}</Text>
+        <Text>Horaires {isEditingSpecialHours ? 'exceptionnels' : ''}</Text>
       </XStack>
 
       {isEditingSpecialHours ? (
-        <SpecialBusinessHoursEditor />
+        <SpecialBusinessHoursEditor
+          specialTimePeriodsProps={specialHours.specialHourPeriods}
+          onSpecialTimePeriodsChange={(specialHourPeriods) =>
+            setSpecialHours({ specialHourPeriods })
+          }
+        />
       ) : (
         <BusinessHoursEditor
-          businessHours={memoizedBusinessHours}
+          businessHours={businessHours}
           onBusinessHoursChange={handleBusinessHoursChange}
         ></BusinessHoursEditor>
       )}
