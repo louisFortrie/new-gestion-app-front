@@ -76,6 +76,7 @@ export const TemplatesScreen = () => {
     category: 'positive',
     message: '',
   })
+  const [isUpdating, setIsUpdating] = useState(false)
 
   const handleTitleChange = (e) => {
     console.log(e.target.value)
@@ -106,6 +107,29 @@ export const TemplatesScreen = () => {
         withCredentials: true,
       })
       .then((response) => {
+        getTemplates()
+      })
+  }
+
+  const handleUpdateTemplate = (id: string) => {
+    axios
+      .put(
+        `${apiUrl}/api/templates/${id}`,
+        {
+          template: {
+            ...newTemplate,
+          },
+        },
+        {
+          withCredentials: true,
+        }
+      )
+      .then((response) => {
+        setNewTemplate({
+          title: '',
+          category: 'positive',
+          message: '',
+        })
         getTemplates()
       })
   }
@@ -199,9 +223,33 @@ export const TemplatesScreen = () => {
               onChange={(e) => handleDescriptionChange(e)}
             />
           </XStack>
-          <CustomButton alignSelf="flex-end" onPress={() => handleSave()}>
-            Sauvegarder
-          </CustomButton>
+          {isUpdating ? (
+            <XStack alignSelf="flex-end" gap={16}>
+              <Button
+                theme={'red'}
+                onPress={() => {
+                  setIsUpdating(false)
+                  setNewTemplate({
+                    title: '',
+                    category: 'positive',
+                    message: '',
+                  })
+                }}
+              >
+                Annuler
+              </Button>
+              <CustomButton
+                alignSelf="flex-end"
+                onPress={() => handleUpdateTemplate(newTemplate.id)}
+              >
+                Mettre à jour
+              </CustomButton>
+            </XStack>
+          ) : (
+            <CustomButton alignSelf="flex-end" onPress={() => handleSave()}>
+              Sauvegarder
+            </CustomButton>
+          )}
         </StyledForm>
       </YStack>
       <YStack gap={16}>
@@ -219,7 +267,14 @@ export const TemplatesScreen = () => {
                     <TemplateTitle>{template.title}</TemplateTitle>
                     <TemplateDescription>{template.message}</TemplateDescription>
                     <XStack gap={16}>
-                      <Button icon={<PenSquare />} f={1}>
+                      <Button
+                        icon={<PenSquare />}
+                        f={1}
+                        onPress={() => {
+                          setNewTemplate(template)
+                          setIsUpdating(true)
+                        }}
+                      >
                         Modifier
                       </Button>
                       <Button
@@ -268,7 +323,14 @@ export const TemplatesScreen = () => {
                     <TemplateTitle>{template.title}</TemplateTitle>
                     <TemplateDescription>{template.message}</TemplateDescription>
                     <XStack gap={16}>
-                      <Button icon={<PenSquare />} f={1}>
+                      <Button
+                        icon={<PenSquare />}
+                        f={1}
+                        onPress={() => {
+                          setNewTemplate(template)
+                          setIsUpdating(true)
+                        }}
+                      >
                         Modifier
                       </Button>
                       <Button
@@ -305,7 +367,14 @@ export const TemplatesScreen = () => {
                     <TemplateTitle>{template.title}</TemplateTitle>
                     <TemplateDescription>{template.message}</TemplateDescription>
                     <XStack gap={16}>
-                      <Button icon={<PenSquare />} f={1}>
+                      <Button
+                        icon={<PenSquare />}
+                        f={1}
+                        onPress={() => {
+                          setNewTemplate(template)
+                          setIsUpdating(true)
+                        }}
+                      >
                         Modifier
                       </Button>
                       <Button

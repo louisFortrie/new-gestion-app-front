@@ -8,25 +8,33 @@ import {
   Tooltip,
   Legend,
   CategoryScale,
-  Filler
+  Filler,
 } from 'chart.js'
 
 // Enregistrer les modules nécessaires de Chart.js
-ChartJS.register(LineElement, PointElement, LinearScale,CategoryScale,Filler, Title, Tooltip, Legend)
+ChartJS.register(
+  LineElement,
+  PointElement,
+  LinearScale,
+  CategoryScale,
+  Filler,
+  Title,
+  Tooltip,
+  Legend
+)
 
 interface LineChartProps {
   dataprops: any
+  customOptions?: any
 }
-export const LineChart = ({ dataprops }: LineChartProps) => {
-    
-  
+export const LineChart = ({ dataprops, customOptions }: LineChartProps) => {
   // Options du graphique
   const options = {
     responsive: true,
-    maintainAspectRatio: false, 
+    maintainAspectRatio: false,
     plugins: {
       legend: {
-       display: false, // Position de la légende
+        display: false, // Position de la légende
       },
       title: {
         display: false,
@@ -34,13 +42,12 @@ export const LineChart = ({ dataprops }: LineChartProps) => {
     },
     scales: {
       x: {
-      
         title: {
           display: false,
         },
-        grid : {
-          display : false
-        }
+        grid: {
+          display: false,
+        },
       },
       y: {
         // beginAtZero: true,
@@ -49,9 +56,8 @@ export const LineChart = ({ dataprops }: LineChartProps) => {
           display: false,
         },
       },
-     
     },
   }
 
-  return <Line data={dataprops} options={options} />
+  return <Line data={dataprops} options={customOptions ?? options} />
 }

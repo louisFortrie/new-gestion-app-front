@@ -30,6 +30,7 @@ const useStores = () => {
   useEffect(() => {
     if (!user || !user.googleAccounts || user.googleAccounts.length === 0) return
     const fetchStores = async () => {
+      if (stores.length > 0) return
       setLoading(true)
       try {
         await refreshToken()

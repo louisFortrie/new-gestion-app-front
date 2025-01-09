@@ -21,8 +21,9 @@ interface GraphCardProps {
   graph: React.ReactNode
   prevValue?: number
   currValue?: number
-  onTimeSpanChange?: (timeSpan: 'daily' | 'weekly' | 'monthly') => void
+  onTimeSpanChange?: (timeSpan: 'daily' | 'weekly' | 'monthly' | 'total') => void
   icon?: React.ReactNode
+  totalEnabled?: boolean
 }
 
 export const GraphCard = ({
@@ -32,6 +33,7 @@ export const GraphCard = ({
   icon,
   prevValue,
   currValue,
+  totalEnabled = false
 }: GraphCardProps) => {
   return (
     <Card>
@@ -61,6 +63,7 @@ export const GraphCard = ({
         justifyContent="center"
       >
         <TimeSpanGroup
+        totalEnabled={totalEnabled}
           onTimeSpanChange={(timespan) => onTimeSpanChange && onTimeSpanChange(timespan)}
         ></TimeSpanGroup>
       </XStack>

@@ -14,9 +14,9 @@ const useAuth = () => {
 
   // Vérifier si l'utilisateur est authentifié lors du chargement du composant
   useEffect(() => {
-    const user = localStorage.getItem('user')
-    if (user) {
-      setUser(JSON.parse(user))
+    const localUser = localStorage.getItem('user')
+    if (localUser && !user) {
+      setUser(JSON.parse(localUser))
     }
   }, [])
 

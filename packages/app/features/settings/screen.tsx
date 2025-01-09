@@ -33,11 +33,8 @@ export const SettingsScreen = () => {
     axios.get(apiUrl + '/api/gestion/accounts/' + user.id).then((res) => {
       console.log(res.data)
       setAccounts(res.data)
-      setUser({ ...user, googleAccounts: [{ googleAccount: res.data[0] }] })
-      localStorage.setItem(
-        'user',
-        JSON.stringify({ ...user, googleAccounts: [{ googleAccount: res.data[0] }] })
-      )
+      setUser({ ...user, googleAccounts: res.data })
+      localStorage.setItem('user', JSON.stringify({ ...user, googleAccounts: res.data }))
     })
   }
 

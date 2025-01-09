@@ -96,6 +96,7 @@ export const StoresListScreen = () => {
             totalReviews={store.reviews.totalReviewCount}
             imageUrl={store.medias?.[0]?.googleUrl}
             onPress={() => handleSelectStore(store)}
+            accountId={store.accountId}
           />
         ))}
         <CustomButton width={200} height={200} onPress={handleAddAccount}>

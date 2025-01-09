@@ -25,6 +25,7 @@ import axios from 'axios'
 import useAuth from 'app/hooks/useAuth'
 import useStores from 'app/hooks/useStores'
 import { Check as CheckIcon } from '@tamagui/lucide-icons'
+import { TableLoadingSkeleton } from './TableLoadingSkeleton'
 
 // Styled components using Tamagui
 const TableContainer = styled(YGroup, {
@@ -170,6 +171,9 @@ export const ReviewTable = ({ reviews, totalCount, pageChange }) => {
   const [hasNextPage, setHasNextPage] = useState(true) // Whether there are more reviews to load
   const [respondedChecked, setRespondedChecked] = useState(true) // Whether the 'responded' checkbox is checked
   const [notRespondedChecked, setNotRespondedChecked] = useState(true) // Whether the 'not responded' checkbox is checked
+  const [totalReviewsCount, setTotalReviewsCount] = useState(totalCount)
+  const [totalPages, setTotalPages] = useState(Math.ceil(totalCount / itemsPerPage))
+
   // Filter and paginate reviews
   const filteredReviews = useMemo(() => {
     const filteredReviewsByResponseStatus = reviews.filter((review) => {
@@ -185,18 +189,20 @@ export const ReviewTable = ({ reviews, totalCount, pageChange }) => {
       return true
     })
 
-    return filteredReviewsByResponseStatus.filter(
+    const filteredReviewsByContent = filteredReviewsByResponseStatus.filter(
       (review) =>
         review.reviewer.displayName.toLowerCase().includes(searchQuery.toLowerCase()) ||
         review.comment?.toLowerCase().includes(searchQuery.toLowerCase())
     )
+    setTotalPages(Math.ceil(filteredReviewsByContent.length / itemsPerPage))
+
+    setTotalReviewsCount(filteredReviewsByContent.length)
+    return filteredReviewsByContent
   }, [reviews, searchQuery, respondedChecked, notRespondedChecked])
 
   useEffect(() => {
     pageChange(currentPage)
   }, [currentPage])
-
-  const totalPages = Math.ceil(totalCount / itemsPerPage)
 
   const paginatedReviews = useMemo(() => {
     const startIndex = (currentPage - 1) * itemsPerPage
@@ -215,7 +221,7 @@ export const ReviewTable = ({ reviews, totalCount, pageChange }) => {
         {
           reviewId,
           reply: responseText,
-          accountId: user.googleAccounts[0].googleAccount.accountId,
+          accountId: selectedStore.accountId,
           locationId: selectedStore.name.split('/')[1],
         },
         {
@@ -352,7 +358,6 @@ export const ReviewTable = ({ reviews, totalCount, pageChange }) => {
                 f={1}
                 separator={<Separator backgroundColor="#E2E8F0" height={1} />}
                 borderRadius={0}
-                
               >
                 <YGroup.Item>
                   <Text
@@ -398,8 +403,7 @@ export const ReviewTable = ({ reviews, totalCount, pageChange }) => {
               >
                 <YGroup.Item>
                   <Text
-                textAlign="center"
-
+                    textAlign="center"
                     paddingVertical={16}
                     paddingHorizontal={32}
                     color={'#475569'}
@@ -412,9 +416,7 @@ export const ReviewTable = ({ reviews, totalCount, pageChange }) => {
                 {paginatedReviews.map((review, index) => (
                   <YGroup.Item key={index} f={1}>
                     <View f={1} backgroundColor="white" padding={32} justifyContent="center">
-                      <Text color={'#475569'} 
-                textAlign="center"
-                >
+                      <Text color={'#475569'} textAlign="center">
                         {new Date(review.createTime).toLocaleDateString('fr')}
                       </Text>
                     </View>
@@ -437,8 +439,7 @@ export const ReviewTable = ({ reviews, totalCount, pageChange }) => {
                     color={'#475569'}
                     fontWeight={500}
                     fontSize={16}
-                textAlign="center"
-
+                    textAlign="center"
                   >
                     Note
                   </Text>
@@ -451,13 +452,11 @@ export const ReviewTable = ({ reviews, totalCount, pageChange }) => {
                       f={1}
                       flexDirection="row"
                       alignItems="center"
-                      justifyContent='center'
+                      justifyContent="center"
                       gap={8}
                     >
                       <StarFull color={'orange'} size={'$1'} />
-                      <Text 
-                      
-                      color={'orange'}>{convertStarRatingToNumber(review.starRating)}</Text>
+                      <Text color={'orange'}>{convertStarRatingToNumber(review.starRating)}</Text>
                     </View>
                   </YGroup.Item>
                 ))}
@@ -478,18 +477,26 @@ export const ReviewTable = ({ reviews, totalCount, pageChange }) => {
                     color={'#475569'}
                     fontWeight={500}
                     fontSize={16}
-                textAlign="center"
-
+                    textAlign="center"
                   >
                     Commentaire
                   </Text>
                 </YGroup.Item>
                 {paginatedReviews.map((review, index) => (
                   <YGroup.Item key={index} f={1} width={200} height={'100%'}>
-                    <View f={1} backgroundColor="white" padding={32} justifyContent="center" alignItems='center'>
-                      <Text width={200} numberOfLines={1} height={20} color={'#475569'}
-                textAlign="center"
-                      
+                    <View
+                      f={1}
+                      backgroundColor="white"
+                      padding={32}
+                      justifyContent="center"
+                      alignItems="center"
+                    >
+                      <Text
+                        width={200}
+                        numberOfLines={1}
+                        height={20}
+                        color={'#475569'}
+                        textAlign="center"
                       >
                         {review.comment || ' '}
                       </Text>
@@ -513,8 +520,7 @@ export const ReviewTable = ({ reviews, totalCount, pageChange }) => {
                     color={'#475569'}
                     fontWeight={500}
                     fontSize={16}
-                textAlign="center"
-
+                    textAlign="center"
                   >
                     Status
                   </Text>
@@ -551,8 +557,7 @@ export const ReviewTable = ({ reviews, totalCount, pageChange }) => {
                     color={'#475569'}
                     fontWeight={500}
                     fontSize={16}
-                textAlign="center"
-
+                    textAlign="center"
                   >
                     Action
                   </Text>
@@ -585,7 +590,8 @@ export const ReviewTable = ({ reviews, totalCount, pageChange }) => {
           >
             <Text color="#475569">
               Affichage de {(currentPage - 1) * itemsPerPage + 1} à{' '}
-              {Math.min(currentPage * itemsPerPage, filteredReviews.length)} des {totalCount} avis
+              {Math.min(currentPage * itemsPerPage, filteredReviews.length)} des {totalReviewsCount}{' '}
+              avis
             </Text>
             <XStack gap={8}>
               <Button

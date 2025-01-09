@@ -45,6 +45,7 @@ export const Manage = () => {
   })
   const [newStoreInfo, setNewStoreInfo] = useState({
     title: '',
+    medias: [],
     storefrontAddress: {
       addressLines: [''],
       locality: '',
@@ -57,6 +58,9 @@ export const Manage = () => {
     websiteUri: '',
     phoneNumbers: {
       primaryPhone: '',
+    },
+    profile: {
+      description: '',
     },
   })
 
@@ -87,12 +91,13 @@ export const Manage = () => {
   }
 
   const handleSaveModifications = () => {
+    const { medias, ...newLocation } = newStoreInfo
     axios
       .put(
         `${apiUrl}/api/mybusiness/locations/${selectedStore?.name.split('/')[1]}`,
         {
           newLocation: {
-            ...newStoreInfo,
+            ...newLocation,
             regularHours: businessHours,
             specialHours: specialHours,
           },
@@ -172,7 +177,13 @@ export const Manage = () => {
                 </Stack>
               </XStack>
             </XStack>
-            <CustomInput placeholder="description"></CustomInput>
+            <CustomInput
+              placeholder="description"
+              value={newStoreInfo?.profile?.description}
+              onChangeText={(text) => {
+                setNewStoreInfo({ ...newStoreInfo, profile: { description: text } })
+              }}
+            ></CustomInput>
           </YStack>
         </XStack>
       </StyledYstack>
@@ -181,7 +192,7 @@ export const Manage = () => {
         <MediasManagement></MediasManagement>
       </StyledXStack> */}
       <XStack alignItems="center" gap={32}>
-        <Title>Horaire d'ouvertures</Title>
+        <Title>Horaires d'ouverture</Title>
         <Switch
           backgroundColor={'#CDF463'}
           size={'$3'}
@@ -189,7 +200,7 @@ export const Manage = () => {
         >
           <Switch.Thumb animation={'quick'} />
         </Switch>
-        <Text>Horaires {isEditingSpecialHours ? 'exceptionnels' : ''}</Text>
+        <Text>Horaires exceptionnelles</Text>
       </XStack>
 
       {isEditingSpecialHours ? (

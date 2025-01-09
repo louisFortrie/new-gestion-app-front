@@ -41,29 +41,53 @@ const DayContainer = styled(XStack, {
 
 const timeOptions = [
   { name: '00:00' },
+  { name: '00:30' },
   { name: '01:00' },
+  { name: '01:30' },
   { name: '02:00' },
+  { name: '02:30' },
   { name: '03:00' },
+  { name: '03:30' },
   { name: '04:00' },
+  { name: '04:30' },
   { name: '05:00' },
+  { name: '05:30' },
   { name: '06:00' },
+  { name: '06:30' },
   { name: '07:00' },
+  { name: '07:30' },
   { name: '08:00' },
+  { name: '08:30' },
   { name: '09:00' },
+  { name: '09:30' },
   { name: '10:00' },
+  { name: '10:30' },
   { name: '11:00' },
+  { name: '11:30' },
   { name: '12:00' },
+  { name: '12:30' },
   { name: '13:00' },
+  { name: '13:30' },
   { name: '14:00' },
+  { name: '14:30' },
   { name: '15:00' },
+  { name: '15:30' },
   { name: '16:00' },
+  { name: '16:30' },
   { name: '17:00' },
+  { name: '17:30' },
   { name: '18:00' },
+  { name: '18:30' },
   { name: '19:00' },
+  { name: '19:30' },
   { name: '20:00' },
+  { name: '20:30' },
   { name: '21:00' },
+  { name: '21:30' },
   { name: '22:00' },
+  { name: '22:30' },
   { name: '23:00' },
+  { name: '23:30' },
 ]
 
 interface SpecialBusinessHoursEditorProps {
@@ -161,19 +185,18 @@ export const SpecialBusinessHoursEditor = ({
           </CustomButton>
         </XStack>
         {specialTimePeriodsProps.map((period, index) => {
+          const defaultDate = new Date(
+            period.startDate.year,
+            period.startDate.month - 1,
+            period.startDate.day
+          )
           return (
             <DayContainer key={index}>
               <XStack alignItems="center" gap={32} f={1}>
                 <DatePicker
                   clearIcon={null}
-                  minDate={new Date()}
-                  value={
-                    new Date(
-                      period.startDate.year,
-                      period.startDate.month - 1,
-                      period.startDate.day
-                    )
-                  }
+                  // minDate={new Date()}
+                  value={defaultDate}
                   onChange={(date) => {
                     console.log('date', (date as Date).getMonth())
                     const newSpecialTimePeriods = [...specialTimePeriodsProps]
@@ -194,7 +217,7 @@ export const SpecialBusinessHoursEditor = ({
                   <Switch
                     backgroundColor={'#CDF463'}
                     size={'$3'}
-                    defaultChecked={true}
+                    defaultChecked={!specialTimePeriodsProps[index].closed}
                     onCheckedChange={(checked) => {
                       const newSpecialTimePeriods = [...specialTimePeriodsProps]
                       newSpecialTimePeriods[index].closed = !checked
@@ -210,7 +233,7 @@ export const SpecialBusinessHoursEditor = ({
                     <CustomSelect
                       width={'49%'}
                       options={timeOptions}
-                      value={`${period.openTime.hours.toString().padStart(2, '0')}:${period.openTime.minutes?.toString().padStart(2, '0') || '00'}`}
+                      value={`${period.openTime?.hours?.toString().padStart(2, '0') || '09'}:${period.openTime?.minutes?.toString().padStart(2, '0') || '00'}`}
                       onChange={(time) => {
                         const newSpecialTimePeriods = [...specialTimePeriodsProps]
                         newSpecialTimePeriods[index].openTime = {
@@ -225,7 +248,7 @@ export const SpecialBusinessHoursEditor = ({
                     <CustomSelect
                       width={'49%'}
                       options={timeOptions}
-                      value={`${period.closeTime.hours.toString().padStart(2, '0')}:${period.closeTime.minutes?.toString().padStart(2, '0') || '00'}`}
+                      value={`${period.closeTime?.hours?.toString().padStart(2, '0') || '17'}:${period.closeTime?.minutes?.toString().padStart(2, '0') || '00'}`}
                       onChange={(time) => {
                         const newSpecialTimePeriods = [...specialTimePeriodsProps]
                         newSpecialTimePeriods[index].closeTime = {

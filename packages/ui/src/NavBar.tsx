@@ -20,6 +20,7 @@ import {
 import { usePathname, useRouter } from 'solito/navigation'
 import { useEffect, useState } from 'react'
 import useAuth from 'app/hooks/useAuth'
+import useStores from 'app/hooks/useStores'
 
 const StyledYStack = styled(YStack, {
   width: '$20',
@@ -69,14 +70,13 @@ const StyledButton = styled(Button, {
 
 export const NavBar = () => {
   const [isReviewsOpen, setIsReviewsOpen] = useState(false)
-
+  const { selectedStore } = useStores()
   const router = useRouter()
   const pathName = usePathname()
   const { logout } = useAuth()
 
   const isActive = (path: string) => pathName === path
-  const isInStoreListPage = pathName?.startsWith('/stores-list')
-
+  const isInStoreListPage = pathName?.startsWith('/stores-list') || !selectedStore
   useEffect(() => {
     const isReviewPath = pathName?.endsWith('/stats') || pathName?.endsWith('/templates')
     setIsReviewsOpen(isReviewPath || false)
@@ -114,7 +114,7 @@ export const NavBar = () => {
                 <XStack alignItems="center">
                   <Dot color={'#475569'} />
                   <StyledText color={'#475569'} fontWeight={400}>
-                    Statistics des avis
+                    Review management
                   </StyledText>
                 </XStack>
               </StyledButton>
@@ -140,12 +140,12 @@ export const NavBar = () => {
         <StyledText>Aide et support</StyledText>
       </StyledButton> */}
       <Separator alignSelf="stretch" marginVertical={16}></Separator>
-      {!isInStoreListPage && (
-        <StyledButton onPress={() => router.push('/stores-list')}>
-          <LayoutList color={'black'} />
-          <StyledText>Choix de boutique</StyledText>
-        </StyledButton>
-      )}
+
+      <StyledButton onPress={() => router.push('/stores-list')} active={isActive('/stores-list')}>
+        <LayoutList color={'black'} />
+        <StyledText>Choix de boutique</StyledText>
+      </StyledButton>
+
       <StyledButton active={isActive('/settings')} onPress={() => router.push('/settings')}>
         <User color={'black'} />
         <StyledText>Comptes</StyledText>

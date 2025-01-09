@@ -29,11 +29,17 @@ const StyledButton = styled(Button, {
 })
 
 interface TimeSpanGroupProps {
-  onTimeSpanChange: (timeSpan: 'daily' | 'weekly' | 'monthly') => void
+  onTimeSpanChange: (timeSpan: 'daily' | 'weekly' | 'monthly' | 'total') => void
+  totalEnabled?: boolean
 }
 
-export const TimeSpanGroup = ({ onTimeSpanChange = () => {} }: TimeSpanGroupProps) => {
-  const [timeSpanSelected, setTimeSpanSelected] = useState<'daily' | 'weekly' | 'monthly'>('daily')
+export const TimeSpanGroup = ({
+  onTimeSpanChange = () => {},
+  totalEnabled = false,
+}: TimeSpanGroupProps) => {
+  const [timeSpanSelected, setTimeSpanSelected] = useState<
+    'daily' | 'weekly' | 'monthly' | 'total'
+  >('daily')
 
   useEffect(() => {
     onTimeSpanChange(timeSpanSelected)
@@ -51,14 +57,22 @@ export const TimeSpanGroup = ({ onTimeSpanChange = () => {} }: TimeSpanGroupProp
         active={timeSpanSelected === 'weekly'}
         onPress={() => setTimeSpanSelected('weekly')}
       >
-        Mensuelle
+        Mensuel
       </StyledButton>
       <StyledButton
         active={timeSpanSelected === 'monthly'}
         onPress={() => setTimeSpanSelected('monthly')}
       >
-        Semestrielle
+        Semestriel
       </StyledButton>
+      {totalEnabled && (
+        <StyledButton
+          active={timeSpanSelected === 'total' && totalEnabled}
+          onPress={() => setTimeSpanSelected('total')}
+        >
+          Total
+        </StyledButton>
+      )}
     </XStack>
   )
 }

@@ -1,4 +1,4 @@
-import { Text, YStack, YStackProps, styled, Stack, XStack, Popover, Button, Image  } from 'tamagui'
+import { Text, YStack, YStackProps, styled, Stack, XStack, Popover, Button, Image } from 'tamagui'
 import { MoreVertical, StarFull } from '@tamagui/lucide-icons'
 import { useEffect } from 'react'
 import axios from 'axios'
@@ -28,38 +28,52 @@ const CoverContainer = styled(Stack, {
   backgroundColor: 'lightgray',
 })
 interface StoreCardProps extends YStackProps {
-  locationId : string
+  locationId: string
   title: string
   averageRating: number
   totalReviews: number
-  imageUrl ?: string
+  accountId : string
+  imageUrl?: string
 }
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL
 
-export const StoreCard = ({ locationId,  title, averageRating, totalReviews, imageUrl, ...props }: StoreCardProps) => {
-  const {user } = useAuth()
+export const StoreCard = ({
+  locationId,
+  title,
+  averageRating,
+  totalReviews,
+  imageUrl,
+  accountId,
+  ...props
+}: StoreCardProps) => {
+  const { user } = useAuth()
 
   useEffect(() => {
-    if(!user) return
+    if (!user) return
 
-    axios.get(`${apiUrl}/api/gestionStore/checkIfStoreExists/locationId/${locationId}/accountId/${user.googleAccounts[0].googleAccount.accountId}`, {
-      withCredentials: true,
-    }).then((response) => {
-      console.log(response.data)
-    }).catch((error) => {
-      console.error('Erreur lors de la récupération des avis:', error)
-    }
-    )
-  }
-  , [user])
+    axios
+      .get(
+        `${apiUrl}/api/gestionStore/checkIfStoreExists/locationId/${locationId}/accountId/${accountId}`,
+        {
+          withCredentials: true,
+        }
+      )
+      .then((response) => {
+        console.log(response.data)
+      })
+      .catch((error) => {
+        console.error('Erreur lors de la récupération des avis:', error)
+      })
+  }, [user])
 
   return (
     <Card {...props}>
-      <CoverContainer backgroundImage={`url(${imageUrl})`} backgroundSize="cover" backgroundPosition="center">
-       
-
-      </CoverContainer>
+      <CoverContainer
+        backgroundImage={`url(${imageUrl})`}
+        backgroundSize="cover"
+        backgroundPosition="center"
+      ></CoverContainer>
       <XStack justifyContent="space-between">
         <Text fontSize={18} color={'#020617'} fontWeight={600}>
           {title}

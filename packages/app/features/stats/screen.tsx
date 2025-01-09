@@ -1,5 +1,5 @@
 import { H1, H3, H4, Text, YStack, XStack } from 'tamagui'
-import { ReviewTable, StatsCard } from '@my/ui'
+import { ReviewTable, StatsCard, TableLoadingSkeleton } from '@my/ui'
 import { Check, MessagesSquare, Clock, Reply, ArrowUp } from '@tamagui/lucide-icons'
 import useStores from 'app/hooks/useStores'
 import { useEffect, useState } from 'react'
@@ -16,6 +16,7 @@ export const StatsScreen = () => {
   const { user } = useAuth()
   const { selectedStore, loading } = useStores()
   const [reviews, setReviews] = useState<any[]>([])
+  const [reviewsLoading, setReviewsLoading] = useState(true)
   const [metrics, setMetrics] = useState<ReviewResponseMetrics>({
     averageResponseTime: 0,
     responseRate: 0,
@@ -25,7 +26,7 @@ export const StatsScreen = () => {
 
   const fetchReviews = async (pageToken: string | null = null) => {
     const response = await axios.get(
-      `${apiUrl}/api/gestion/getReviews/${user.googleAccounts[0].googleAccount.accountId}/${selectedStore.name.split('/')[1]}${pageToken ? '?pageToken=' + pageToken : ''}`,
+      `${apiUrl}/api/gestion/getAllReviews/${user.googleAccounts[0].googleAccount.accountId}/${selectedStore.name.split('/')[1]}${pageToken ? '?pageToken=' + pageToken : ''}`,
       {
         withCredentials: true,
       }
@@ -36,16 +37,16 @@ export const StatsScreen = () => {
   }
 
   const handlePageChange = (page) => {
-    console.log('page', page, nextPageToken)
-
-    const totalPages = Math.ceil(reviews.length / 10)
-    if (page > totalPages && nextPageToken) {
-      fetchReviews(nextPageToken)
-    }
+    // console.log('page', page, nextPageToken)
+    // const totalPages = Math.ceil(reviews.length / 10)
+    // if (page > totalPages && nextPageToken) {
+    //   fetchReviews(nextPageToken)
+    // }
   }
 
   useEffect(() => {
     if (!selectedStore || !user || loading) return
+    console.log('use effect reviews')
 
     axios
       .get(`${apiUrl}/api/gestionStore/storeMetrics/${selectedStore.name.split('/')[1]}`, {
@@ -57,19 +58,19 @@ export const StatsScreen = () => {
       .catch((error) => {
         console.error('Erreur lors de la récupération des métriques:', error)
       })
-
+    setReviewsLoading(true)
     axios
       .get(
-        `${apiUrl}/api/gestion/getReviews/${user.googleAccounts[0].googleAccount.accountId}/${selectedStore.name.split('/')[1]}`,
+        `${apiUrl}/api/gestion/getAllReviews/${selectedStore.accountId}/${selectedStore.name.split('/')[1]}`,
         {
           withCredentials: true,
         }
       )
       .then((response) => {
-        setReviews(response.data.reviews)
+        setReviews(response.data)
         console.log(response.data)
-
-        if (response.data.pageToken) setNextPageToken(response.data.pageToken)
+        setReviewsLoading(false)
+        // if (response.data.pageToken) setNextPageToken(response.data.pageToken)
       })
       .catch((error) => {
         console.error('Erreur lors de la récupération des avis:', error)
@@ -77,7 +78,7 @@ export const StatsScreen = () => {
     setTotalReviews(selectedStore.reviews.totalReviewCount)
     // axios.get
     // setReviews(selectedStore.reviews.reviews)
-  }, [selectedStore, user, loading])
+  }, [loading])
   return (
     <YStack gap={32}>
       <YStack gap={16}>
@@ -111,7 +112,7 @@ export const StatsScreen = () => {
             icon={<Reply color={'#06B6D4'} />}
           />
           <StatsCard
-            title="Avis pas répondues"
+            title="Avis sans réponse"
             value={`${Math.round(totalReviews * (1 - metrics.responseRate / 100))}`}
             backgroundColor={'#BBF6D7'}
             f={1}
@@ -119,11 +120,15 @@ export const StatsScreen = () => {
           />
         </XStack>
       </YStack>
-      <ReviewTable
-        pageChange={handlePageChange}
-        totalCount={totalReviews}
-        reviews={reviews}
-      ></ReviewTable>
+      {reviewsLoading ? (
+        <TableLoadingSkeleton />
+      ) : (
+        <ReviewTable
+          pageChange={handlePageChange}
+          totalCount={totalReviews}
+          reviews={reviews}
+        ></ReviewTable>
+      )}
     </YStack>
   )
 }

@@ -138,9 +138,12 @@ export const DashboardScreen = () => {
       })
 
     axios
-      .get(`${apiUrl}/api/mybusiness/locations/${selectedStore.name.split('/')[1]}/metrics`, {
-        withCredentials: true,
-      })
+      .get(
+        `${apiUrl}/api/mybusiness/locations/${selectedStore.name.split('/')[1]}/metrics/${selectedStore.accountId}`,
+        {
+          withCredentials: true,
+        }
+      )
       .then((response) => {
         console.log(response.data)
         setGoogleMetrics(response.data)
@@ -241,7 +244,7 @@ export const DashboardScreen = () => {
     datasets: [],
   })
   const [selectedPeriodRatingEvolution, setSelectedPeriodRatingEvolution] = useState<
-    'daily' | 'weekly' | 'monthly'
+    'daily' | 'weekly' | 'monthly' | 'total'
   >('daily')
 
   useEffect(() => {
@@ -256,6 +259,8 @@ export const DashboardScreen = () => {
           return gestionStoreMetrics.metric.weekly.comparison.current
         case 'monthly':
           return gestionStoreMetrics.metric.monthly.comparison.current
+        case 'total':
+          return gestionStoreMetrics.metric.totalByMonths.data
         default:
           return gestionStoreMetrics.metric.daily.comparison.current
       }
@@ -294,7 +299,7 @@ export const DashboardScreen = () => {
   }, [gestionStoreMetrics, selectedPeriodRatingEvolution])
 
   const [selectedPeriodTotalReviews, setSelectedPeriodTotalReviews] = useState<
-    'daily' | 'weekly' | 'monthly'
+    'daily' | 'weekly' | 'monthly' | 'total'
   >('daily')
   const [chartDataTotalReviews, setChartDataTotalReviews] = useState<{
     labels: string[]
@@ -313,6 +318,8 @@ export const DashboardScreen = () => {
     if (gestionStoreMetrics.metric.daily.comparison.current.length == 0) return
 
     const getMetricData = (period) => {
+      console.log(period)
+
       switch (period) {
         case 'daily':
           return gestionStoreMetrics.metric.daily.comparison.current
@@ -320,6 +327,8 @@ export const DashboardScreen = () => {
           return gestionStoreMetrics.metric.weekly.comparison.current
         case 'monthly':
           return gestionStoreMetrics.metric.monthly.comparison.current
+        case 'total':
+          return gestionStoreMetrics.metric.totalByMonths.data
         default:
           return gestionStoreMetrics.metric.daily.comparison.current
       }
@@ -750,8 +759,45 @@ export const DashboardScreen = () => {
           <GraphCard
             title="Evolution de la note moyenne"
             icon={<Star size={20} color={'#94A3B8'} />}
-            graph={<LineChart dataprops={averageRatingEvolutionChartData}></LineChart>}
+            graph={
+              <LineChart
+                dataprops={averageRatingEvolutionChartData}
+                customOptions={{
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  plugins: {
+                    legend: {
+                      display: false, // Position de la légende
+                    },
+                    title: {
+                      display: false,
+                    },
+                  },
+                  scales: {
+                    x: {
+                      title: {
+                        display: false,
+                      },
+                      grid: {
+                        display: false,
+                      },
+                    },
+                    y: {
+                      beginAtZero: true,
+                      max: 5,
+                      ticks: {
+                        stepSize: 0.5,
+                      },
+                      title: {
+                        display: false,
+                      },
+                    },
+                  },
+                }}
+              ></LineChart>
+            }
             onTimeSpanChange={(timeSpan) => setSelectedPeriodRatingEvolution(timeSpan)}
+            totalEnabled={true}
           ></GraphCard>
           <GraphCard
             title="Cliques généré vers le site web"
@@ -824,8 +870,44 @@ export const DashboardScreen = () => {
             icon={<MessagesSquare size={20} color={'#94A3B8'} />}
             prevValue={2}
             currValue={2}
-            graph={<LineChart dataprops={chartDataTotalReviews}></LineChart>}
+            graph={
+              <LineChart
+                dataprops={chartDataTotalReviews}
+                customOptions={{
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  plugins: {
+                    legend: {
+                      display: false, // Position de la légende
+                    },
+                    title: {
+                      display: false,
+                    },
+                  },
+                  scales: {
+                    x: {
+                      title: {
+                        display: false,
+                      },
+                      grid: {
+                        display: false,
+                      },
+                    },
+                    y: {
+                      ticks: {
+                        stepSize: 1,
+                      },
+                      beginAtZero: true,
+                      title: {
+                        display: false,
+                      },
+                    },
+                  },
+                }}
+              ></LineChart>
+            }
             onTimeSpanChange={(timeSpan) => setSelectedPeriodTotalReviews(timeSpan)}
+            totalEnabled={true}
           ></GraphCard>
         </XStack>
       </YStack>
