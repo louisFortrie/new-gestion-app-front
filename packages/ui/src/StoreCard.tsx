@@ -10,7 +10,7 @@ const Card = styled(YStack, {
   borderRadius: '$4',
   backgroundColor: 'white',
   padding: '$4',
-  width: 'calc(100% / 4 - 12px)',
+  width: 'calc(100% / 5 - 12px)',
   gap: 16,
   transition: 'all 0.2s',
   hoverStyle: {
@@ -33,6 +33,8 @@ interface StoreCardProps extends YStackProps {
   averageRating: number
   totalReviews: number
   accountId : string
+  address : string
+  locality : string
   imageUrl?: string
 }
 
@@ -45,6 +47,8 @@ export const StoreCard = ({
   totalReviews,
   imageUrl,
   accountId,
+  address,
+  locality,
   ...props
 }: StoreCardProps) => {
   const { user } = useAuth()
@@ -105,6 +109,8 @@ export const StoreCard = ({
       </Popover.Content>
         </Popover > */}
       </XStack>
+      <Text fontSize={14}>{address}, {locality}</Text>
+      
       <XStack alignItems="center" gap={3}>
         <StarFull size={'$1'} color={'orange'}></StarFull>
         <Text fontSize={14} fontWeight={500}>

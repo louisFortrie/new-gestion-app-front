@@ -12,7 +12,7 @@ import {
   Star,
   StarFull,
 } from '@tamagui/lucide-icons'
-import { Text, XStack, Stack, YStack, styled } from 'tamagui'
+import { Text, XStack, Stack, YStack, styled, H2, H3 } from 'tamagui'
 import useStores from 'app/hooks/useStores'
 import { useEffect, useState } from 'react'
 import useAuth from 'app/hooks/useAuth'
@@ -53,7 +53,7 @@ interface ReviewResponseMetrics {
 }
 
 export const DashboardScreen = () => {
-  const { selectedStore, loading } = useStores()
+  const { selectedStore, loading } = useStores(false)
   const { user } = useAuth()
   const [metrics, setMetrics] = useState<ReviewResponseMetrics>({
     averageResponseTimeHours: 0,
@@ -124,7 +124,10 @@ export const DashboardScreen = () => {
     },
   })
   useEffect(() => {
-    if (!selectedStore || !user || user.googleAccounts.length === 0 || loading) return
+    // if (!selectedStore || !user || user.googleAccounts.length === 0 || loading) return
+    console.log(selectedStore)
+
+    if (!selectedStore) return
     axios
       .get(`${apiUrl}/api/gestionStore/storeMetrics/${selectedStore.name.split('/')[1]}`, {
         withCredentials: true,
@@ -151,7 +154,7 @@ export const DashboardScreen = () => {
       .catch((error) => {
         console.error('Erreur lors de la récupération des métriques:', error)
       })
-  }, [loading])
+  }, [selectedStore])
 
   // useEffect(() => {
   //   if (!selectedStore || !user || user.googleAccounts.length === 0 || loading) return
@@ -675,6 +678,7 @@ export const DashboardScreen = () => {
       <Text col={'#0F172A'} fontSize={24} fontWeight={600}>
         Dashboard
       </Text>
+      <H3>{selectedStore ? selectedStore.title : ''}</H3>
       <XStack height={270} gap={16}>
         {/* TODO faire un composant HeadCard */}
         <HeadCard

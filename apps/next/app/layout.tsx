@@ -4,8 +4,7 @@ import HocLayout from './hocLayout'
 import './layout.style.css'
 
 export const metadata: Metadata = {
-  title: 'Wheely',
-  description: 'Wheely ',
+  title: 'GStar',
   icons: '/favicon.ico',
 }
 

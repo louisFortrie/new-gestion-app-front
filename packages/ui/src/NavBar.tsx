@@ -18,7 +18,7 @@ import {
   Users2,
 } from '@tamagui/lucide-icons'
 import { usePathname, useRouter } from 'solito/navigation'
-import { useEffect, useState } from 'react'
+import { use, useEffect, useState } from 'react'
 import useAuth from 'app/hooks/useAuth'
 import useStores from 'app/hooks/useStores'
 
@@ -71,12 +71,17 @@ const StyledButton = styled(Button, {
 export const NavBar = () => {
   const [isReviewsOpen, setIsReviewsOpen] = useState(false)
   const { selectedStore } = useStores()
+  const [isStoreSelected, setIsStoreSelected] = useState(false)
   const router = useRouter()
   const pathName = usePathname()
   const { logout } = useAuth()
 
   const isActive = (path: string) => pathName === path
-  const isInStoreListPage = pathName?.startsWith('/stores-list') || !selectedStore
+  const isInStoreListPage = pathName?.startsWith('/stores-list')
+  useEffect(() => {
+    setIsStoreSelected(selectedStore !== null)
+  }, [selectedStore])
+
   useEffect(() => {
     const isReviewPath = pathName?.endsWith('/stats') || pathName?.endsWith('/templates')
     setIsReviewsOpen(isReviewPath || false)
@@ -88,7 +93,7 @@ export const NavBar = () => {
         Gstar
       </H2>
 
-      {!isInStoreListPage && (
+      {!isInStoreListPage && isStoreSelected && (
         <>
           <StyledButton onPress={() => router.push('/dashboard')} active={isActive('/dashboard')}>
             <LayoutDashboard color={'black'} />

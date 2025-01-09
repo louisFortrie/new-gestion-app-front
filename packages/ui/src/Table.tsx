@@ -455,8 +455,10 @@ export const ReviewTable = ({ reviews, totalCount, pageChange }) => {
                       justifyContent="center"
                       gap={8}
                     >
+                      <Text color={'orange'} fontWeight={600}>
+                        {convertStarRatingToNumber(review.starRating)}
+                      </Text>
                       <StarFull color={'orange'} size={'$1'} />
-                      <Text color={'orange'}>{convertStarRatingToNumber(review.starRating)}</Text>
                     </View>
                   </YGroup.Item>
                 ))}
@@ -593,7 +595,7 @@ export const ReviewTable = ({ reviews, totalCount, pageChange }) => {
               {Math.min(currentPage * itemsPerPage, filteredReviews.length)} des {totalReviewsCount}{' '}
               avis
             </Text>
-            <XStack gap={8}>
+            <XStack gap={8} alignItems="center">
               <Button
                 variant="outlined"
                 disabled={currentPage === 1}

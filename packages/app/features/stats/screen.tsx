@@ -14,7 +14,7 @@ interface ReviewResponseMetrics {
 const apiUrl = process.env.NEXT_PUBLIC_API_URL
 export const StatsScreen = () => {
   const { user } = useAuth()
-  const { selectedStore, loading } = useStores()
+  const { selectedStore } = useStores(false)
   const [reviews, setReviews] = useState<any[]>([])
   const [reviewsLoading, setReviewsLoading] = useState(true)
   const [metrics, setMetrics] = useState<ReviewResponseMetrics>({
@@ -26,7 +26,7 @@ export const StatsScreen = () => {
 
   const fetchReviews = async (pageToken: string | null = null) => {
     const response = await axios.get(
-      `${apiUrl}/api/gestion/getAllReviews/${user.googleAccounts[0].googleAccount.accountId}/${selectedStore.name.split('/')[1]}${pageToken ? '?pageToken=' + pageToken : ''}`,
+      `${apiUrl}/api/gestion/getReviews/${selectedStore.accountId}/${selectedStore.name.split('/')[1]}${pageToken ? '?pageToken=' + pageToken : ''}`,
       {
         withCredentials: true,
       }
@@ -34,6 +34,9 @@ export const StatsScreen = () => {
     setReviews((prev) => [...prev, ...response.data.reviews])
     // setTotalReviews(response.data.totalReviews)
     setNextPageToken(response.data.pageToken)
+    if (response.data.pageToken) {
+      fetchReviews(response.data.pageToken)
+    }
   }
 
   const handlePageChange = (page) => {
@@ -45,7 +48,7 @@ export const StatsScreen = () => {
   }
 
   useEffect(() => {
-    if (!selectedStore || !user || loading) return
+    if (!selectedStore || !user) return
     console.log('use effect reviews')
 
     axios
@@ -59,26 +62,30 @@ export const StatsScreen = () => {
         console.error('Erreur lors de la récupération des métriques:', error)
       })
     setReviewsLoading(true)
-    axios
-      .get(
-        `${apiUrl}/api/gestion/getAllReviews/${selectedStore.accountId}/${selectedStore.name.split('/')[1]}`,
-        {
-          withCredentials: true,
-        }
-      )
-      .then((response) => {
-        setReviews(response.data)
-        console.log(response.data)
-        setReviewsLoading(false)
-        // if (response.data.pageToken) setNextPageToken(response.data.pageToken)
-      })
-      .catch((error) => {
-        console.error('Erreur lors de la récupération des avis:', error)
-      })
+    // axios
+    //   .get(
+    //     `${apiUrl}/api/gestion/getReviews/${selectedStore.accountId}/${selectedStore.name.split('/')[1]}${nextPageToken ? '?pageToken=' + nextPageToken : ''}`,
+    //     {
+    //       withCredentials: true,
+    //     }
+    //   )
+    //   .then((response) => {
+    //     setReviews(response.data)
+    //     console.log(response.data)
+    //     setReviewsLoading(false)
+    //     response.data.pageToken ? setNextPageToken(response.data.pageToken) : setNextPageToken(null)
+    //   })
+    //   .catch((error) => {
+    //     console.error('Erreur lors de la récupération des avis:', error)
+    //   })
+    fetchReviews()
+    setReviewsLoading(false)
+
     setTotalReviews(selectedStore.reviews.totalReviewCount)
     // axios.get
     // setReviews(selectedStore.reviews.reviews)
-  }, [loading])
+  }, [selectedStore])
+
   return (
     <YStack gap={32}>
       <YStack gap={16}>

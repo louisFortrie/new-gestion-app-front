@@ -4,7 +4,7 @@ import axios from 'axios'
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL
 
-const useStores = () => {
+const useStores = (shouldFetch: boolean = true) => {
   const [stores, setStores] = useState<any[]>([])
   const [selectedStore, setSelectedStore] = useState<any>(null)
   const [loading, setLoading] = useState(false)
@@ -28,9 +28,8 @@ const useStores = () => {
   }
 
   useEffect(() => {
-    if (!user || !user.googleAccounts || user.googleAccounts.length === 0) return
+    if (!user || !shouldFetch) return
     const fetchStores = async () => {
-      if (stores.length > 0) return
       setLoading(true)
       try {
         await refreshToken()
@@ -39,6 +38,8 @@ const useStores = () => {
           withCredentials: true,
         })
         setStores(response.data)
+        console.log('Magasins récupérés:', response.data)
+
         setLoading(false)
       } catch (error) {
         console.error('Erreur lors de la récupération des magasins:', error)
@@ -46,7 +47,7 @@ const useStores = () => {
         setLoading(false)
       }
     }
-
+    if (loading) return
     fetchStores()
   }, [user])
 
