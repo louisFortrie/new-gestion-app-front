@@ -85,9 +85,11 @@ export const Manage = () => {
   }, [])
 
   const handleBusinessHoursChange = useCallback((businessHoursNew) => {
+    const localSelectedStore = JSON.parse(localStorage.getItem('selectedStore')!)
     setBusinessHours(businessHoursNew)
+
     console.log('business hours changed', businessHoursNew)
-    if (businessHours.periods.length === 0) {
+    if (businessHoursNew === localSelectedStore.regularHours) {
       console.log('no change')
 
       setIsEditingStoreInfo(false)

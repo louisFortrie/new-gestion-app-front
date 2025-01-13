@@ -223,6 +223,7 @@ export const ReviewTable = ({ reviews, totalCount, pageChange }) => {
           reply: responseText,
           accountId: selectedStore.accountId,
           locationId: selectedStore.name.split('/')[1],
+          totalReviewCount : totalReviewsCount
         },
         {
           withCredentials: true,
