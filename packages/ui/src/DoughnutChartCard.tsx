@@ -104,7 +104,7 @@ export const DoughnutChartCard = ({ title, dataProps, icon }: DoughnutChartCardP
         ],
       })
     } else {
-      setInsideText(dataToUse.comparison.current.average)
+      setInsideText((Math.round(dataToUse.comparison.current.average * 10)/10).toString())
       setData({
         labels: ['1 Star', '2 Stars', '3 Stars', '4 Stars', '5 Stars'],
         datasets: [

@@ -11,6 +11,8 @@ import useStores from 'app/hooks/useStores'
 import { memo, useCallback, useEffect, useMemo, useState } from 'react'
 import axios from 'axios'
 
+const MemoizedBusinessHoursEditor = memo(BusinessHoursEditor)
+
 const StyledYstack = styled(YStack, {
   gap: '$2',
   padding: '$2',
@@ -76,6 +78,7 @@ export const Manage = () => {
     setNewStoreInfo(storeInfo)
     console.log('selectedStore use effect')
   }, [selectedStore])
+  const [isEditingStoreInfo, setIsEditingStoreInfo] = useState(false)
 
   const handleIsEditingSpecialHours = useCallback((checked) => {
     setIsEditingSpecialHours(checked)
@@ -84,6 +87,15 @@ export const Manage = () => {
   const handleBusinessHoursChange = useCallback((businessHoursNew) => {
     setBusinessHours(businessHoursNew)
     console.log('business hours changed', businessHoursNew)
+    if (businessHours.periods.length === 0) {
+      console.log('no change')
+
+      setIsEditingStoreInfo(false)
+    } else {
+      console.log('change')
+
+      setIsEditingStoreInfo(true)
+    }
   }, [])
 
   if (businessHours.periods.length === 0) {
@@ -91,16 +103,22 @@ export const Manage = () => {
   }
 
   const handleSaveModifications = () => {
-    const { medias, ...newLocation } = newStoreInfo
+    const { medias, phoneNumbers, ...newLocation } = newStoreInfo
+    const phoneNumbersChanged =
+      JSON.stringify(newStoreInfo.phoneNumbers) !== JSON.stringify(selectedStore.phoneNumbers)
+
+    const updatedLocation = {
+      ...newLocation,
+      regularHours: businessHours,
+      specialHours: specialHours,
+      ...(phoneNumbersChanged && { phoneNumbers: newStoreInfo.phoneNumbers }), // Inclure phoneNumbers seulement s'ils ont changé
+    }
+
     axios
       .put(
         `${apiUrl}/api/mybusiness/locations/${selectedStore?.name.split('/')[1]}`,
         {
-          newLocation: {
-            ...newLocation,
-            regularHours: businessHours,
-            specialHours: specialHours,
-          },
+          newLocation: updatedLocation,
         },
         {
           withCredentials: true,
@@ -108,6 +126,7 @@ export const Manage = () => {
       )
       .then((res) => {
         console.log('res', res)
+        setIsEditingStoreInfo(false)
       })
   }
 
@@ -134,6 +153,7 @@ export const Manage = () => {
               value={newStoreInfo?.title}
               onChangeText={(text) => {
                 setNewStoreInfo((prev) => ({ ...prev, title: text }))
+                setIsEditingStoreInfo(true)
               }}
             ></CustomInput>
             <XStack gap={32} width={'100%'}>
@@ -150,6 +170,7 @@ export const Manage = () => {
                   <CustomInput
                     placeholder="Restaurant"
                     value={newStoreInfo?.categories?.primaryCategory?.displayName}
+                    disabled
                   ></CustomInput>
                 </Stack>
               </XStack>
@@ -161,6 +182,7 @@ export const Manage = () => {
                   value={newStoreInfo?.websiteUri}
                   onChangeText={(text) => {
                     setNewStoreInfo({ ...newStoreInfo, websiteUri: text })
+                    setIsEditingStoreInfo(true)
                   }}
                 ></CustomInput>
               </Stack>
@@ -172,6 +194,7 @@ export const Manage = () => {
                     value={newStoreInfo?.phoneNumbers?.primaryPhone}
                     onChangeText={(text) => {
                       setNewStoreInfo({ ...newStoreInfo, phoneNumbers: { primaryPhone: text } })
+                      setIsEditingStoreInfo(true)
                     }}
                   ></CustomInput>
                 </Stack>
@@ -182,6 +205,7 @@ export const Manage = () => {
               value={newStoreInfo?.profile?.description}
               onChangeText={(text) => {
                 setNewStoreInfo({ ...newStoreInfo, profile: { description: text } })
+                setIsEditingStoreInfo(true)
               }}
             ></CustomInput>
           </YStack>
@@ -206,21 +230,26 @@ export const Manage = () => {
       {isEditingSpecialHours ? (
         <SpecialBusinessHoursEditor
           specialTimePeriodsProps={specialHours.specialHourPeriods}
-          onSpecialTimePeriodsChange={(specialHourPeriods) =>
+          onSpecialTimePeriodsChange={(specialHourPeriods) => {
             setSpecialHours({ specialHourPeriods })
-          }
+            setIsEditingStoreInfo(true)
+          }}
         />
       ) : (
-        <BusinessHoursEditor
+        <MemoizedBusinessHoursEditor
           businessHours={businessHours}
           onBusinessHoursChange={handleBusinessHoursChange}
-        ></BusinessHoursEditor>
+        ></MemoizedBusinessHoursEditor>
       )}
 
       <XStack justifyContent="flex-end" gap={16}>
-        <Button icon={<SquarePen />}>Modifier</Button>
-        <CustomButton onPress={() => handleSaveModifications()} icon={<Check />}>
-          Approuver
+        <CustomButton
+          disabled={!isEditingStoreInfo}
+          backgroundColor={!isEditingStoreInfo ? 'lightgray' : '#CDF463'}
+          onPress={() => handleSaveModifications()}
+          icon={<Check />}
+        >
+          Sauvegarder
         </CustomButton>
       </XStack>
     </YStack>

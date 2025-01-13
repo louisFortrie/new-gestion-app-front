@@ -79,6 +79,8 @@ export const NavBar = () => {
   const isActive = (path: string) => pathName === path
   const isInStoreListPage = pathName?.startsWith('/stores-list')
   useEffect(() => {
+    console.log(selectedStore)
+
     setIsStoreSelected(selectedStore !== null)
   }, [selectedStore])
 
