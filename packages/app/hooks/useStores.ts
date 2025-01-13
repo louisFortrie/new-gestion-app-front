@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import useAuth from './useAuth'
 import axios from 'axios'
+import { usePathname } from 'solito/navigation'
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL
 
@@ -9,7 +10,7 @@ const useStores = (shouldFetch: boolean = true) => {
   const [selectedStore, setSelectedStore] = useState<any>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
-
+  const pathname = usePathname()
   const { user } = useAuth()
 
   const refreshToken = async () => {
@@ -56,7 +57,7 @@ const useStores = (shouldFetch: boolean = true) => {
     if (localStore) {
       setSelectedStore(JSON.parse(localStore))
     }
-  }, [])
+  }, [pathname])
 
   return { stores, loading, error, selectedStore, setSelectedStore }
 }

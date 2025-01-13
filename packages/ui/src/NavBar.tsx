@@ -79,10 +79,10 @@ export const NavBar = () => {
   const isActive = (path: string) => pathName === path
   const isInStoreListPage = pathName?.startsWith('/stores-list')
   useEffect(() => {
-    console.log(selectedStore)
+    console.log(selectedStore, 'selectedStore')
 
     setIsStoreSelected(selectedStore !== null)
-  }, [selectedStore])
+  }, [selectedStore, pathName])
 
   useEffect(() => {
     const isReviewPath = pathName?.endsWith('/stats') || pathName?.endsWith('/templates')

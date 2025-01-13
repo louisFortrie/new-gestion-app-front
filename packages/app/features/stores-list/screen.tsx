@@ -18,8 +18,10 @@ export const StoresListScreen = () => {
   const { user } = useAuth()
   const router = useRouter()
   const handleSelectStore = (store: any) => {
-    setSelectedStore(store)
     localStorage.setItem('selectedStore', JSON.stringify(store))
+    setSelectedStore(store)
+    console.log('Selected store:', store)
+
     router.push('/dashboard')
   }
 
