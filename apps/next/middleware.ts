@@ -13,6 +13,12 @@ export async function middleware(req: NextRequest) {
     const storesListUrl = new URL('/stores-list', req.url)
     return NextResponse.redirect(storesListUrl)
   }
+  const url = new URL(req.url)
+  const accountId = url.searchParams.get('accountId')
+  if (token && accountId) {
+    const settingsUrl = new URL('/settings', req.url)
+    return NextResponse.redirect(settingsUrl)
+  }
 
   if (!token && !req.url.endsWith('/login')) {
     const loginUrl = new URL('/login', req.url)
