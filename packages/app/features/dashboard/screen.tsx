@@ -65,6 +65,7 @@ export const DashboardScreen = () => {
     daily: {
       comparison: {
         current: {
+          total : 0,
           oneStar: 0,
           twoStars: 0,
           threeStars: 0,
@@ -76,6 +77,7 @@ export const DashboardScreen = () => {
     weekly: {
       comparison: {
         current: {
+          total : 0,
           oneStar: 0,
           twoStars: 0,
           threeStars: 0,
@@ -87,6 +89,7 @@ export const DashboardScreen = () => {
     monthly: {
       comparison: {
         current: {
+          total : 0,
           oneStar: 0,
           twoStars: 0,
           threeStars: 0,
