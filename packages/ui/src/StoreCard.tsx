@@ -10,7 +10,7 @@ const Card = styled(YStack, {
   borderRadius: '$4',
   backgroundColor: 'white',
   padding: '$4',
-  width: 'calc(100% / 5 - 12px)',
+  width: 'calc(100% / 5.02 - 12px)',
   gap: 16,
   transition: 'all 0.2s',
   hoverStyle: {
@@ -109,7 +109,7 @@ export const StoreCard = ({
       </Popover.Content>
         </Popover > */}
       </XStack>
-      <Text fontSize={14}>{address}, {locality}</Text>
+      <Text fontSize={14} maxLines={1} textOverflow='ellipsis'>{address}, {locality}</Text>
       
       <XStack alignItems="center" gap={3}>
         <StarFull size={'$1'} color={'orange'}></StarFull>

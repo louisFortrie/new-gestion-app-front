@@ -134,6 +134,7 @@ export const DashboardScreen = () => {
       })
       .then((response) => {
         setGestionStoreMetrics(response.data)
+        if(response.data.googleRatingGrouped.daily ) 
         setGroupedReviews(response.data.googleRatingGrouped)
       })
       .catch((error) => {
@@ -698,7 +699,7 @@ export const DashboardScreen = () => {
               <YStack gap={8}>
                 <Text>Nombre total d'avis</Text>
                 <Text fontSize={32} fontWeight={600}>
-                  {selectedStore?.reviews?.totalReviewCount}
+                  {selectedStore?.reviews?.totalReviewCount || 0}
                 </Text>
               </YStack>
             </HeadCard>
@@ -713,7 +714,7 @@ export const DashboardScreen = () => {
                     ? `${Math.floor(gestionStoreMetrics.averageResponseTime / 168)} Sem.`
                     : gestionStoreMetrics.averageResponseTime > 24
                       ? `${Math.floor(gestionStoreMetrics.averageResponseTime / 24)} J`
-                      : `${gestionStoreMetrics.averageResponseTime} H`}
+                      : `${gestionStoreMetrics.averageResponseTime || 0} H`}
                 </Text>
               </YStack>
             </HeadCard>
@@ -726,7 +727,7 @@ export const DashboardScreen = () => {
               <YStack gap={8}>
                 <Text>Note moyenne</Text>
                 <Text fontSize={32} fontWeight={600}>
-                  {Math.round(selectedStore?.reviews?.averageRating * 10) / 10}
+                  {(Math.round(selectedStore?.reviews?.averageRating * 10) / 10) || 0}
                 </Text>
               </YStack>
             </HeadCard>
@@ -737,7 +738,7 @@ export const DashboardScreen = () => {
               <YStack>
                 <Text>Taux de réponse</Text>
                 <Text fontSize={32} fontWeight={600}>
-                  {gestionStoreMetrics.responseRate}%
+                  {gestionStoreMetrics.responseRate || 0}%
                 </Text>
               </YStack>
             </HeadCard>

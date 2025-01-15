@@ -93,7 +93,7 @@ export const StatsScreen = () => {
         <XStack f={1} gap={16}>
           <StatsCard
             title="Total des avis reçus"
-            value={totalReviews}
+            value={totalReviews || 0}
             backgroundColor={'#E3DEFF'}
             f={1}
             icon={<MessagesSquare color={'#9333EA'} />}
@@ -105,7 +105,7 @@ export const StatsScreen = () => {
                 ? `${Math.floor(metrics.averageResponseTime / 168)} Sem.`
                 : metrics.averageResponseTime > 24
                   ? `${Math.floor(metrics.averageResponseTime / 24)} J`
-                  : `${metrics.averageResponseTime} H`
+                  : `${metrics.averageResponseTime || 0} H`
             }
             backgroundColor={'#C8DCFF'}
             f={1}
@@ -113,14 +113,14 @@ export const StatsScreen = () => {
           />
           <StatsCard
             title="Taux de réponse"
-            value={`${metrics.responseRate}%`}
+            value={`${metrics.responseRate || 0}%`}
             backgroundColor={'#C5F4F7'}
             f={1}
             icon={<Reply color={'#06B6D4'} />}
           />
           <StatsCard
             title="Avis sans réponse"
-            value={`${Math.round(totalReviews * (1 - metrics.responseRate / 100))}`}
+            value={`${Math.round(totalReviews * (1 - metrics.responseRate / 100)) || 0}`}
             backgroundColor={'#BBF6D7'}
             f={1}
             icon={<ArrowUp color={'#10B981'} />}

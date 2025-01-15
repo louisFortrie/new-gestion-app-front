@@ -58,7 +58,7 @@ export const StoresListScreen = () => {
   }, [])
 
   return (
-    <YStack gap={16}>
+    <YStack gap={16} >
       <Dialog modal open={dialogOpen}>
         <Dialog.Portal>
           <Dialog.Overlay
@@ -99,14 +99,14 @@ export const StoresListScreen = () => {
       <Text fontSize={24} color={'#0F172A'} fontWeight={600}>
         Choix de la boutique
       </Text>
-      <XStack gap={16} flexWrap="wrap" alignItems="center">
+      <XStack gap={16} flexWrap="wrap" alignItems="center" >
         {stores.map((store) => (
           <StoreCard
             key={store.id}
             locationId={store.name.split('/')[1]}
             title={store.title}
-            averageRating={Math.round(store.reviews.averageRating * 10) / 10}
-            totalReviews={store.reviews.totalReviewCount}
+            averageRating={(Math.round(store.reviews.averageRating * 10) / 10) || 0}
+            totalReviews={store.reviews.totalReviewCount || 0}
             imageUrl={store.medias?.[0]?.googleUrl}
             onPress={() => handleSelectStore(store)}
             accountId={store.accountId}
