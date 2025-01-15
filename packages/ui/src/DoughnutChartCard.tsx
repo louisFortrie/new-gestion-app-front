@@ -88,7 +88,7 @@ export const DoughnutChartCard = ({ title, dataProps, icon }: DoughnutChartCardP
   }, [dataProps])
 
   useEffect(() => {
-    const allZero = Object.values(dataToUse.comparison.current).every((value) => value === 0)
+    const allZero = dataToUse.comparison.current.total === 0 
     console.log(dataToUse, 'dataToUse')
 
     if (allZero) {
