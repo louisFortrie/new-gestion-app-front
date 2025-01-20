@@ -215,7 +215,9 @@ export const SpecialBusinessHoursEditor = ({
                 />
                 <XStack gap={16}>
                   <Switch
-                    backgroundColor={'#CDF463'}
+                    backgroundColor={
+                      !specialTimePeriodsProps[index].closed ? '#CDF463' : 'lightgray'
+                    }
                     size={'$3'}
                     defaultChecked={!specialTimePeriodsProps[index].closed}
                     onCheckedChange={(checked) => {

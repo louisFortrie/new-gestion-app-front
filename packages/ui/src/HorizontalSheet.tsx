@@ -557,8 +557,9 @@ export const HorizontalSheet = ({ open, selectedReview, handleOpenPressed, handl
                   <LogoContainer>
                     <MessagesSquare />
                   </LogoContainer>
-                  <YStack>
+                  <YStack width={'96%'}>
                     <SectionTitle>Commentaire</SectionTitle>
+
                     <Text>{selectedReview.comment}</Text>
                   </YStack>
                 </XStack>

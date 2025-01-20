@@ -180,7 +180,7 @@ export const TemplatesScreen = () => {
         <Text col={'#0F172A'} fontSize={24} fontWeight={600}>
           Créer un nouveau template de réponse
         </Text>
-        <StyledForm gap={16}>
+        <StyledForm gap={16} id="templateForm">
           <XStack alignItems="center">
             <Text width={200} col={'#334155'}>
               Titre du template

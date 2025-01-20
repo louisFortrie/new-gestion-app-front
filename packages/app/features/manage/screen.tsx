@@ -1,15 +1,31 @@
-import { styled, YStack, Text, XStack, Label, Stack, Button, Spinner, Switch } from 'tamagui'
+import {
+  styled,
+  YStack,
+  Text,
+  XStack,
+  Label,
+  Stack,
+  Button,
+  Spinner,
+  Switch,
+  Select,
+  getFontSize,
+  FontSizeTokens,
+} from 'tamagui'
 import {
   CustomInput,
   BusinessHoursEditor,
   CustomButton,
   MediasManagement,
   SpecialBusinessHoursEditor,
+  SearchSelect,
 } from '@my/ui'
-import { Check, SquarePen } from '@tamagui/lucide-icons'
+import { Check, ChevronDown, ChevronUp, SquarePen } from '@tamagui/lucide-icons'
 import useStores from 'app/hooks/useStores'
 import { memo, useCallback, useEffect, useMemo, useState } from 'react'
 import axios from 'axios'
+import { LinearGradient } from 'tamagui/linear-gradient'
+import React from 'react'
 
 const MemoizedBusinessHoursEditor = memo(BusinessHoursEditor)
 
@@ -68,7 +84,18 @@ export const Manage = () => {
 
   const [isEditingSpecialHours, setIsEditingSpecialHours] = useState(false)
 
-  const { selectedStore } = useStores()
+  const { selectedStore, stores, loading, setSelectedStore } = useStores()
+  const [selectDefaultValue, setSelectDefaultValue] = useState('')
+  useEffect(() => {
+    if (loading) return
+    setSelectDefaultValue(selectedStore?.title.toLowerCase())
+  }, [loading])
+
+  const memoizedStores = useMemo(() => {
+    // Calculer une valeur mémoïsée
+
+    return stores.map((item) => item)
+  }, [stores])
 
   useEffect(() => {
     if (!selectedStore) return
@@ -132,14 +159,37 @@ export const Manage = () => {
       })
   }
 
+  const handleSelectedStoreChange = (option: { label: string; value: string }) => {
+    console.log(option, 'select store option')
+
+    const selectedStore = stores.find((store) => store.title.toLowerCase() === option.value)
+    console.log(selectedStore, 'selected store')
+
+    setSelectedStore(selectedStore)
+    localStorage.setItem('selectedStore', JSON.stringify(selectedStore))
+  }
+
   return (
     <YStack gap={32}>
-      <YStack>
-        <Title>Gérer les informations des fiches d'établissement</Title>
-        <Text color={'#535862'} fontSize={14}>
-          Mettez à jour les informations de votre d'établissement et assurer leurs consistance
-        </Text>
-      </YStack>
+      <XStack f={1} justifyContent="space-between">
+        <YStack>
+          <Title>Gérer les informations des fiches d'établissement</Title>
+          <Text color={'#535862'} fontSize={14}>
+            Mettez à jour les informations de votre d'établissement et assurer leurs consistance
+          </Text>
+        </YStack>
+        <SearchSelect
+          options={stores.map((store) => ({
+            label: store.title,
+            value: store.title.toLowerCase(),
+          }))}
+          onSelect={handleSelectedStoreChange}
+          selectedOption={{
+            label: selectedStore?.title,
+            value: selectedStore?.title.toLowerCase(),
+          }}
+        ></SearchSelect>
+      </XStack>
       <StyledYstack padding={'$5'}>
         <XStack gap={64} f={1} justifyContent="center">
           <YStack justifyContent="center" gap={24}>

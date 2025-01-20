@@ -109,7 +109,7 @@ export const StoreCard = ({
       </Popover.Content>
         </Popover > */}
       </XStack>
-      <Text fontSize={14} maxLines={1} textOverflow='ellipsis'>{address}, {locality}</Text>
+      <Text fontSize={14} numberOfLines={1} >{address}, {locality}</Text>
       
       <XStack alignItems="center" gap={3}>
         <StarFull size={'$1'} color={'orange'}></StarFull>

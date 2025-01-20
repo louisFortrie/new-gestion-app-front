@@ -1,5 +1,5 @@
 import { memo, useCallback, useEffect, useMemo } from 'react'
-import { Button, XStack, YStack, styled, Text, Switch } from 'tamagui'
+import { Button, XStack, YStack, styled, Text, Switch, Stack } from 'tamagui'
 import { CustomSelect } from '@my/ui'
 import { Clock, Plus, Trash } from '@tamagui/lucide-icons'
 
@@ -244,7 +244,7 @@ export const BusinessHoursEditor = memo(
               <Text width={100}>{displayDay[day]}</Text>
               <XStack alignItems="center" height="fit-content" gap={16}>
                 <Switch
-                  backgroundColor="#CDF463"
+                  backgroundColor={isOpen ? '#CDF463' : 'lightgray'}
                   size="$3"
                   checked={isOpen}
                   onCheckedChange={(checked) => handleDayToggle(checked, day)}
@@ -253,6 +253,7 @@ export const BusinessHoursEditor = memo(
                 </Switch>
                 <Text>{isOpen ? 'Ouvert' : 'Fermé'}</Text>
               </XStack>
+              {!isOpen && <Stack width={'76%'} />}
               {isOpen && (
                 <DayPeriods
                   day={day}

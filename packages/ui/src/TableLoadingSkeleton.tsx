@@ -38,8 +38,6 @@ const TableCell = styled(XStack, {
   paddingHorizontal: '$2',
   width: 'calc(100% / 6)',
   overflow: 'hidden',
-  textOverflow: 'ellipsis',
-  whiteSpace: 'nowrap',
 })
 
 const SkeletonText = styled(Text, {

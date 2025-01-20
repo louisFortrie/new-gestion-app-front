@@ -19,13 +19,17 @@ import {
   Label,
 } from 'tamagui'
 import { ArrowLeft, ArrowRight, StarFull } from '@tamagui/lucide-icons'
-import { useMemo, useState, useEffect } from 'react'
+import { useMemo, useState, useEffect, useRef } from 'react'
 import { HorizontalSheet } from './HorizontalSheet'
 import axios from 'axios'
 import useAuth from 'app/hooks/useAuth'
 import useStores from 'app/hooks/useStores'
 import { Check as CheckIcon } from '@tamagui/lucide-icons'
 import { TableLoadingSkeleton } from './TableLoadingSkeleton'
+import { StarRatingFilter } from '@my/ui'
+import DateRangePicker from '@wojtekmaj/react-daterange-picker'
+import '@wojtekmaj/react-daterange-picker/dist/DateRangePicker.css'
+import 'react-calendar/dist/Calendar.css'
 
 // Styled components using Tamagui
 const TableContainer = styled(YGroup, {
@@ -159,7 +163,7 @@ const convertStarRatingToNumber = (starRating: string) => {
 }
 const apiUrl = process.env.NEXT_PUBLIC_API_URL
 
-export const ReviewTable = ({ reviews, totalCount, pageChange }) => {
+export const ReviewTable = ({ reviews, totalCount, pageChange, loading }) => {
   const [currentPage, setCurrentPage] = useState(1)
   const [searchQuery, setSearchQuery] = useState('')
   const [responseSheetOpen, setResponseSheetOpen] = useState(false)
@@ -173,6 +177,11 @@ export const ReviewTable = ({ reviews, totalCount, pageChange }) => {
   const [notRespondedChecked, setNotRespondedChecked] = useState(true) // Whether the 'not responded' checkbox is checked
   const [totalReviewsCount, setTotalReviewsCount] = useState(totalCount)
   const [totalPages, setTotalPages] = useState(Math.ceil(totalCount / itemsPerPage))
+  const [ratingFilter, setRatingFilter] = useState(5)
+  const [startDate, setStartDate] = useState(new Date())
+  const [endDate, setEndDate] = useState(new Date())
+  const [minDate, setMinDate] = useState(new Date())
+  const [maxDate, setMaxDate] = useState(new Date())
 
   // Filter and paginate reviews
   const filteredReviews = useMemo(() => {
@@ -189,20 +198,46 @@ export const ReviewTable = ({ reviews, totalCount, pageChange }) => {
       return true
     })
 
-    const filteredReviewsByContent = filteredReviewsByResponseStatus.filter(
+    const filteredReviewsByRating = filteredReviewsByResponseStatus.filter(
+      (review) => convertStarRatingToNumber(review.starRating) <= ratingFilter
+    )
+    const filteredReviewsByDate = filteredReviewsByRating.filter(
+      (review) => new Date(review.createTime) >= startDate && new Date(review.createTime) <= endDate
+    )
+
+    const filteredReviewsByContent = filteredReviewsByDate.filter(
       (review) =>
         review.reviewer.displayName.toLowerCase().includes(searchQuery.toLowerCase()) ||
         review.comment?.toLowerCase().includes(searchQuery.toLowerCase())
     )
+
     setTotalPages(Math.ceil(filteredReviewsByContent.length / itemsPerPage))
 
     setTotalReviewsCount(filteredReviewsByContent.length)
     return filteredReviewsByContent
-  }, [reviews, searchQuery, respondedChecked, notRespondedChecked])
+  }, [
+    reviews,
+    searchQuery,
+    respondedChecked,
+    notRespondedChecked,
+    ratingFilter,
+    startDate,
+    endDate,
+  ])
 
   useEffect(() => {
     pageChange(currentPage)
   }, [currentPage])
+
+  useEffect(() => {
+    if (!reviews || reviews.length === 0) return
+    const startDate = new Date(reviews[reviews.length - 1].createTime)
+    const endDate = new Date(reviews[0].createTime)
+    setMinDate(startDate)
+    setMaxDate(endDate)
+    setStartDate(startDate)
+    setEndDate(endDate)
+  }, [reviews])
 
   const paginatedReviews = useMemo(() => {
     const startIndex = (currentPage - 1) * itemsPerPage
@@ -223,7 +258,7 @@ export const ReviewTable = ({ reviews, totalCount, pageChange }) => {
           reply: responseText,
           accountId: selectedStore.accountId,
           locationId: selectedStore.name.split('/')[1],
-          totalReviewCount : totalReviewsCount
+          totalReviewCount: totalReviewsCount,
         },
         {
           withCredentials: true,
@@ -242,6 +277,56 @@ export const ReviewTable = ({ reviews, totalCount, pageChange }) => {
 
   return (
     <>
+      <style>
+        {`
+            /* Styliser l'input directement */
+            .react-daterange-picker__wrapper {
+              border: 2px solid gray;
+              border-radius: 0.375rem;
+              padding: 0.5rem;
+            }
+
+            .react-daterange-picker__inputGroup {
+              font-family: sans-serif;
+              font-size: 1rem;
+              color: #1f2937;
+            }
+
+            /* Styliser le calendrier popup */
+            .react-calendar {
+              background-color: white;
+              border: 1px solid #e5e7eb;
+              border-radius: 0.5rem;
+              box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            }
+
+            .react-calendar__tile--active {
+              background-color: #2563eb !important;
+              color: white;
+            }
+
+            .react-calendar__tile:hover {
+              background-color: #bfdbfe;
+            }
+
+            /* Styliser les icônes */
+            .react-daterange-picker__button {
+              padding: 0.25rem;
+            }
+
+            .react-daterange-picker__button:hover {
+              background-color: #f3f4f6;
+              border-radius: 0.25rem;
+            }
+
+            /* Styliser l'état focus */
+            .react-daterange-picker__wrapper:focus-within {
+              border-color: #3b82f6;
+              box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
+              outline: none;
+            }
+          `}
+      </style>
       <YGroup
         f={1}
         width={'100%'}
@@ -267,6 +352,8 @@ export const ReviewTable = ({ reviews, totalCount, pageChange }) => {
                   <Button>Filtres</Button>
                 </Popover.Trigger>
                 <Popover.Content
+                  onOpenAutoFocus={(event) => event.preventDefault()}
+                  trapFocus={false}
                   borderWidth={1}
                   borderColor="$borderColor"
                   enterStyle={{ y: -10, opacity: 0 }}
@@ -282,6 +369,34 @@ export const ReviewTable = ({ reviews, totalCount, pageChange }) => {
                   ]}
                 >
                   <YStack gap="$3">
+                    <Text fontWeight={600} fontSize={'$3'}>
+                      Dates
+                    </Text>
+                    <DateRangePicker
+                      autoFocus={false}
+                      value={[startDate, endDate]}
+                      onChange={(value) => {
+                        if (value === null) {
+                          setStartDate(minDate)
+                          setEndDate(maxDate)
+                          return
+                        }
+                        setStartDate(value[0])
+                        setEndDate(value[1])
+                      }}
+                      showLeadingZeros={true}
+                      disabled={loading}
+                    />
+                    <Text fontWeight={600} fontSize={'$3'}>
+                      Notes
+                    </Text>
+                    <StarRatingFilter
+                      onChange={(value) => setRatingFilter(value)}
+                      value={ratingFilter}
+                    ></StarRatingFilter>
+                    <Text fontWeight={600} fontSize={'$3'}>
+                      Statut
+                    </Text>
                     <XStack alignItems="center" gap={8}>
                       <Checkbox
                         id="responded"

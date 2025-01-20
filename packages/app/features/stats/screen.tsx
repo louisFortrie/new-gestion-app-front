@@ -17,6 +17,7 @@ export const StatsScreen = () => {
   const { selectedStore } = useStores(false)
   const [reviews, setReviews] = useState<any[]>([])
   const [reviewsLoading, setReviewsLoading] = useState(true)
+  const [firstPageLoading, setFirstPageLoading] = useState(true)
   const [metrics, setMetrics] = useState<ReviewResponseMetrics>({
     averageResponseTime: 0,
     responseRate: 0,
@@ -25,6 +26,7 @@ export const StatsScreen = () => {
   const [totalReviews, setTotalReviews] = useState(0)
 
   const fetchReviews = async (pageToken: string | null = null) => {
+    setReviewsLoading(true)
     const response = await axios.get(
       `${apiUrl}/api/gestion/getReviews/${selectedStore.accountId}/${selectedStore.name.split('/')[1]}${pageToken ? '?pageToken=' + pageToken : ''}`,
       {
@@ -34,8 +36,10 @@ export const StatsScreen = () => {
     setReviews((prev) => [...prev, ...response.data.reviews])
     // setTotalReviews(response.data.totalReviews)
     setNextPageToken(response.data.pageToken)
+    setReviewsLoading(false)
     if (response.data.pageToken) {
       fetchReviews(response.data.pageToken)
+      setReviewsLoading(true)
     }
   }
 
@@ -61,7 +65,6 @@ export const StatsScreen = () => {
       .catch((error) => {
         console.error('Erreur lors de la récupération des métriques:', error)
       })
-    setReviewsLoading(true)
     // axios
     //   .get(
     //     `${apiUrl}/api/gestion/getReviews/${selectedStore.accountId}/${selectedStore.name.split('/')[1]}${nextPageToken ? '?pageToken=' + nextPageToken : ''}`,
@@ -78,8 +81,9 @@ export const StatsScreen = () => {
     //   .catch((error) => {
     //     console.error('Erreur lors de la récupération des avis:', error)
     //   })
+    setFirstPageLoading(true)
     fetchReviews()
-    setReviewsLoading(false)
+    setFirstPageLoading(false)
 
     setTotalReviews(selectedStore.reviews.totalReviewCount)
     // axios.get
@@ -127,13 +131,14 @@ export const StatsScreen = () => {
           />
         </XStack>
       </YStack>
-      {reviewsLoading ? (
+      {firstPageLoading ? (
         <TableLoadingSkeleton />
       ) : (
         <ReviewTable
           pageChange={handlePageChange}
           totalCount={totalReviews}
           reviews={reviews}
+          loading={reviewsLoading}
         ></ReviewTable>
       )}
     </YStack>

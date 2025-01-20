@@ -1,6 +1,6 @@
 'use client'
 
-import { Text, XStack, YStack, Dialog } from 'tamagui'
+import { Text, XStack, YStack, Dialog, Stack } from 'tamagui'
 import { CustomButton, StoreCard } from '@my/ui'
 import useStores from 'app/hooks/useStores'
 import { useRouter } from 'solito/navigation'
@@ -22,7 +22,7 @@ export const StoresListScreen = () => {
     setSelectedStore(store)
     console.log('Selected store:', store)
 
-    router.push('/dashboard')
+    router.push('/stats')
   }
 
   const handleAddAccount = async () => {
@@ -58,7 +58,7 @@ export const StoresListScreen = () => {
   }, [])
 
   return (
-    <YStack gap={16} >
+    <YStack gap={16}>
       <Dialog modal open={dialogOpen}>
         <Dialog.Portal>
           <Dialog.Overlay
@@ -99,15 +99,15 @@ export const StoresListScreen = () => {
       <Text fontSize={24} color={'#0F172A'} fontWeight={600}>
         Choix de la boutique
       </Text>
-      <XStack gap={16} flexWrap="wrap" alignItems="center" >
-        {stores.map((store) => (
+      <XStack gap={16} flexWrap="wrap" alignItems="center">
+        {stores.map((store, index) => (
           <StoreCard
-            key={store.id}
+            key={index}
             locationId={store.name.split('/')[1]}
             title={store.title}
-            averageRating={(Math.round(store.reviews.averageRating * 10) / 10) || 0}
+            averageRating={Math.round(store.reviews.averageRating * 10) / 10 || 0}
             totalReviews={store.reviews.totalReviewCount || 0}
-            imageUrl={store.medias?.[0]?.googleUrl}
+            imageUrl={store.medias?.[0]?.googleUrl || ''}
             onPress={() => handleSelectStore(store)}
             accountId={store.accountId}
             address={store.storefrontAddress?.addressLines[0]}
