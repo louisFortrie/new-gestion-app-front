@@ -188,6 +188,7 @@ export const Manage = () => {
             label: selectedStore?.title,
             value: selectedStore?.title.toLowerCase(),
           }}
+          loading={loading}
         ></SearchSelect>
       </XStack>
       <StyledYstack padding={'$5'}>

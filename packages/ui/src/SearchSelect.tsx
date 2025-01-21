@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react'
-import { Input, Select, YStack, XStack, styled, YGroup, Text, Stack } from 'tamagui'
+import { Input, Select, YStack, XStack, styled, YGroup, Text, Stack, Spinner } from 'tamagui'
 import { Check, ChevronDown, Search } from '@tamagui/lucide-icons'
 
 const SearchInput = styled(Input, {
@@ -51,6 +51,7 @@ export const SearchSelect = ({
   options = [{ label: "Erreur pas d'options", value: "erreurpasd'options" }],
   onSelect,
   selectedOption = { label: "Erreur pas d'options", value: "erreurpasd'options" },
+  loading = true
 }) => {
   const [searchValue, setSearchValue] = useState('')
   const [isFocused, setIsFocused] = useState(false)
@@ -61,7 +62,7 @@ export const SearchSelect = ({
     if (isFocused) {
       setDisplayedOptions(options)
     }
-  }, [isFocused])
+  }, [isFocused, options])
 
   useEffect(() => {
     if (selectedOption) {
@@ -78,6 +79,8 @@ export const SearchSelect = ({
       )
     }
   }, [searchValue])
+
+
 
   return (
     <YStack gap="$4">
@@ -99,7 +102,9 @@ export const SearchSelect = ({
 
       {isFocused && (
         <SelectGroup>
-          {displayedOptions.map((option) => (
+          {loading && <YGroup.Item> <SelectItem alignItems='center' justifyContent='center'  paddingHorizontal="$2"
+                paddingVertical="$3"><Spinner color='black'></Spinner></SelectItem></YGroup.Item>}
+          {!loading && displayedOptions.map((option) => (
             <YGroup.Item key={option.value}>
               <SelectItem
                 paddingHorizontal="$2"

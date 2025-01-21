@@ -101,7 +101,15 @@ export const StoresListScreen = () => {
                 </Dialog.Description>
                 <Unspaced>
                   <Dialog.Close asChild>
-                    <Button position="absolute" top="$3" right="$3" size="$2" circular icon={X} />
+                    <Button
+                      position="absolute"
+                      top="$3"
+                      right="$3"
+                      size="$2"
+                      circular
+                      icon={X}
+                      onPress={() => setDialogOpen(false)}
+                    />
                   </Dialog.Close>
                 </Unspaced>
               </>
