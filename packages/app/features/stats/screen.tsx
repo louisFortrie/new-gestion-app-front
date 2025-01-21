@@ -13,6 +13,8 @@ interface ReviewResponseMetrics {
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL
 export const StatsScreen = () => {
+  console.log('StatsScreen should fetch')
+
   const { user } = useAuth()
   const { selectedStore } = useStores(false)
   const [reviews, setReviews] = useState<any[]>([])
@@ -26,6 +28,7 @@ export const StatsScreen = () => {
   const [totalReviews, setTotalReviews] = useState(0)
 
   const fetchReviews = async (pageToken: string | null = null) => {
+    console.log('fetchReviews triggered should fetch')
     setReviewsLoading(true)
     const response = await axios.get(
       `${apiUrl}/api/gestion/getReviews/${selectedStore.accountId}/${selectedStore.name.split('/')[1]}${pageToken ? '?pageToken=' + pageToken : ''}`,
@@ -52,6 +55,8 @@ export const StatsScreen = () => {
   }
 
   useEffect(() => {
+    console.log('useEffect triggered should fetch')
+
     if (!selectedStore || !user) return
     console.log('use effect reviews')
 

@@ -19,7 +19,7 @@ const Card = styled(XStack, {
   justifyContent: 'flex-start',
   alignItems: 'center',
   display: 'flex',
-  width: 'calc(50% - 16px)',
+  width: 'calc(50% - 8px)',
 })
 
 export const SettingsScreen = () => {
@@ -57,6 +57,15 @@ export const SettingsScreen = () => {
     setPrevUser(user)
   }, [user])
 
+  const handleReAuth = async (email: string) => {
+    window.location.href =
+      process.env.NEXT_PUBLIC_API_URL +
+      '/api/gestion/google/reconnect/' +
+      email +
+      '?redirectUrl=' +
+      window.location.href
+  }
+
   return (
     <YStack>
       <XStack justifyContent="space-between" alignItems="center" gap={16}>
@@ -65,7 +74,7 @@ export const SettingsScreen = () => {
           Ajouter un compte
         </CustomButton>
       </XStack>
-      <XStack gap={16}>
+      <XStack gap={16} f={1} flexWrap="wrap">
         {accounts.map((account) => {
           return (
             <Card key={account.id}>
@@ -82,6 +91,17 @@ export const SettingsScreen = () => {
                   {account.displayName}
                 </Text>
                 <Text color={'#475569'}>{account.email}</Text>
+                {account.needsRefresh && (
+                  <Text
+                    paddingVertical={'$2'}
+                    paddingHorizontal={'$3'}
+                    backgroundColor={'rgba(255, 199, 0, 0.4)'}
+                    color={'orange'}
+                    borderRadius={'$4'}
+                  >
+                    Besoin de se reconnecter
+                  </Text>
+                )}
               </YStack>
               <Stack f={1}></Stack>
               <Popover>
@@ -94,6 +114,7 @@ export const SettingsScreen = () => {
                   borderColor="$borderColor"
                   enterStyle={{ y: -10, opacity: 0 }}
                   exitStyle={{ y: -10, opacity: 0 }}
+                  gap={8}
                   elevate
                   animation={[
                     'quick',
@@ -105,8 +126,16 @@ export const SettingsScreen = () => {
                   ]}
                 >
                   <Popover.Arrow borderWidth={1} borderColor="$borderColor" />
-
-                  <Button onPress={() => handleDeleteAccount(account.id)} icon={<Trash></Trash>}>
+                  {account.needsRefresh && (
+                    <CustomButton onPress={() => handleReAuth(account.email)}>
+                      Se reconnecter
+                    </CustomButton>
+                  )}
+                  <Button
+                    theme={'red'}
+                    onPress={() => handleDeleteAccount(account.id)}
+                    icon={<Trash></Trash>}
+                  >
                     Supprimer
                   </Button>
                 </Popover.Content>

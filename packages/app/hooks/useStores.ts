@@ -29,6 +29,8 @@ const useStores = (shouldFetch: boolean = true) => {
   }
 
   useEffect(() => {
+    console.log('useStores should fetch', shouldFetch)
+
     if (!user || !shouldFetch) return
     const fetchStores = async () => {
       setLoading(true)
@@ -40,7 +42,6 @@ const useStores = (shouldFetch: boolean = true) => {
         })
         setStores(response.data)
         console.log('Magasins récupérés:', response.data)
-
         setLoading(false)
       } catch (error) {
         console.error('Erreur lors de la récupération des magasins:', error)

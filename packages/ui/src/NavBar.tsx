@@ -70,7 +70,7 @@ const StyledButton = styled(Button, {
 
 export const NavBar = () => {
   const [isReviewsOpen, setIsReviewsOpen] = useState(false)
-  const { selectedStore } = useStores()
+  const { selectedStore } = useStores(false)
   const [isStoreSelected, setIsStoreSelected] = useState(false)
   const router = useRouter()
   const pathName = usePathname()

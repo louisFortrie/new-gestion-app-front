@@ -445,7 +445,7 @@ export const HorizontalSheet = ({ open, selectedReview, handleOpenPressed, handl
   const [templates, setTemplates] = useState<any[]>([])
 
   const { user } = useAuth()
-  const { selectedStore } = useStores()
+  const { selectedStore } = useStores(false)
   console.log(selectedReview)
   const getTemplates = () => {
     axios

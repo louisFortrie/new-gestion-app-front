@@ -169,7 +169,7 @@ export const ReviewTable = ({ reviews, totalCount, pageChange, loading }) => {
   const [responseSheetOpen, setResponseSheetOpen] = useState(false)
   const [selectedReview, setSelectedReview] = useState({})
   const { user } = useAuth()
-  const { selectedStore } = useStores()
+  const { selectedStore } = useStores(false)
 
   const itemsPerPage = 10
   const [hasNextPage, setHasNextPage] = useState(true) // Whether there are more reviews to load

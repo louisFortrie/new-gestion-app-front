@@ -1,18 +1,19 @@
 'use client'
 
-import { Text, XStack, YStack, Dialog, Stack } from 'tamagui'
+import { Text, XStack, YStack, Dialog, Stack, Unspaced, Button } from 'tamagui'
 import { CustomButton, StoreCard } from '@my/ui'
 import useStores from 'app/hooks/useStores'
 import { useRouter } from 'solito/navigation'
 import useAuth from 'app/hooks/useAuth'
 import axios from 'axios'
 import { useEffect, useRef, useState } from 'react'
-import { Plus } from '@tamagui/lucide-icons'
+import { Plus, X } from '@tamagui/lucide-icons'
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL
 
 export const StoresListScreen = () => {
   const [dialogOpen, setDialogOpen] = useState(false)
+  const [needsRefresh, setNeedsRefresh] = useState(false)
   const hasRendered = useRef(false) // Ref pour suivre si le composant a été rendu
   const { stores, setSelectedStore } = useStores()
   const { user } = useAuth()
@@ -29,10 +30,6 @@ export const StoresListScreen = () => {
     window.location.href = apiUrl + '/api/gestion/google'
   }
 
-  useEffect(() => {
-    console.log('Stores:', stores)
-  }, [stores])
-
   // const refreshToken = async () => {
   //   try {
   //     await axios.get(apiUrl + '/api/refresh/' + user.id, {
@@ -47,6 +44,14 @@ export const StoresListScreen = () => {
     if (!user) return
     if (!user.googleAccounts || user.googleAccounts.length === 0) {
       setDialogOpen(true)
+    }
+    if (user.googleAccounts) {
+      const googleAccounts = user.googleAccounts
+      const accountsThatNeedRefresh = googleAccounts.filter((account) => account.needsRefresh)
+      if (accountsThatNeedRefresh.length > 0) {
+        setNeedsRefresh(true)
+        setDialogOpen(true)
+      }
     }
   }, [user])
 
@@ -67,6 +72,7 @@ export const StoresListScreen = () => {
             opacity={0.5}
             enterStyle={{ opacity: 0 }}
             exitStyle={{ opacity: 0 }}
+            onPress={() => needsRefresh && setDialogOpen(false)}
           />
 
           <Dialog.Content
@@ -86,10 +92,28 @@ export const StoresListScreen = () => {
             exitStyle={{ x: 0, y: 10, opacity: 0, scale: 0.95 }}
             gap="$4"
           >
-            <Dialog.Title>Aucun compte google connécté</Dialog.Title>
-            <Dialog.Description>
-              Accéder aux paramètres pour connecter votre compte google
-            </Dialog.Description>
+            {needsRefresh && (
+              <>
+                <Dialog.Title>Besoin de se reconnecter</Dialog.Title>
+                <Dialog.Description>
+                  Un ou plusieurs compte google ont besoin d'être reconnectés accédez aux paramètres
+                  pour les reconnecter
+                </Dialog.Description>
+                <Unspaced>
+                  <Dialog.Close asChild>
+                    <Button position="absolute" top="$3" right="$3" size="$2" circular icon={X} />
+                  </Dialog.Close>
+                </Unspaced>
+              </>
+            )}
+            {!needsRefresh && (
+              <>
+                <Dialog.Title>Aucun compte google connécté</Dialog.Title>
+                <Dialog.Description>
+                  Accéder aux paramètres pour connecter votre compte google
+                </Dialog.Description>
+              </>
+            )}
             <CustomButton onPress={() => router.push('/settings')}>
               Accéder aux paramètres
             </CustomButton>
