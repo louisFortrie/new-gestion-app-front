@@ -67,7 +67,7 @@ export const SettingsScreen = () => {
   }
 
   return (
-    <YStack>
+    <YStack gap={8}>
       <XStack justifyContent="space-between" alignItems="center" gap={16}>
         <Text>Gestion des comptes google associés</Text>
         <CustomButton icon={<Plus />} onPress={() => handleAddAccount()}>

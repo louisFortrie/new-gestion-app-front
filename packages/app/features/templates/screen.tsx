@@ -19,7 +19,7 @@ const TemplateCard = styled(YStack, {
   backgroundColor: 'white',
   padding: '$4',
   borderRadius: '$4',
-  height: 230,
+  minHeight: 230,
   justifyContent: 'space-between',
 })
 
