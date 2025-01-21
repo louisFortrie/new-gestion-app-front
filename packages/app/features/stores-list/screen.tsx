@@ -42,7 +42,7 @@ export const StoresListScreen = () => {
 
   useEffect(() => {
     if (!user) return
-    if (!user.googleAccounts || user.googleAccounts.length === 0) {
+    if (!user.googleAccounts || user.googleAccounts.length === 0 || !stores) {
       setDialogOpen(true)
     }
     if (user.googleAccounts) {
@@ -132,20 +132,21 @@ export const StoresListScreen = () => {
         Choix de la boutique
       </Text>
       <XStack gap={16} flexWrap="wrap" alignItems="center">
-        {stores.map((store, index) => (
-          <StoreCard
-            key={index}
-            locationId={store.name.split('/')[1]}
-            title={store.title}
-            averageRating={Math.round(store.reviews.averageRating * 10) / 10 || 0}
-            totalReviews={store.reviews.totalReviewCount || 0}
-            imageUrl={store.medias?.[0]?.googleUrl || ''}
-            onPress={() => handleSelectStore(store)}
-            accountId={store.accountId}
-            address={store.storefrontAddress?.addressLines[0]}
-            locality={store.storefrontAddress?.locality}
-          />
-        ))}
+        {stores &&
+          stores.map((store, index) => (
+            <StoreCard
+              key={index}
+              locationId={store.name.split('/')[1]}
+              title={store.title}
+              averageRating={Math.round(store.reviews.averageRating * 10) / 10 || 0}
+              totalReviews={store.reviews.totalReviewCount || 0}
+              imageUrl={store.medias?.[0]?.googleUrl || ''}
+              onPress={() => handleSelectStore(store)}
+              accountId={store.accountId}
+              address={store.storefrontAddress?.addressLines[0]}
+              locality={store.storefrontAddress?.locality}
+            />
+          ))}
         <CustomButton width={200} height={200} onPress={handleAddAccount}>
           <Plus></Plus>
         </CustomButton>
