@@ -5,6 +5,7 @@ import axios from 'axios'
 import { useEffect, useState } from 'react'
 import { YStack, Text, styled, Form, XStack, Stack, Button, TextArea } from 'tamagui'
 import useAuth from 'app/hooks/useAuth'
+import { useToastController } from '@my/ui'
 
 const StyledForm = styled(Form, {
   width: '100%',
@@ -68,6 +69,7 @@ const TemplateDescription = styled(Text, {
 const apiUrl = process.env.NEXT_PUBLIC_API_URL
 
 export const TemplatesScreen = () => {
+  const toast = useToastController()
   const { user } = useAuth()
   const [templates, setTemplates] = useState([])
 
@@ -109,6 +111,15 @@ export const TemplatesScreen = () => {
       .then((response) => {
         getTemplates()
       })
+      .catch((error) => {
+        console.error('Erreur lors de la suppression du template:', error)
+        toast.show('Erreur lors de la suppression du template', {
+          type: 'error',
+          message:
+            'une erreur est survenue lors de la suppression du template vérifiez votre connexion',
+          customData: { theme: 'red' },
+        })
+      })
   }
 
   const handleUpdateTemplate = (id: string) => {
@@ -131,6 +142,15 @@ export const TemplatesScreen = () => {
           message: '',
         })
         getTemplates()
+      })
+      .catch((error) => {
+        console.error('Erreur lors de la mise à jour du template:', error)
+        toast.show('Erreur lors de la mise à jour du template', {
+          type: 'error',
+          message:
+            'une erreur est survenue lors de la mise à jour du template vérifiez votre connexion',
+          customData: { theme: 'red' },
+        })
       })
   }
 
@@ -156,6 +176,15 @@ export const TemplatesScreen = () => {
         })
         getTemplates()
       })
+      .catch((error) => {
+        console.error('Erreur lors de la création du template:', error)
+        toast.show('Erreur lors de la création du template', {
+          type: 'error',
+          message:
+            'une erreur est survenue lors de la création du template vérifiez votre connexion',
+          customData: { theme: 'red' },
+        })
+      })
   }
 
   const getTemplates = () => {
@@ -166,6 +195,15 @@ export const TemplatesScreen = () => {
       .then((response) => {
         const templates = response.data.responseTemplates
         setTemplates(templates)
+      })
+      .catch((error) => {
+        console.error('Erreur lors de la création du template:', error)
+        toast.show('Erreur lors de la création du template', {
+          type: 'error',
+          message:
+            'une erreur est survenue lors de la création du template vérifiez votre connexion',
+          customData: { theme: 'red' },
+        })
       })
   }
 

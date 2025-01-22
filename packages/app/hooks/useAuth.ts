@@ -41,8 +41,9 @@ const useAuth = () => {
     } catch (error) {
       console.error('Erreur lors de la connexion:', error)
       toast.show('Erreur lors de la connexion', {
+        type: 'error',
         message: "Nom d'utilisateur ou mot de passe incorrect",
-        theme: 'red',
+        customData: { theme: 'red' },
       })
       setError(error)
       setLoading(false)

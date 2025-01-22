@@ -7,7 +7,6 @@ import { useState } from 'react'
 import useAuth from 'app/hooks/useAuth'
 
 const Login = () => {
-  const toast = useToastController()
   const [password, setPassword] = useState('')
   const [userName, setUserName] = useState('')
 
@@ -32,7 +31,13 @@ const Login = () => {
           <Text color={'$gray10Light'} textAlign="center">
             Améliorez l'expérience de vos clients en toute simplicité.
           </Text>
-          <Form width={'100%'}>
+          <Form
+            width={'100%'}
+            onSubmit={() => {
+              login(userName, password)
+            }}
+            gap={8}
+          >
             <Label htmlFor="emailInput">Nom d'utilisateur</Label>
             <Input
               id="emailInput"
@@ -46,29 +51,26 @@ const Login = () => {
               onChangeText={(text) => setPassword(text)}
               secureTextEntry
             ></Input>
-          </Form>
-          <XStack justifyContent="space-between" alignItems="center" width={'100%'}>
-            <XStack alignItems="center" gap={'$2'}>
-              <Checkbox id="checkBox">
-                <Checkbox.Indicator>
-                  <CheckIcon />
-                </Checkbox.Indicator>
-              </Checkbox>
-              <Label htmlFor="checkBox">Se souvenir de moi</Label>
+            <XStack justifyContent="space-between" alignItems="center" width={'100%'}>
+              <XStack alignItems="center" gap={'$2'}>
+                <Checkbox id="checkBox">
+                  <Checkbox.Indicator>
+                    <CheckIcon />
+                  </Checkbox.Indicator>
+                </Checkbox>
+                <Label htmlFor="checkBox">Se souvenir de moi</Label>
+              </XStack>
+              <Text color={'#98b548'} fontWeight={'$4'}>
+                Mot de passe oublié ?
+              </Text>
             </XStack>
-            <Text color={'#98b548'} fontWeight={'$4'}>
-              Mot de passe oublié ?
-            </Text>
-          </XStack>
-          <CustomButton
-            width={'100%'}
-            onPress={() => {
-              login(userName, password)
-            }}
-            icon={loading && <Spinner color={'black'} />}
-          >
-            Se connecter
-          </CustomButton>
+            <Form.Trigger asChild>
+              <CustomButton width={'100%'} icon={loading ? <Spinner color={'black'} /> : undefined}>
+                Se connecter
+              </CustomButton>
+            </Form.Trigger>
+          </Form>
+
           <Text>
             Vous n'avez pas de compte ?{' '}
             <Text color={'#98b548'} fontWeight={'$4'}>

@@ -1,4 +1,4 @@
-import { BarChart, DoughnutChartCard, GraphCard, LineChart } from '@my/ui'
+import { BarChart, DoughnutChartCard, GraphCard, LineChart, useToastController } from '@my/ui'
 import {
   Clock,
   Eye,
@@ -7,16 +7,15 @@ import {
   MessageSquare,
   MessagesSquare,
   Phone,
-  PieChart,
   Reply,
   Star,
-  StarFull,
 } from '@tamagui/lucide-icons'
 import { Text, XStack, Stack, YStack, styled, H2, H3 } from 'tamagui'
 import useStores from 'app/hooks/useStores'
 import { useEffect, useState } from 'react'
 import useAuth from 'app/hooks/useAuth'
 import axios from 'axios'
+import { useGoogleMetrics } from 'app/hooks/useGoogleMetrics'
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL
 
@@ -54,6 +53,7 @@ interface ReviewResponseMetrics {
 
 export const DashboardScreen = () => {
   const { selectedStore, loading } = useStores(false)
+  const toast = useToastController()
   const { user } = useAuth()
   const [metrics, setMetrics] = useState<ReviewResponseMetrics>({
     averageResponseTimeHours: 0,
@@ -65,7 +65,7 @@ export const DashboardScreen = () => {
     daily: {
       comparison: {
         current: {
-          total : 0,
+          total: 0,
           oneStar: 0,
           twoStars: 0,
           threeStars: 0,
@@ -77,7 +77,7 @@ export const DashboardScreen = () => {
     weekly: {
       comparison: {
         current: {
-          total : 0,
+          total: 0,
           oneStar: 0,
           twoStars: 0,
           threeStars: 0,
@@ -89,7 +89,7 @@ export const DashboardScreen = () => {
     monthly: {
       comparison: {
         current: {
-          total : 0,
+          total: 0,
           oneStar: 0,
           twoStars: 0,
           threeStars: 0,
@@ -126,6 +126,11 @@ export const DashboardScreen = () => {
       },
     },
   })
+
+  // const { googleMetricsHook, googleMetricsLoading } = useGoogleMetrics({
+  //   storeId: selectedStore?.name.split('/')[1],
+  //   accountId: selectedStore?.accountId,
+  // })
   useEffect(() => {
     // if (!selectedStore || !user || user.googleAccounts.length === 0 || loading) return
     console.log(selectedStore)
@@ -137,12 +142,19 @@ export const DashboardScreen = () => {
       })
       .then((response) => {
         setGestionStoreMetrics(response.data)
-        if(response.data.googleRatingGrouped.daily ) 
-        setGroupedReviews(response.data.googleRatingGrouped)
+        if (response.data.googleRatingGrouped.daily)
+          setGroupedReviews(response.data.googleRatingGrouped)
       })
       .catch((error) => {
         console.error('Erreur lors de la récupération des métriques:', error)
+        toast.show('Erreur lors de la récupération des métriques', {
+          type: 'error',
+          message:
+            'une erreur est survenue lors de la récupération des métriques vérifiez votre connexion',
+          customData: { theme: 'red' },
+        })
       })
+    setGestionStoreMetrics(null)
 
     axios
       .get(
@@ -157,6 +169,12 @@ export const DashboardScreen = () => {
       })
       .catch((error) => {
         console.error('Erreur lors de la récupération des métriques:', error)
+        toast.show('Erreur lors de la récupération des métriques', {
+          type: 'error',
+          message:
+            'une erreur est survenue lors de la récupération des métriques vérifiez votre connexion',
+          customData: { theme: 'red' },
+        })
       })
   }, [selectedStore])
 
@@ -256,6 +274,7 @@ export const DashboardScreen = () => {
 
   useEffect(() => {
     console.log(gestionStoreMetrics, 'gestionStoreMetrics')
+    if (!gestionStoreMetrics) return
     if (gestionStoreMetrics.metric.daily.comparison.current.length == 0) return
 
     const getMetricData = (period) => {
@@ -322,6 +341,7 @@ export const DashboardScreen = () => {
 
   useEffect(() => {
     console.log(gestionStoreMetrics, 'gestionStoreMetrics')
+    if (!gestionStoreMetrics) return
     if (gestionStoreMetrics.metric.daily.comparison.current.length == 0) return
 
     const getMetricData = (period) => {
@@ -415,7 +435,7 @@ export const DashboardScreen = () => {
   }>({ labels: [], datasets: [] })
 
   useEffect(() => {
-    if (!googleMetrics) return
+    if (!googleMetrics || !googleMetrics?.metrics) return
     console.log(googleMetrics)
 
     const formatDataForChart = () => {
@@ -483,7 +503,7 @@ export const DashboardScreen = () => {
   }>({ labels: [], datasets: [] })
 
   useEffect(() => {
-    if (!googleMetrics) return
+    if (!googleMetrics || !googleMetrics?.metrics) return
     console.log(googleMetrics)
 
     const formatDataForChart = () => {
@@ -551,7 +571,7 @@ export const DashboardScreen = () => {
   }>({ labels: [], datasets: [] })
 
   useEffect(() => {
-    if (!googleMetrics) return
+    if (!googleMetrics || !googleMetrics?.metrics) return
     console.log(googleMetrics)
 
     const formatDataForChart = () => {
@@ -636,7 +656,7 @@ export const DashboardScreen = () => {
   }>({ labels: [], datasets: [] })
 
   useEffect(() => {
-    if (!googleMetrics) return
+    if (!googleMetrics || !googleMetrics?.metrics) return
     console.log(googleMetrics)
 
     const formatDataForChart = () => {
@@ -713,11 +733,11 @@ export const DashboardScreen = () => {
               <YStack gap={8}>
                 <Text>Temps de réponse moyen</Text>
                 <Text fontSize={32} fontWeight={600}>
-                  {gestionStoreMetrics.averageResponseTime > 2160
-                    ? `${Math.floor(gestionStoreMetrics.averageResponseTime / 168)} Sem.`
-                    : gestionStoreMetrics.averageResponseTime > 24
-                      ? `${Math.floor(gestionStoreMetrics.averageResponseTime / 24)} J`
-                      : `${gestionStoreMetrics.averageResponseTime || 0} H`}
+                  {gestionStoreMetrics?.averageResponseTime > 2160
+                    ? `${Math.floor(gestionStoreMetrics?.averageResponseTime / 168)} Sem.`
+                    : gestionStoreMetrics?.averageResponseTime > 24
+                      ? `${Math.floor(gestionStoreMetrics?.averageResponseTime / 24)} J`
+                      : `${gestionStoreMetrics?.averageResponseTime || 0} H`}
                 </Text>
               </YStack>
             </HeadCard>
@@ -730,7 +750,7 @@ export const DashboardScreen = () => {
               <YStack gap={8}>
                 <Text>Note moyenne</Text>
                 <Text fontSize={32} fontWeight={600}>
-                  {(Math.round(selectedStore?.reviews?.averageRating * 10) / 10) || 0}
+                  {Math.round(selectedStore?.reviews?.averageRating * 10) / 10 || 0}
                 </Text>
               </YStack>
             </HeadCard>
@@ -741,7 +761,7 @@ export const DashboardScreen = () => {
               <YStack>
                 <Text>Taux de réponse</Text>
                 <Text fontSize={32} fontWeight={600}>
-                  {gestionStoreMetrics.responseRate || 0}%
+                  {gestionStoreMetrics?.responseRate || 0}%
                 </Text>
               </YStack>
             </HeadCard>
@@ -811,10 +831,16 @@ export const DashboardScreen = () => {
             title="Cliques généré vers le site web"
             icon={<Laptop size={20} color={'#94A3B8'} />}
             currValue={
-              googleMetrics?.metrics[selectedPeriodClicks].comparison.current.totals.WEBSITE_CLICKS
+              googleMetrics?.metrics
+                ? googleMetrics?.metrics[selectedPeriodClicks].comparison.current.totals
+                    .WEBSITE_CLICKS
+                : 0
             }
             prevValue={
-              googleMetrics?.metrics[selectedPeriodClicks].comparison.previous.totals.WEBSITE_CLICKS
+              googleMetrics?.metrics
+                ? googleMetrics?.metrics[selectedPeriodClicks].comparison.previous.totals
+                    .WEBSITE_CLICKS
+                : 0
             }
             onTimeSpanChange={(timeSpan) => setSelectedPeriodClicks(timeSpan)}
             graph={<BarChart dataProps={chartDataClicks}></BarChart>}
@@ -822,24 +848,28 @@ export const DashboardScreen = () => {
           <GraphCard
             title="Vue de la page"
             currValue={
-              googleMetrics?.metrics[selectedPeriodViews].comparison.current.totals
-                .BUSINESS_IMPRESSIONS_DESKTOP_SEARCH +
-              googleMetrics?.metrics[selectedPeriodViews].comparison.current.totals
-                .BUSINESS_IMPRESSIONS_MOBILE_SEARCH +
-              googleMetrics?.metrics[selectedPeriodViews].comparison.current.totals
-                .BUSINESS_IMPRESSIONS_DESKTOP_MAPS +
-              googleMetrics?.metrics[selectedPeriodViews].comparison.current.totals
-                .BUSINESS_IMPRESSIONS_MOBILE_MAPS
+              googleMetrics?.metrics
+                ? googleMetrics?.metrics[selectedPeriodViews].comparison.current.totals
+                    .BUSINESS_IMPRESSIONS_DESKTOP_SEARCH +
+                  googleMetrics?.metrics[selectedPeriodViews].comparison.current.totals
+                    .BUSINESS_IMPRESSIONS_MOBILE_SEARCH +
+                  googleMetrics?.metrics[selectedPeriodViews].comparison.current.totals
+                    .BUSINESS_IMPRESSIONS_DESKTOP_MAPS +
+                  googleMetrics?.metrics[selectedPeriodViews].comparison.current.totals
+                    .BUSINESS_IMPRESSIONS_MOBILE_MAPS
+                : 0
             }
             prevValue={
-              googleMetrics?.metrics[selectedPeriodViews].comparison.previous.totals
-                .BUSINESS_IMPRESSIONS_DESKTOP_SEARCH +
-              googleMetrics?.metrics[selectedPeriodViews].comparison.previous.totals
-                .BUSINESS_IMPRESSIONS_MOBILE_SEARCH +
-              googleMetrics?.metrics[selectedPeriodViews].comparison.previous.totals
-                .BUSINESS_IMPRESSIONS_DESKTOP_MAPS +
-              googleMetrics?.metrics[selectedPeriodViews].comparison.previous.totals
-                .BUSINESS_IMPRESSIONS_MOBILE_MAPS
+              googleMetrics?.metrics
+                ? googleMetrics?.metrics[selectedPeriodViews].comparison.previous.totals
+                    .BUSINESS_IMPRESSIONS_DESKTOP_SEARCH +
+                  googleMetrics?.metrics[selectedPeriodViews].comparison.previous.totals
+                    .BUSINESS_IMPRESSIONS_MOBILE_SEARCH +
+                  googleMetrics?.metrics[selectedPeriodViews].comparison.previous.totals
+                    .BUSINESS_IMPRESSIONS_DESKTOP_MAPS +
+                  googleMetrics?.metrics[selectedPeriodViews].comparison.previous.totals
+                    .BUSINESS_IMPRESSIONS_MOBILE_MAPS
+                : 0
             }
             onTimeSpanChange={(timeSpan) => setSelectedPeriodViews(timeSpan)}
             icon={<Eye size={20} color={'#94A3B8'} />}
@@ -852,21 +882,29 @@ export const DashboardScreen = () => {
             icon={<MapPin size={20} color={'#94A3B8'} />}
             graph={<LineChart dataprops={chartData}></LineChart>}
             currValue={
-              googleMetrics?.metrics[selectedPeriod].comparison.current.totals
-                .BUSINESS_DIRECTION_REQUESTS
+              googleMetrics?.metrics
+                ? googleMetrics?.metrics[selectedPeriod].comparison.current.totals
+                    .BUSINESS_DIRECTION_REQUESTS
+                : 0
             }
             prevValue={
-              googleMetrics?.metrics[selectedPeriod].comparison.previous.totals
-                .BUSINESS_DIRECTION_REQUESTS
+              googleMetrics?.metrics
+                ? googleMetrics?.metrics[selectedPeriod].comparison.previous.totals
+                    .BUSINESS_DIRECTION_REQUESTS
+                : 0
             }
             onTimeSpanChange={(timeSpan) => setSelectedPeriod(timeSpan)}
           ></GraphCard>
           <GraphCard
             currValue={
-              googleMetrics?.metrics[selectedPeriodCalls].comparison.current.totals.CALL_CLICKS
+              googleMetrics?.metrics
+                ? googleMetrics?.metrics[selectedPeriodCalls].comparison.current.totals.CALL_CLICKS
+                : 0
             }
             prevValue={
-              googleMetrics?.metrics[selectedPeriodCalls].comparison.previous.totals.CALL_CLICKS
+              googleMetrics?.metrics
+                ? googleMetrics?.metrics[selectedPeriodCalls].comparison.previous.totals.CALL_CLICKS
+                : 0
             }
             onTimeSpanChange={(timeSpan) => setSelectedPeriodCalls(timeSpan)}
             title="Appels téléphoniques"

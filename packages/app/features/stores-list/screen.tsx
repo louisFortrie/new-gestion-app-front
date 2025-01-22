@@ -5,8 +5,7 @@ import { CustomButton, StoreCard } from '@my/ui'
 import useStores from 'app/hooks/useStores'
 import { useRouter } from 'solito/navigation'
 import useAuth from 'app/hooks/useAuth'
-import axios from 'axios'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Plus, X } from '@tamagui/lucide-icons'
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL
@@ -14,14 +13,12 @@ const apiUrl = process.env.NEXT_PUBLIC_API_URL
 export const StoresListScreen = () => {
   const [dialogOpen, setDialogOpen] = useState(false)
   const [needsRefresh, setNeedsRefresh] = useState(false)
-  const hasRendered = useRef(false) // Ref pour suivre si le composant a été rendu
   const { stores, setSelectedStore } = useStores()
   const { user } = useAuth()
   const router = useRouter()
   const handleSelectStore = (store: any) => {
     localStorage.setItem('selectedStore', JSON.stringify(store))
     setSelectedStore(store)
-    console.log('Selected store:', store)
 
     router.push('/stats')
   }
@@ -29,16 +26,6 @@ export const StoresListScreen = () => {
   const handleAddAccount = async () => {
     window.location.href = apiUrl + '/api/gestion/google'
   }
-
-  // const refreshToken = async () => {
-  //   try {
-  //     await axios.get(apiUrl + '/api/refresh/' + user.id, {
-  //       withCredentials: true,
-  //     })
-  //   } catch (error) {
-  //     console.error('Erreur lors de la récupération des magasins:', error)
-  //   }
-  // }
 
   useEffect(() => {
     if (!user) return
@@ -54,13 +41,6 @@ export const StoresListScreen = () => {
       }
     }
   }, [user])
-
-  useEffect(() => {
-    if (!hasRendered.current) {
-      console.log('Component rendered for the first time')
-      hasRendered.current = true // Marque le composant comme rendu
-    }
-  }, [])
 
   return (
     <YStack gap={16}>

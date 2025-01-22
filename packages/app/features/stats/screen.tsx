@@ -1,10 +1,11 @@
-import { H1, H3, H4, Text, YStack, XStack } from 'tamagui'
+import { H4, YStack, XStack } from 'tamagui'
 import { ReviewTable, StatsCard, TableLoadingSkeleton } from '@my/ui'
 import { Check, MessagesSquare, Clock, Reply, ArrowUp } from '@tamagui/lucide-icons'
 import useStores from 'app/hooks/useStores'
 import { useEffect, useState } from 'react'
 import useAuth from 'app/hooks/useAuth'
 import axios from 'axios'
+import { useToastController } from '@my/ui'
 
 interface ReviewResponseMetrics {
   averageResponseTime: number
@@ -14,7 +15,7 @@ interface ReviewResponseMetrics {
 const apiUrl = process.env.NEXT_PUBLIC_API_URL
 export const StatsScreen = () => {
   console.log('StatsScreen should fetch')
-
+  const toast = useToastController()
   const { user } = useAuth()
   const { selectedStore } = useStores(false)
   const [reviews, setReviews] = useState<any[]>([])
@@ -30,28 +31,31 @@ export const StatsScreen = () => {
   const fetchReviews = async (pageToken: string | null = null) => {
     console.log('fetchReviews triggered should fetch')
     setReviewsLoading(true)
-    const response = await axios.get(
-      `${apiUrl}/api/gestion/getReviews/${selectedStore.accountId}/${selectedStore.name.split('/')[1]}${pageToken ? '?pageToken=' + pageToken : ''}`,
-      {
-        withCredentials: true,
-      }
-    )
-    setReviews((prev) => [...prev, ...response.data.reviews])
-    // setTotalReviews(response.data.totalReviews)
-    setNextPageToken(response.data.pageToken)
-    setReviewsLoading(false)
-    if (response.data.pageToken) {
-      fetchReviews(response.data.pageToken)
-      setReviewsLoading(true)
-    }
-  }
+    try {
+      const response = await axios.get(
+        `${apiUrl}/api/gestion/getReviews/${selectedStore.accountId}/${selectedStore.name.split('/')[1]}${pageToken ? '?pageToken=' + pageToken : ''}`,
+        {
+          withCredentials: true,
+        }
+      )
 
-  const handlePageChange = (page) => {
-    // console.log('page', page, nextPageToken)
-    // const totalPages = Math.ceil(reviews.length / 10)
-    // if (page > totalPages && nextPageToken) {
-    //   fetchReviews(nextPageToken)
-    // }
+      setReviews((prev) => [...prev, ...response.data.reviews])
+      // setTotalReviews(response.data.totalReviews)
+      setNextPageToken(response.data.pageToken)
+      setReviewsLoading(false)
+      if (response.data.pageToken) {
+        fetchReviews(response.data.pageToken)
+        setReviewsLoading(true)
+      }
+    } catch (error) {
+      console.log(error)
+      toast.show('Erreur lors de la récupération des avis', {
+        type: 'error',
+        message:
+          'une erreur est survenue lors de la récupération des avis vérifiez votre connexion',
+        customData: { theme: 'red' },
+      })
+    }
   }
 
   useEffect(() => {
@@ -69,6 +73,12 @@ export const StatsScreen = () => {
       })
       .catch((error) => {
         console.error('Erreur lors de la récupération des métriques:', error)
+        toast.show('Erreur lors de la récupération des métriques', {
+          type: 'error',
+          message:
+            'une erreur est survenue lors de la récupération des métriques vérifiez votre connexion',
+          customData: { theme: 'red' },
+        })
       })
     // axios
     //   .get(
@@ -140,7 +150,6 @@ export const StatsScreen = () => {
         <TableLoadingSkeleton />
       ) : (
         <ReviewTable
-          pageChange={handlePageChange}
           totalCount={totalReviews}
           reviews={reviews}
           loading={reviewsLoading}

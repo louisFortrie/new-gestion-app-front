@@ -1,44 +1,22 @@
-import {
-  styled,
-  YStack,
-  Text,
-  XStack,
-  Label,
-  Stack,
-  Button,
-  Spinner,
-  Switch,
-  Select,
-  getFontSize,
-  FontSizeTokens,
-} from 'tamagui'
+import { styled, YStack, Text, XStack, Label, Stack, Spinner, Switch } from 'tamagui'
 import {
   CustomInput,
   BusinessHoursEditor,
   CustomButton,
-  MediasManagement,
   SpecialBusinessHoursEditor,
   SearchSelect,
+  useToastController,
 } from '@my/ui'
-import { Check, ChevronDown, ChevronUp, SquarePen } from '@tamagui/lucide-icons'
+import { Check } from '@tamagui/lucide-icons'
 import useStores from 'app/hooks/useStores'
-import { memo, useCallback, useEffect, useMemo, useState } from 'react'
+import { memo, useCallback, useEffect, useState } from 'react'
 import axios from 'axios'
-import { LinearGradient } from 'tamagui/linear-gradient'
-import React from 'react'
 
 const MemoizedBusinessHoursEditor = memo(BusinessHoursEditor)
 
 const StyledYstack = styled(YStack, {
   gap: '$2',
   padding: '$2',
-  backgroundColor: 'white',
-  borderRadius: '$4',
-})
-
-const StyledXStack = styled(XStack, {
-  gap: '$2',
-  padding: '$4',
   backgroundColor: 'white',
   borderRadius: '$4',
 })
@@ -51,8 +29,9 @@ const Title = styled(Text, {
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL
 
-type Day = 'MONDAY' | 'TUESDAY' | 'WEDNESDAY' | 'THURSDAY' | 'FRIDAY' | 'SATURDAY' | 'SUNDAY'
 export const Manage = () => {
+  const toast = useToastController()
+
   console.log('render manage')
 
   const [businessHours, setBusinessHours] = useState({
@@ -90,12 +69,6 @@ export const Manage = () => {
     if (loading) return
     setSelectDefaultValue(selectedStore?.title.toLowerCase())
   }, [loading])
-
-  const memoizedStores = useMemo(() => {
-    // Calculer une valeur mémoïsée
-
-    return stores.map((item) => item)
-  }, [stores])
 
   useEffect(() => {
     if (!selectedStore) return
@@ -156,6 +129,15 @@ export const Manage = () => {
       .then((res) => {
         console.log('res', res)
         setIsEditingStoreInfo(false)
+      })
+      .catch((error) => {
+        console.error("Erreur lors de la mise à jour des informations de l'établissement:", error)
+        toast.show("Erreur lors de la mise à jour des informations de l'établissement", {
+          type: 'error',
+          message:
+            "une erreur est survenue lors de la mise à jour des informations de l'établissement vérifiez votre connexion",
+          customData: { theme: 'red' },
+        })
       })
   }
 

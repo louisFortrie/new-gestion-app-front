@@ -10,99 +10,30 @@ import {
   H4,
   YGroup,
   Image,
-  Stack,
   XGroup,
   Separator,
   View,
   Popover,
   Checkbox,
   Label,
+  Spinner,
 } from 'tamagui'
 import { ArrowLeft, ArrowRight, StarFull } from '@tamagui/lucide-icons'
 import { useMemo, useState, useEffect, useRef } from 'react'
 import { HorizontalSheet } from './HorizontalSheet'
 import axios from 'axios'
-import useAuth from 'app/hooks/useAuth'
 import useStores from 'app/hooks/useStores'
 import { Check as CheckIcon } from '@tamagui/lucide-icons'
-import { TableLoadingSkeleton } from './TableLoadingSkeleton'
 import { StarRatingFilter } from '@my/ui'
+import {convertStarRatingToNumber} from 'app/utils/convertions'
 import DateRangePicker from '@wojtekmaj/react-daterange-picker'
 import '@wojtekmaj/react-daterange-picker/dist/DateRangePicker.css'
 import 'react-calendar/dist/Calendar.css'
 
-// Styled components using Tamagui
-const TableContainer = styled(YGroup, {
-  backgroundColor: '$background',
-  borderRadius: '$4',
-  overflow: 'hidden',
-})
-
-const TableHeader = styled(XStack, {
-  padding: '$4',
-  justifyContent: 'space-between',
-  alignItems: 'center',
-  borderWidth: 1,
-  borderColor: '#E2E8F0',
-})
 
 const SearchInput = styled(Input, {
   width: 200,
   backgroundColor: 'transparent',
-})
-
-const Table = styled(YStack, {
-  width: '100%',
-})
-
-const TableRow = styled(XStack, {
-  padding: '$4',
-  borderWidth: 1,
-  borderColor: '#E2E8F0',
-  alignItems: 'center',
-  variants: {
-    isHeader: {
-      true: {
-        backgroundColor: '#F1F5F9',
-      },
-    },
-    isHovered: {
-      true: {
-        backgroundColor: '$backgroundHover',
-      },
-    },
-  } as const,
-})
-
-const TableCell = styled(XStack, {
-  flex: 1,
-  paddingHorizontal: '$2',
-  width: 'calc(100% / 6)',
-  overflow: 'hidden',
-  textOverflow: 'ellipsis',
-  whiteSpace: 'nowrap',
-})
-
-const Tag = styled(XStack, {
-  borderRadius: '$10',
-  paddingHorizontal: '$3',
-  paddingVertical: '$1',
-  variants: {
-    type: {
-      price: {
-        backgroundColor: '$green2Light',
-      },
-      quality: {
-        backgroundColor: '$purple2Light',
-      },
-      service: {
-        backgroundColor: '$blue2Light',
-      },
-      staff: {
-        backgroundColor: '$orange2Light',
-      },
-    },
-  } as const,
 })
 
 const StatusIndicator = styled(XStack, {
@@ -127,52 +58,17 @@ const Dot = styled(XStack, {
   borderRadius: 1000,
 })
 
-const PaginationContainer = styled(XStack, {
-  padding: '$4',
-  justifyContent: 'space-between',
-  alignItems: 'center',
-  borderWidth: 1,
-  borderColor: '#E2E8F0',
-})
 
-const PageButton = styled(Button, {
-  variants: {
-    isActive: {
-      true: {
-        backgroundColor: '$blue4Light',
-      },
-    },
-  } as const,
-})
 
-const convertStarRatingToNumber = (starRating: string) => {
-  switch (starRating) {
-    case 'ONE':
-      return 1
-    case 'TWO':
-      return 2
-    case 'THREE':
-      return 3
-    case 'FOUR':
-      return 4
-    case 'FIVE':
-      return 5
-    default:
-      return 0
-  }
-}
 const apiUrl = process.env.NEXT_PUBLIC_API_URL
 
-export const ReviewTable = ({ reviews, totalCount, pageChange, loading }) => {
+export const ReviewTable = ({ reviews, totalCount, loading }) => {
   const [currentPage, setCurrentPage] = useState(1)
   const [searchQuery, setSearchQuery] = useState('')
   const [responseSheetOpen, setResponseSheetOpen] = useState(false)
   const [selectedReview, setSelectedReview] = useState({})
-  const { user } = useAuth()
   const { selectedStore } = useStores(false)
-
   const itemsPerPage = 10
-  const [hasNextPage, setHasNextPage] = useState(true) // Whether there are more reviews to load
   const [respondedChecked, setRespondedChecked] = useState(true) // Whether the 'responded' checkbox is checked
   const [notRespondedChecked, setNotRespondedChecked] = useState(true) // Whether the 'not responded' checkbox is checked
   const [totalReviewsCount, setTotalReviewsCount] = useState(totalCount)
@@ -225,10 +121,7 @@ export const ReviewTable = ({ reviews, totalCount, pageChange, loading }) => {
     endDate,
   ])
 
-  useEffect(() => {
-    pageChange(currentPage)
-  }, [currentPage])
-
+ 
   useEffect(() => {
     if (!reviews || reviews.length === 0) return
     const startDate = new Date(reviews[reviews.length - 1].createTime)
@@ -346,6 +239,7 @@ export const ReviewTable = ({ reviews, totalCount, pageChange, loading }) => {
           >
             <H4 fontSize={18}>Avis centralisés</H4>
             <XStack gap="$4">
+              {loading && <Spinner color='black' alignSelf='center'/>}
               <SearchInput placeholder="Search" value={searchQuery} onChangeText={setSearchQuery} />
               <Popover allowFlip>
                 <Popover.Trigger asChild>
