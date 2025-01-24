@@ -93,9 +93,7 @@ const Login = () => {
           </Text>
           <Anchor
             color={'#98b548'}
-            onPress={() => {
-              router.push('/privacy')
-            }}
+            href="/privacy"
             hoverStyle={{
               cursor: 'pointer',
             }}
