@@ -1,6 +1,19 @@
 'use client'
 
-import { XStack, YStack, H2, H5, Form, Label, Input, Checkbox, Text, Stack, Spinner } from 'tamagui'
+import {
+  XStack,
+  YStack,
+  H2,
+  H5,
+  Form,
+  Label,
+  Input,
+  Checkbox,
+  Text,
+  Stack,
+  Spinner,
+  Anchor,
+} from 'tamagui'
 import { Check as CheckIcon } from '@tamagui/lucide-icons'
 import { CustomButton, useToastController } from '@my/ui'
 import { useState } from 'react'
@@ -77,6 +90,12 @@ const Login = () => {
               S'inscrire
             </Text>
           </Text>
+          <Anchor
+            color={'#98b548'}
+            href="https://docs.google.com/document/d/e/2PACX-1vTlKkvkYnyfnU6oF8qahqFygfQQGD6x62_VuCed4r7TfO1EE5IWGU_TX8I1HGA8pH2toP5tBNeo1jTA/pub"
+          >
+            Règles de confidentialité
+          </Anchor>
         </YStack>
       </Stack>
       <Stack

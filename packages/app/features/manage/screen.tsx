@@ -7,7 +7,7 @@ import {
   SearchSelect,
   useToastController,
 } from '@my/ui'
-import { Check } from '@tamagui/lucide-icons'
+import { Check, Info } from '@tamagui/lucide-icons'
 import useStores from 'app/hooks/useStores'
 import { memo, useCallback, useEffect, useState } from 'react'
 import axios from 'axios'
@@ -113,6 +113,7 @@ export const Manage = () => {
       ...newLocation,
       regularHours: businessHours,
       specialHours: specialHours,
+      accountId: selectedStore?.accountId,
       ...(phoneNumbersChanged && { phoneNumbers: newStoreInfo.phoneNumbers }), // Inclure phoneNumbers seulement s'ils ont changé
     }
 
@@ -129,6 +130,8 @@ export const Manage = () => {
       .then((res) => {
         console.log('res', res)
         setIsEditingStoreInfo(false)
+        setSelectedStore(res.data.location)
+        localStorage.setItem('selectedStore', JSON.stringify(res.data.location))
       })
       .catch((error) => {
         console.error("Erreur lors de la mise à jour des informations de l'établissement:", error)
@@ -153,13 +156,31 @@ export const Manage = () => {
 
   return (
     <YStack gap={32}>
-      <XStack f={1} justifyContent="space-between">
+      <XStack f={1} gap={32}>
         <YStack>
           <Title>Gérer les informations des fiches d'établissement</Title>
           <Text color={'#535862'} fontSize={14}>
             Mettez à jour les informations de votre d'établissement et assurer leurs consistance
           </Text>
         </YStack>
+        {selectedStore?.metadata?.hasPendingEdits && (
+          <XStack
+            gap={16}
+            backgroundColor={'rgba(245, 208, 39, 0.43)'}
+            alignItems="center"
+            justifyContent="center"
+            borderRadius={'$4'}
+            paddingVertical={'$3'}
+            paddingHorizontal={'$4'}
+          >
+            <Info color={'orange'} />
+            <Text fontWeight={600} color={'orange'}>
+              Une mise à jour des informations doit être validé par Google
+            </Text>
+          </XStack>
+        )}
+
+        <Stack f={1}></Stack>
         <SearchSelect
           options={stores.map((store) => ({
             label: store.title,
@@ -204,7 +225,7 @@ export const Manage = () => {
                 <Stack width={'75%'}>
                   <CustomInput
                     placeholder="Restaurant"
-                    value={newStoreInfo?.categories?.primaryCategory?.displayName}
+                    value={newStoreInfo?.categories?.primaryCategory?.displayName || ''}
                     disabled
                   ></CustomInput>
                 </Stack>
@@ -214,7 +235,7 @@ export const Manage = () => {
               <Stack width={'40%'}>
                 <CustomInput
                   placeholder="www.example.com"
-                  value={newStoreInfo?.websiteUri}
+                  value={newStoreInfo?.websiteUri || ''}
                   onChangeText={(text) => {
                     setNewStoreInfo({ ...newStoreInfo, websiteUri: text })
                     setIsEditingStoreInfo(true)
@@ -226,7 +247,7 @@ export const Manage = () => {
                 <Stack width={'75%'}>
                   <CustomInput
                     placeholder="+33 1 23 45 67 89"
-                    value={newStoreInfo?.phoneNumbers?.primaryPhone}
+                    value={newStoreInfo?.phoneNumbers?.primaryPhone || ''}
                     onChangeText={(text) => {
                       setNewStoreInfo({ ...newStoreInfo, phoneNumbers: { primaryPhone: text } })
                       setIsEditingStoreInfo(true)
@@ -237,7 +258,7 @@ export const Manage = () => {
             </XStack>
             <CustomInput
               placeholder="description"
-              value={newStoreInfo?.profile?.description}
+              value={newStoreInfo?.profile?.description || ''}
               onChangeText={(text) => {
                 setNewStoreInfo({ ...newStoreInfo, profile: { description: text } })
                 setIsEditingStoreInfo(true)
@@ -253,7 +274,7 @@ export const Manage = () => {
       <XStack alignItems="center" gap={32}>
         <Title>Horaires d'ouverture</Title>
         <Switch
-          backgroundColor={'#CDF463'}
+          backgroundColor={isEditingSpecialHours ? '#CDF463' : 'lightgray'}
           size={'$3'}
           onCheckedChange={(checked) => handleIsEditingSpecialHours(checked)}
         >
@@ -272,7 +293,7 @@ export const Manage = () => {
         />
       ) : (
         <MemoizedBusinessHoursEditor
-          businessHours={businessHours}
+          businessHours={selectedStore?.regularHours}
           onBusinessHoursChange={handleBusinessHoursChange}
         ></MemoizedBusinessHoursEditor>
       )}

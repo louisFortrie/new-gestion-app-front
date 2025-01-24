@@ -1,4 +1,4 @@
-import { memo, useCallback, useEffect, useMemo } from 'react'
+import { memo, useCallback, useEffect, useMemo, useState } from 'react'
 import { Button, XStack, YStack, styled, Text, Switch, Stack } from 'tamagui'
 import { CustomSelect } from '@my/ui'
 import { Clock, Plus, Trash } from '@tamagui/lucide-icons'
@@ -157,33 +157,186 @@ export const BusinessHoursEditor = memo(
         acc[period.openDay].push(period)
         return acc
       }, initial)
-    }, [businessHours.periods])
+    }, [businessHours])
 
-    const handleDayToggle = useCallback(
+    const [periodForMonday, setPeriodForMonday] = useState<TimePeriod[]>(periodsByDay['MONDAY'])
+    // useEffect(() => {
+      
+    //   setPeriodForMonday(periodsByDay['MONDAY'])
+    //   console.log('periodsByDay', periodsByDay, periodForMonday);
+      
+    // }, [periodsByDay['MONDAY']])
+
+    const [periodForTuesday, setPeriodForTuesday] = useState<TimePeriod[]>(periodsByDay['TUESDAY'])
+    // useEffect(() => {
+    //   setPeriodForTuesday(periodsByDay['TUESDAY'])
+    // }, [periodsByDay])
+
+    const [periodForWednesday, setPeriodForWednesday] = useState<TimePeriod[]>(periodsByDay['WEDNESDAY'])
+    // useEffect(() => {
+    //   setPeriodForWednesday(periodsByDay['WEDNESDAY'])
+    // }, [periodsByDay])
+
+    const [periodForThursday, setPeriodForThursday] = useState<TimePeriod[]>(periodsByDay['THURSDAY'])
+    // useEffect(() => {
+    //   setPeriodForThursday(periodsByDay['THURSDAY'])
+    // }, [periodsByDay])
+
+    const [periodForFriday, setPeriodForFriday] = useState<TimePeriod[]>(periodsByDay['FRIDAY'])
+    // useEffect(() => {
+    //   setPeriodForFriday(periodsByDay['FRIDAY'])
+    // }, [periodsByDay])
+
+    const [periodForSaturday, setPeriodForSaturday] = useState<TimePeriod[]>(periodsByDay['SATURDAY'])
+    // useEffect(() => {
+    //   setPeriodForSaturday(periodsByDay['SATURDAY'])
+    // }, [periodsByDay])
+
+    const [periodForSunday, setPeriodForSunday] = useState<TimePeriod[]>(periodsByDay['SUNDAY'])
+    useEffect(() => {
+      console.log('resetting periods for sunday');
+      
+      setPeriodForSunday(periodsByDay['SUNDAY'])
+    }, [periodsByDay])
+
+    const handleDayToggle = 
       (checked: boolean, day: Day) => {
-        const newPeriods = Object.entries(periodsByDay).flatMap(([currentDay, periods]) => {
-          if (currentDay === day) {
-            return checked
-              ? [
-                  {
-                    openDay: day,
-                    openTime: {},
-                    closeDay: day,
-                    closeTime: { hours: 24 },
-                  },
-                ]
-              : []
-          }
-          return periods
-        })
 
-        onBusinessHoursChange({ periods: newPeriods })
-      },
-      [periodsByDay, onBusinessHoursChange]
-    )
+        console.log('checked', checked, day);
+        
+        switch (day) {
+          case 'MONDAY':
+            setPeriodForMonday(
+              checked
+                ? [{ openDay: day, openTime: {}, closeDay: day, closeTime: { hours: 24 } }]
+                : []
+            )
+            break
+          case 'TUESDAY':
+            setPeriodForTuesday(
+              checked
+                ? [{ openDay: day, openTime: {}, closeDay: day, closeTime: { hours: 24 } }]
+                : []
+            )
+            break
+          case 'WEDNESDAY':
+            setPeriodForWednesday(
+              checked
+                ? [{ openDay: day, openTime: {}, closeDay: day, closeTime: { hours: 24 } }]
+                : []
+            )
+            break
+          case 'THURSDAY':
+            setPeriodForThursday(
+              checked
+                ? [{ openDay: day, openTime: {}, closeDay: day, closeTime: { hours: 24 } }]
+                : []
+            )
+            break
+          case 'FRIDAY':
+            setPeriodForFriday(
+              checked
+                ? [{ openDay: day, openTime: {}, closeDay: day, closeTime: { hours: 24 } }]
+                : []
+            )
+            break
+          case 'SATURDAY':
+            setPeriodForSaturday(
+              checked
+                ? [{ openDay: day, openTime: {}, closeDay: day, closeTime: { hours: 24 } }]
+                : []
+            )
+            break
+          case 'SUNDAY':
+            setPeriodForSunday(
+              checked
+                ? [{ openDay: day, openTime: {}, closeDay: day, closeTime: { hours: 24 } }]
+                : []
+            )
+            break
+        }
+
+        // const newPeriods = Object.entries(periodsByDay).flatMap(([currentDay, periods]) => {
+        //   if (currentDay === day) {
+        //     return checked
+        //       ? [
+        //           {
+        //             openDay: day,
+        //             openTime: {},
+        //             closeDay: day,
+        //             closeTime: { hours: 24 },
+        //           },
+        //         ]
+        //       : []
+        //   }
+        //   return periods
+        // })
+
+        // onBusinessHoursChange({ periods: newPeriods })
+      }
 
     const handleUpdatePeriod = useCallback(
       (day: Day, index: number, updatedPeriod: TimePeriod) => {
+        console.log('updatedPeriod', updatedPeriod)
+
+        switch (day) {
+          case 'MONDAY':
+            setPeriodForMonday((prev) => {
+              const updated = [...prev]
+              updated[index] = updatedPeriod
+              return updated
+            })
+            break
+          case 'TUESDAY':
+            setPeriodForTuesday((prev) => {
+              const updated = [...prev]
+              updated[index] = updatedPeriod
+              return updated
+            })
+            break
+          case 'WEDNESDAY':
+            setPeriodForWednesday((prev) => {
+              const updated = [...prev]
+              updated[index] = updatedPeriod
+              return updated
+            })
+            break
+          case 'THURSDAY':
+            setPeriodForThursday((prev) => {
+              const updated = [...prev]
+              updated[index] = updatedPeriod
+              return updated
+            })
+            break
+          case 'FRIDAY':
+            setPeriodForFriday((prev) => {
+              const updated = [...prev]
+              updated[index] = updatedPeriod
+              return updated
+            })
+            break
+          case 'SATURDAY':
+            setPeriodForSaturday((prev) => {
+              const updated = [...prev]
+              updated[index] = updatedPeriod
+              return updated
+            })
+            break
+          case 'SUNDAY':
+            setPeriodForSunday((prev) => {
+              const updated = [...prev]
+              updated[index] = updatedPeriod
+              return updated
+            })
+            console.log('sunday', periodForSunday);
+            
+            break
+        }
+        
+
+
+        return
+
         const newPeriods = Object.entries(periodsByDay).flatMap(([currentDay, periods]) => {
           if (currentDay === day) {
             const updatedPeriods = [...periods]
@@ -198,49 +351,190 @@ export const BusinessHoursEditor = memo(
       [periodsByDay, onBusinessHoursChange]
     )
 
+
+
+    useEffect( () => {
+    
+
+      const newPeriods = [
+      ...periodForMonday,
+      ...periodForTuesday,
+      ...periodForWednesday,
+      ...periodForThursday,
+      ...periodForFriday,
+      ...periodForSaturday,
+      ...periodForSunday,
+      ]
+      console.log('newperiods', newPeriods);
+      
+      onBusinessHoursChange({ periods: newPeriods })
+    }, [
+      periodForMonday,
+      periodForTuesday,
+      periodForWednesday,
+      periodForThursday,
+      periodForFriday,
+      periodForSaturday,
+      periodForSunday,
+      
+
+    ])
+
+    const getCorrectPeriodForDay = (day: Day) => {
+      switch (day) {
+        case 'MONDAY':
+          return periodForMonday
+        case 'TUESDAY':
+          return periodForTuesday
+        case 'WEDNESDAY':
+          return periodForWednesday
+        case 'THURSDAY':
+          return periodForThursday
+        case 'FRIDAY':
+          return periodForFriday
+        case 'SATURDAY':
+          return periodForSaturday
+        case 'SUNDAY':
+          return periodForSunday
+      }
+    }
+
     const handleAddPeriod = useCallback(
       (day: Day) => {
-        const newPeriods = Object.entries(periodsByDay).flatMap(([currentDay, periods]) => {
-          if (currentDay === day) {
-            return [
-              ...periods,
-              {
-                openDay: day,
-                openTime: {},
-                closeDay: day,
-                closeTime: { hours: 24 },
-              },
-            ]
-          }
-          return periods
-        })
+        switch (day) {
+          case 'MONDAY':
+            setPeriodForMonday((prev) => [
+              ...prev,
+              { openDay: day, openTime: {}, closeDay: day, closeTime: { hours: 24 } },
+            ])
+            break
+          case 'TUESDAY':
+            setPeriodForTuesday((prev) => [
+              ...prev,
+              { openDay: day, openTime: {}, closeDay: day, closeTime: { hours: 24 } },
+            ])
+            break
+          case 'WEDNESDAY':
+            setPeriodForWednesday((prev) => [
+              ...prev,
+              { openDay: day, openTime: {}, closeDay: day, closeTime: { hours: 24 } },
+            ])
+            break
+          case 'THURSDAY':
+            setPeriodForThursday((prev) => [
+              ...prev,
+              { openDay: day, openTime: {}, closeDay: day, closeTime: { hours: 24 } },
+            ])
+            break
+          case 'FRIDAY':
+            setPeriodForFriday((prev) => [
+              ...prev,
+              { openDay: day, openTime: {}, closeDay: day, closeTime: { hours: 24 } },
+            ])
+            break
+          case 'SATURDAY':
+            setPeriodForSaturday((prev) => [
+              ...prev,
+              { openDay: day, openTime: {}, closeDay: day, closeTime: { hours: 24 } },
+            ])
+            break
+          case 'SUNDAY':
+            setPeriodForSunday((prev) => [
+              ...prev,
+              { openDay: day, openTime: {}, closeDay: day, closeTime: { hours: 24 } },
+            ])
+            break
+        }
 
-        onBusinessHoursChange({ periods: newPeriods })
+        // const newPeriods = Object.entries(periodsByDay).flatMap(([currentDay, periods]) => {
+        //   if (currentDay === day) {
+        //     return [
+        //       ...periods,
+        //       {
+        //         openDay: day,
+        //         openTime: {},
+        //         closeDay: day,
+        //         closeTime: { hours: 24 },
+        //       },
+        //     ]
+        //   }
+        //   return periods
+        // })
+
+        // onBusinessHoursChange({ periods: newPeriods })
       },
       [periodsByDay, onBusinessHoursChange]
     )
 
     const handleRemovePeriod = useCallback(
       (day: Day, index: number) => {
-        const newPeriods = Object.entries(periodsByDay).flatMap(([currentDay, periods]) => {
-          if (currentDay === day) {
-            return periods.filter((_, i) => i !== index)
-          }
-          return periods
-        })
+        switch (day) {
+          case 'MONDAY':
+            setPeriodForMonday((prev) => prev.filter((_, i) => i !== index))
+            break
+          case 'TUESDAY':
+            setPeriodForTuesday((prev) => prev.filter((_, i) => i !== index))
+            break
+          case 'WEDNESDAY':
+            setPeriodForWednesday((prev) => prev.filter((_, i) => i !== index))
+            break
+          case 'THURSDAY':
+            setPeriodForThursday((prev) => prev.filter((_, i) => i !== index))
+            break
+          case 'FRIDAY':
+            setPeriodForFriday((prev) => prev.filter((_, i) => i !== index))
+            break
+          case 'SATURDAY':
+            setPeriodForSaturday((prev) => prev.filter((_, i) => i !== index))
+            break
+          case 'SUNDAY':
+            setPeriodForSunday((prev) => prev.filter((_, i) => i !== index))
+            break
+        }
+        // const newPeriods = Object.entries(periodsByDay).flatMap(([currentDay, periods]) => {
+        //   if (currentDay === day) {
+        //     return periods.filter((_, i) => i !== index)
+        //   }
+        //   return periods
+        // })
 
-        onBusinessHoursChange({ periods: newPeriods })
+        // onBusinessHoursChange({ periods: newPeriods })
       },
       [periodsByDay, onBusinessHoursChange]
     )
 
     return (
       <YStack gap={16}>
-        {(Object.keys(periodsByDay) as Day[]).map((day) => {
-          const isOpen = periodsByDay[day].length > 0
+        {/* <DayContainer key={'MONDAY'} backgroundColor={'red'}>
+          <Text width={100}>{displayDay['MONDAY']}</Text>
+          <XStack alignItems="center" height="fit-content" gap={16}>
+            <Switch
+              backgroundColor={periodForMonday.length > 0 ? '#CDF463' : 'lightgray'}
+              size="$3"
+              checked={periodForMonday.length > 0}
+              onCheckedChange={(checked) => handleDayToggle(checked, 'MONDAY')}
+            >
+              <Switch.Thumb animation="quick" />
+            </Switch>
+            <Text>{periodForMonday.length > 0 ? 'Ouvert' : 'Fermé'}</Text>
+          </XStack>
+          {periodForMonday.length === 0 && <Stack width={'76%'} />}
+          {periodForMonday.length > 0 && (
+            <DayPeriods
+              day={'MONDAY'}
+              periods={periodForMonday}
+              onUpdatePeriod={handleUpdatePeriod}
+              onAddPeriod={handleAddPeriod}
+              onRemovePeriod={handleRemovePeriod}
+            />
+          )}
+        </DayContainer> */}
+
+        {(Object.keys(periodsByDay) as Day[]).map((day, index) => {
+          const isOpen = getCorrectPeriodForDay(day).length > 0
 
           return (
-            <DayContainer key={day}>
+            <DayContainer key={index}>
               <Text width={100}>{displayDay[day]}</Text>
               <XStack alignItems="center" height="fit-content" gap={16}>
                 <Switch
@@ -257,7 +551,7 @@ export const BusinessHoursEditor = memo(
               {isOpen && (
                 <DayPeriods
                   day={day}
-                  periods={periodsByDay[day]}
+                  periods={getCorrectPeriodForDay(day)}
                   onUpdatePeriod={handleUpdatePeriod}
                   onAddPeriod={handleAddPeriod}
                   onRemovePeriod={handleRemovePeriod}
