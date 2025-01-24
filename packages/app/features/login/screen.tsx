@@ -91,9 +91,14 @@ const Login = () => {
               S'inscrire
             </Text>
           </Text>
-          <a color={'#98b548'} href="/privacy">
-            Règles de confidentialité
-          </a>
+          <footer>
+            <p>
+              © 2025 Avistar |{' '}
+              <a href="https://gestion.avistar.fr/privacy" target="_blank">
+                Politique de confidentialité
+              </a>
+            </p>
+          </footer>
         </YStack>
       </Stack>
       <Stack
