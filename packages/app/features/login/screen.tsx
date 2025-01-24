@@ -91,15 +91,9 @@ const Login = () => {
               S'inscrire
             </Text>
           </Text>
-          <Anchor
-            color={'#98b548'}
-            href="/privacy"
-            hoverStyle={{
-              cursor: 'pointer',
-            }}
-          >
+          <a color={'#98b548'} href="/privacy">
             Règles de confidentialité
-          </Anchor>
+          </a>
         </YStack>
       </Stack>
       <Stack
