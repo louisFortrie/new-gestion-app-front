@@ -9,7 +9,7 @@ interface HocLayoutProps extends XStackProps {
 
 const HocLayout: React.FC<HocLayoutProps> = ({ children, ...rest }) => {
   const pathname = usePathname()
-  const isInloginpage = pathname?.startsWith('/login')
+  const isInloginpage = pathname?.startsWith('/login') || pathname?.startsWith('/privacy')
 
   return (
     <XStack {...rest} width={'100%'} position="relative">

@@ -18,13 +18,14 @@ import { Check as CheckIcon } from '@tamagui/lucide-icons'
 import { CustomButton, useToastController } from '@my/ui'
 import { useState } from 'react'
 import useAuth from 'app/hooks/useAuth'
+import { useRouter } from 'solito/navigation'
 
 const Login = () => {
   const [password, setPassword] = useState('')
   const [userName, setUserName] = useState('')
 
   const { login, loading } = useAuth()
-
+  const router = useRouter()
   return (
     <XStack alignItems="center" width={'100%'} justifyContent="space-between">
       <Stack width={'50%'}>
@@ -92,7 +93,12 @@ const Login = () => {
           </Text>
           <Anchor
             color={'#98b548'}
-            href="https://docs.google.com/document/d/e/2PACX-1vTlKkvkYnyfnU6oF8qahqFygfQQGD6x62_VuCed4r7TfO1EE5IWGU_TX8I1HGA8pH2toP5tBNeo1jTA/pub"
+            onPress={() => {
+              router.push('/privacy')
+            }}
+            hoverStyle={{
+              cursor: 'pointer',
+            }}
           >
             Règles de confidentialité
           </Anchor>
