@@ -1,6 +1,6 @@
 'use client'
 
-import { Text, XStack, YStack, Dialog, Stack, Unspaced, Button } from 'tamagui'
+import { Text, XStack, YStack, Dialog, Unspaced, Button } from 'tamagui'
 import { CustomButton, StoreCard } from '@my/ui'
 import useStores from 'app/hooks/useStores'
 import { useRouter } from 'solito/navigation'
@@ -16,6 +16,7 @@ export const StoresListScreen = () => {
   const { stores, setSelectedStore } = useStores()
   const { user } = useAuth()
   const router = useRouter()
+
   const handleSelectStore = (store: any) => {
     localStorage.setItem('selectedStore', JSON.stringify(store))
     setSelectedStore(store)
@@ -31,14 +32,14 @@ export const StoresListScreen = () => {
     if (!user) return
     if (!user.googleAccounts || user.googleAccounts.length === 0 || !stores) {
       setDialogOpen(true)
+      return
     }
-    if (user.googleAccounts) {
-      const googleAccounts = user.googleAccounts
-      const accountsThatNeedRefresh = googleAccounts.filter((account) => account.needsRefresh)
-      if (accountsThatNeedRefresh.length > 0) {
-        setNeedsRefresh(true)
-        setDialogOpen(true)
-      }
+
+    const googleAccounts = user.googleAccounts
+    const accountsThatNeedRefresh = googleAccounts.filter((account) => account.needsRefresh)
+    if (accountsThatNeedRefresh.length > 0) {
+      setNeedsRefresh(true)
+      setDialogOpen(true)
     }
   }, [user])
 
@@ -112,21 +113,20 @@ export const StoresListScreen = () => {
         Choix de la boutique
       </Text>
       <XStack gap={16} flexWrap="wrap" alignItems="center">
-        {stores &&
-          stores.map((store, index) => (
-            <StoreCard
-              key={index}
-              locationId={store.name.split('/')[1]}
-              title={store.title}
-              averageRating={Math.round(store.reviews.averageRating * 10) / 10 || 0}
-              totalReviews={store.reviews.totalReviewCount || 0}
-              imageUrl={store.medias?.[0]?.googleUrl || ''}
-              onPress={() => handleSelectStore(store)}
-              accountId={store.accountId}
-              address={store.storefrontAddress?.addressLines[0]}
-              locality={store.storefrontAddress?.locality}
-            />
-          ))}
+        {stores?.map((store, index) => (
+          <StoreCard
+            key={store.name}
+            locationId={store.name.split('/')[1]}
+            title={store.title}
+            averageRating={Math.round(store.reviews.averageRating * 10) / 10 || 0}
+            totalReviews={store.reviews.totalReviewCount || 0}
+            imageUrl={store.medias?.[0]?.googleUrl || ''}
+            onPress={() => handleSelectStore(store)}
+            accountId={store.accountId}
+            address={store.storefrontAddress?.addressLines[0]}
+            locality={store.storefrontAddress?.locality}
+          />
+        ))}
         <CustomButton width={200} height={200} onPress={handleAddAccount}>
           <Plus></Plus>
         </CustomButton>

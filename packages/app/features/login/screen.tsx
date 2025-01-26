@@ -15,7 +15,7 @@ import {
   Anchor,
 } from 'tamagui'
 import { Check as CheckIcon } from '@tamagui/lucide-icons'
-import { CustomButton, useToastController } from '@my/ui'
+import { CustomButton } from '@my/ui'
 import { useState } from 'react'
 import useAuth from 'app/hooks/useAuth'
 import { useRouter } from 'solito/navigation'
