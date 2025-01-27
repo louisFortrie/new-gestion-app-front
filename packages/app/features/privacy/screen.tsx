@@ -168,6 +168,7 @@ const styles = {
   container: {
     padding: '16px',
     backgroundColor: '#fff',
+    fontFamily: 'Outfit, sans-serif',
   },
   title: {
     fontSize: '24px',

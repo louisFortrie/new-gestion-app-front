@@ -6,8 +6,10 @@ import {
   ChevronDown,
   Cog,
   Dot,
+  Info,
   LayoutDashboard,
   LayoutList,
+  LogIn,
   LogOut,
   MessageSquareMore,
   Settings,
@@ -74,10 +76,12 @@ export const NavBar = () => {
   const [isStoreSelected, setIsStoreSelected] = useState(false)
   const router = useRouter()
   const pathName = usePathname()
-  const { logout } = useAuth()
+  const { logout, user } = useAuth()
 
   const isActive = (path: string) => pathName === path
   const isInStoreListPage = pathName?.startsWith('/stores-list')
+  const isInAboutPage = pathName?.startsWith('/about')
+
   useEffect(() => {
     console.log(selectedStore, 'selectedStore')
 
@@ -94,73 +98,92 @@ export const NavBar = () => {
       <H2 color={'black'} marginBottom={'$10'} alignSelf="flex-start">
         Gstar
       </H2>
-
-      {!isInStoreListPage && isStoreSelected && (
+      {user && (
         <>
-          <StyledButton onPress={() => router.push('/dashboard')} active={isActive('/dashboard')}>
-            <LayoutDashboard color={'black'} />
-            <StyledText>Dashboard</StyledText>
-          </StyledButton>
-          <StyledButton onPress={() => router.push('/manage')} active={isActive('/manage')}>
-            <Store color={'black'} />
-            <StyledText>Gérer</StyledText>
-          </StyledButton>
-          <StyledButton onPress={() => setIsReviewsOpen(!isReviewsOpen)}>
-            <MessageSquareMore color={'black'} />
-            <StyledText>Avis</StyledText>
-            <Stack f={1}></Stack>
-            <ChevronDown
-              color={'black'}
-              transform={isReviewsOpen ? 'rotate(180deg)' : 'rotate(0)'}
-              transition="transform .3s ease"
-            />
-          </StyledButton>
-          {isReviewsOpen && (
-            <YStack gap={4}>
-              <StyledButton active={isActive('/stats')} onPress={() => router.push('/stats')}>
-                <XStack alignItems="center">
-                  <Dot color={'#475569'} />
-                  <StyledText color={'#475569'} fontWeight={400}>
-                    Review management
-                  </StyledText>
-                </XStack>
-              </StyledButton>
+          {!isInStoreListPage && isStoreSelected && (
+            <>
               <StyledButton
-                active={isActive('/templates')}
-                onPress={() => router.push('/templates')}
+                onPress={() => router.push('/dashboard')}
+                active={isActive('/dashboard')}
               >
-                <XStack alignItems="center">
-                  <Dot color={'#475569'} />
-
-                  <StyledText color={'#475569'} fontWeight={400}>
-                    Templates de réponses
-                  </StyledText>
-                </XStack>
+                <LayoutDashboard color={'black'} />
+                <StyledText>Dashboard</StyledText>
               </StyledButton>
-            </YStack>
-          )}
-        </>
-      )}
+              <StyledButton onPress={() => router.push('/manage')} active={isActive('/manage')}>
+                <Store color={'black'} />
+                <StyledText>Gérer</StyledText>
+              </StyledButton>
+              <StyledButton onPress={() => setIsReviewsOpen(!isReviewsOpen)}>
+                <MessageSquareMore color={'black'} />
+                <StyledText>Avis</StyledText>
+                <Stack f={1}></Stack>
+                <ChevronDown
+                  color={'black'}
+                  transform={isReviewsOpen ? 'rotate(180deg)' : 'rotate(0)'}
+                  transition="transform .3s ease"
+                />
+              </StyledButton>
+              {isReviewsOpen && (
+                <YStack gap={4}>
+                  <StyledButton active={isActive('/stats')} onPress={() => router.push('/stats')}>
+                    <XStack alignItems="center">
+                      <Dot color={'#475569'} />
+                      <StyledText color={'#475569'} fontWeight={400}>
+                        Review management
+                      </StyledText>
+                    </XStack>
+                  </StyledButton>
+                  <StyledButton
+                    active={isActive('/templates')}
+                    onPress={() => router.push('/templates')}
+                  >
+                    <XStack alignItems="center">
+                      <Dot color={'#475569'} />
 
-      {/* <StyledButton active={isActive('/help')} onPress={() => router.push('/help')}>
+                      <StyledText color={'#475569'} fontWeight={400}>
+                        Templates de réponses
+                      </StyledText>
+                    </XStack>
+                  </StyledButton>
+                </YStack>
+              )}
+            </>
+          )}
+
+          {/* <StyledButton active={isActive('/help')} onPress={() => router.push('/help')}>
         <ShieldCheck color={'black'} />
         <StyledText>Aide et support</StyledText>
       </StyledButton> */}
-      <Separator alignSelf="stretch" marginVertical={16}></Separator>
+          <Separator alignSelf="stretch" marginVertical={16}></Separator>
 
-      <StyledButton onPress={() => router.push('/stores-list')} active={isActive('/stores-list')}>
-        <LayoutList color={'black'} />
-        <StyledText>Choix de boutique</StyledText>
-      </StyledButton>
+          <StyledButton
+            onPress={() => router.push('/stores-list')}
+            active={isActive('/stores-list')}
+          >
+            <LayoutList color={'black'} />
+            <StyledText>Choix de boutique</StyledText>
+          </StyledButton>
 
-      <StyledButton active={isActive('/settings')} onPress={() => router.push('/settings')}>
-        <User color={'black'} />
-        <StyledText>Comptes</StyledText>
+          <StyledButton active={isActive('/settings')} onPress={() => router.push('/settings')}>
+            <User color={'black'} />
+            <StyledText>Comptes</StyledText>
+          </StyledButton>
+          <StyledButton onPress={() => logout()}>
+            <LogOut color={'black'} />
+            <StyledText>Se déconnecter</StyledText>
+          </StyledButton>
+        </>
+      )}
+      <StyledButton active={isActive('/about')} onPress={() => router.push('/about')}>
+        <Info color={'black'} />
+        <StyledText>à propos</StyledText>
       </StyledButton>
-      <StyledButton onPress={() => logout()}>
-        <LogOut color={'black'} />
-        <StyledText>Se déconnecter</StyledText>
-      </StyledButton>
+      {isInAboutPage && !user && (
+        <StyledButton onPress={() => router.push('/login')}>
+          <LogIn color={'black'} />
+          <StyledText>Se connecter</StyledText>
+        </StyledButton>
+      )}
     </StyledYStack>
   )
 }

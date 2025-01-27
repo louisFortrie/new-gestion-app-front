@@ -91,16 +91,30 @@ const Login = () => {
               S'inscrire
             </Text>
           </Text>
-          <footer>
-            <p>
-              © 2025 Avistar |{' '}
-              <a href="https://gestion.avistar.fr/privacy" target="_blank">
-                Politique de confidentialité
-              </a>
-            </p>
-          </footer>
         </YStack>
       </Stack>
+      <footer
+        style={{
+          position: 'absolute',
+          bottom: 20,
+          left: 0,
+          zIndex: 10,
+          width: '50%',
+          justifyContent: 'center',
+          display: 'flex',
+        }}
+      >
+        <p
+          style={{
+            fontFamily: 'Outfit, sans-serif',
+          }}
+        >
+          © 2025 Avistar |{' '}
+          <a href="https://gestion.avistar.fr/privacy" target="_blank">
+            Politique de confidentialité
+          </a>
+        </p>
+      </footer>
       <Stack
         width={'50%'}
         backgroundImage='url("/login_guy.jpg")'
